@@ -1,0 +1,10 @@
+[X] Paging and virtual memory
+[ ] Module system
+[ ] Process / Application loader
+[ ] API
+[ ] MercuryOS runtime API
+[ ] Terminal
+[ ] Disk driver and file systems
+[ ] MercuryOS website
+[ ] Own executable format (.mre -> Mercury Runtime Executable)
+[ ] Syscalls

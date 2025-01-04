@@ -1,0 +1,14 @@
+kernel/wip
+kernel/build
+kernel/mercury.iso
+kernel/kernel.bin
+bootloader/build
+bootloader/kernel-test
+bootloader/test
+bootloader/kernel.bin
+bootloader/stage2.map
+web
+kernel-cpp
+installer
+mercury_image.img
+*.vdi
