@@ -1,0 +1,4 @@
+#ifndef __MERCURY__CORE__ELF__ELF_LOADER_H
+#define __MERCURY__CORE__ELF__ELF_LOADER_H
+
+#endif

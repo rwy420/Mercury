@@ -8,7 +8,7 @@ build/image.img: stage1 stage2
 	dd if=/dev/zero of=build/image.img  bs=512 count=2880
 	#mkfs.fat -F 12 -n "NBOS" build/image.img
 	dd if=build/stage1.bin of=build/image.img conv=notrunc
-	python ../scripts/bootos_header.py
+	python ../scripts/bootfs/bootos_header.py
 	dd if=../header.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=512
 	dd if=build/stage2.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=4608 #512
 	dd if=kernel.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=5120 #1024
