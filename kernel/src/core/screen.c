@@ -5,11 +5,6 @@
 
 static uint8_t x = 0, y = 0;
 
-/*void sysprintf(string str)
-{
-	asm("int $0x80" : : "a" (4), "b" (str));
-}*/
-
 void printf(string str)
 {
 	uint16_t* video_memory = (uint16_t*) 0xb8000;

@@ -29,7 +29,7 @@ main:
 
 	mov ax, 9 ;0x01
 	mov dl, [drive_number]
-	mov cl, 32
+	mov cl, 40
 	mov bx, 0x8E00
 	call disk_read
 

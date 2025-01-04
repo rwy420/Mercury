@@ -14,9 +14,6 @@ build/%.o: src/%.c
 build/%.o: src/core/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
-build/%.o: src/core/elf/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
-
 build/%.o: src/hardware/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
@@ -36,6 +33,9 @@ build/%.o: src/fs/bootfs/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
 build/%.o: src/memory/%.c
+	gcc $(GPPPARAMS) -o $@ -c $<
+
+build/%.o: src/core/elf/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
 build/%.o: asm/%.s
