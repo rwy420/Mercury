@@ -16,8 +16,4 @@ void read_files()
 	}
 
 	entries = (BootFS_Entry*) buffer;
-<<<<<<< HEAD
-	printf(entries[0].name);
-=======
->>>>>>> d183a15 (ELF32 Loader working)
 }

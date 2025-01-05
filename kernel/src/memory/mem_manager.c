@@ -114,8 +114,6 @@ void free_blocks(uint32_t* address, uint32_t num_blocks)
 
 	used_blocks -= num_blocks;
 }
-<<<<<<< HEAD
-=======
 
 
 
@@ -224,4 +222,3 @@ void free(void* ptr)
     }
     
 }
->>>>>>> d183a15 (ELF32 Loader working)

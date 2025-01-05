@@ -5,14 +5,11 @@
 
 #define ELF_IDENT 16
 
-<<<<<<< HEAD
-=======
 #define EI_MAG0 0x7F
 #define EI_MAG1 'E'
 #define EI_MAG2 'L'
 #define EI_MAG3 'F'
 
->>>>>>> d183a15 (ELF32 Loader working)
 #define SHT_DYNSYM 0xB
 #define SHT_SYMTAB 0x2
 #define SHT_REL 0x9
@@ -22,10 +19,6 @@
 #define ELF32_R_SYM(INFO)	((INFO) >> 8)
 #define ELF32_R_TYPE(INFO)	((uint8_t)(INFO))
 
-<<<<<<< HEAD
-
-=======
->>>>>>> d183a15 (ELF32 Loader working)
 typedef uint16_t Elf32_Half;
 typedef uint32_t Elf32_Off;
 typedef uint32_t Elf32_Addr;

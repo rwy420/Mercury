@@ -81,30 +81,17 @@ void* image_load(char* elf_start, unsigned int size)
     char* taddr;
     void* entry;
     int i = 0;
-<<<<<<< HEAD
-    char* exec;
-
-    hdr = (Elf32_Ehdr *) elf_start;
-    
-    if (!is_image_valid(hdr))
-=======
     uint8_t* exec;
 
     hdr = (Elf32_Ehdr*) elf_start;
 
 	if (!is_image_valid(hdr))
->>>>>>> d183a15 (ELF32 Loader working)
     {
         printf("Invalid ELF image\n");
         return 0;
     }
 
-<<<<<<< HEAD
-	
-    exec = (uint8_t*) alloc_blocks(size / 4096);
-=======
     exec = malloc(size);
->>>>>>> d183a15 (ELF32 Loader working)
 
     if (!exec)
     {
@@ -150,9 +137,5 @@ void* image_load(char* elf_start, unsigned int size)
     int symbol_table_index = find_symbol_table(hdr, shdr);
     entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);
 
-<<<<<<< HEAD
-   return entry;
-=======
 	return entry;
->>>>>>> d183a15 (ELF32 Loader working)
 }
