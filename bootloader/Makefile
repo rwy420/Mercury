@@ -12,6 +12,10 @@ build/image.img: stage1 stage2
 	dd if=../header.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=512
 	dd if=build/stage2.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=4608 #512
 	dd if=kernel.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=5120 #1024
+<<<<<<< HEAD
+=======
+	dd if=../modules/system/module of=build/image.img conv=notrunc oflag=seek_bytes seek=37376
+>>>>>>> d183a15 (ELF32 Loader working)
 	#mcopy -i build/image.img build/stage2.bin "::KERNEL"
 	#mcopy -i build/image.img kernel.bin "::KERNEL"
 

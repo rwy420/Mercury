@@ -1,5 +1,9 @@
 #include <core/screen.h>
 #include <core/types.h>
+<<<<<<< HEAD
+=======
+#include <core/elf/elf_loader.h>
+>>>>>>> d183a15 (ELF32 Loader working)
 #include <memory/gdt.h>
 #include <driver/driver.h>
 #include <driver/ps2/ps2keyboard.h>
@@ -57,6 +61,15 @@ void kernel_main()
 	init_memory_manager(kernel_start_address - mem_manager_size - 0x10000, mem_manager_size);
 	init_memory_region(kernel_start_address - mem_manager_size - 0x10000, mem_manager_size);
 
+<<<<<<< HEAD
+=======
+	heap_init(0x200000, 0x50000);
+
+	//size_t mem_manager_size = 0x50000;
+	//init_memory_manager(kernel_end_address, mem_manager_size);
+	//init_memory_region(kernel_end_address, mem_manager_size);
+
+>>>>>>> d183a15 (ELF32 Loader working)
 	printf("<Mercury> Block manager size: 0x");
 	print_hex((mem_manager_size >> 24) & 0xFF);
 	print_hex((mem_manager_size >> 16) & 0xFF);
@@ -86,5 +99,24 @@ void kernel_main()
 
 	read_files();
 
+<<<<<<< HEAD
+=======
+	uint8_t* buffer = malloc(64*512);
+	memset(buffer, 0x0, sizeof(buffer));
+
+	for(int i = 0; i < 32; i++)
+	{
+		read28(73 + i, (buffer + i * 512), 512);
+	}
+
+	print_hex32((size_t) buffer);
+	printf("\n");
+
+	void(*entry)();
+	entry = image_load((char*) buffer, sizeof(buffer));
+
+	entry();
+
+>>>>>>> d183a15 (ELF32 Loader working)
 	while(1);
 }
