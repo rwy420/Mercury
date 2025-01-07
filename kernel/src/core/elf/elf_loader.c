@@ -67,7 +67,7 @@ void* find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const c
     return 0;
 }
 
-void* image_load(char* elf_start, unsigned int size)
+void* image_load(char* elf_start, unsigned int size, bool debug)
 {
     Elf32_Ehdr* hdr;
     Elf32_Phdr* phdr;
@@ -80,7 +80,7 @@ void* image_load(char* elf_start, unsigned int size)
 
     hdr = (Elf32_Ehdr*) elf_start;
 
-	if (!is_image_valid(hdr))
+	if (!is_elf_image(hdr))
     {
         printf("Invalid ELF image\n");
         return 0;
@@ -131,6 +131,19 @@ void* image_load(char* elf_start, unsigned int size)
 
     int symbol_table_index = find_symbol_table(hdr, shdr);
     entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);
+
+	if(debug)
+	{
+		printf("<ELF32 Loader> ELF32 image at: 0x");
+		print_hex32((uint32_t) elf_start);
+		printf("\n");
+		printf("<ELF32 Loader> ELF32 executable buffer at: 0x");
+		print_hex32((uint32_t) exec);
+		printf("\n");
+		printf("<ELF32 Loader> ELF32 executable entry at: 0x");
+		print_hex32((uint32_t) entry);
+		printf("\n");
+	}
 
 	return entry;
 }

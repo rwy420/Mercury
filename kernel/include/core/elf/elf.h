@@ -81,6 +81,6 @@ typedef struct {
 	Elf32_Word		r_info;
 } __attribute__((packed)) Elf32_Rel;
 
-bool is_image_valid(Elf32_Ehdr* hdr);
+bool is_elf_image(Elf32_Ehdr* hdr);
 
 #endif

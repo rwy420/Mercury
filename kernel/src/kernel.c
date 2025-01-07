@@ -101,12 +101,8 @@ void kernel_main()
 		read28(73 + i, (buffer + i * 512), 512);
 	}
 
-	print_hex32((size_t) buffer);
-	printf("\n");
-
 	void(*entry)();
-	entry = image_load((char*) buffer, sizeof(buffer));
-
+	entry = image_load((char*) buffer, sizeof(buffer), true);
 	entry();
 
 	while(1);
