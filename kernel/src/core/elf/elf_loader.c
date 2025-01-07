@@ -3,11 +3,6 @@
 #include <core/screen.h>
 #include <memory/mem_manager.h>
 
-int is_image_valid(Elf32_Ehdr *hdr)
-{
-    return 1;
-}
-
 void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst)
 {
     Elf32_Rel* rel = (Elf32_Rel*)(src + shdr->sh_offset);
