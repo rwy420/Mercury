@@ -12,3 +12,4 @@ kernel-cpp
 installer
 mercury_image.img
 *.vdi
+bootloader/header.bin
