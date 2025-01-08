@@ -84,6 +84,8 @@ void kernel_main()
 	pci_enumerate_devices();
 	printf("<Mercury> PCI Initialization done\n");
 
+	clear_screen();
+
 	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
 	printf("| |\\/| |/ _ \\ '__/ __| | | | '__| | | | | | \\___ \\ \n");
@@ -102,7 +104,7 @@ void kernel_main()
 	}
 
 	void(*entry)();
-	entry = image_load((char*) buffer, sizeof(buffer), true);
+	entry = image_load((char*) buffer, sizeof(buffer), false);
 	entry();
 
 	while(1);

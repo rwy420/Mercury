@@ -16,4 +16,18 @@ void read_files()
 	}
 
 	entries = (BootFS_Entry*) buffer;
+	/*
+	for(int i = 0; i < 2; i++)
+	{
+		BootFS_Entry* entry = &entries[i];
+
+		printf("<Mercury> Found BootFS entry: ");
+		printf(entry->name);
+		printf(" ranging from disk sector 0x");
+		print_hex32(entry->start);
+		printf(" to 0x");
+		print_hex32(entry->end);
+		printf("\n");
+		printf(entry->type);
+	}*/
 }
