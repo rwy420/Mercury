@@ -16,7 +16,7 @@ void read_files()
 	}
 
 	entries = (BootFS_Entry*) buffer;
-	/*
+	
 	for(int i = 0; i < 2; i++)
 	{
 		BootFS_Entry* entry = &entries[i];
@@ -29,5 +29,5 @@ void read_files()
 		print_hex32(entry->end);
 		printf("\n");
 		printf(entry->type);
-	}*/
+	}
 }

@@ -60,10 +60,6 @@ void kernel_main()
 
 	heap_init(0x200000, 0x50000);
 
-	//size_t mem_manager_size = 0x50000;
-	//init_memory_manager(kernel_end_address, mem_manager_size);
-	//init_memory_region(kernel_end_address, mem_manager_size);
-
 	printf("<Mercury> Block manager size: 0x");
 	print_hex((mem_manager_size >> 24) & 0xFF);
 	print_hex((mem_manager_size >> 16) & 0xFF);
@@ -106,6 +102,5 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load((char*) buffer, sizeof(buffer), false);
 	entry();
-
 	while(1);
 }
