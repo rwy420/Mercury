@@ -31,7 +31,24 @@ void pci_enumerate_devices()
 				uint16_t vendor_id = pci_get_vendor_id(bus, slot, function);
 				if(vendor_id == 0xFFFF) continue;
 
+				struct BAR* bar = pci_get_bar(bus, slot, function, 0);
+
 				uint16_t device_id = pci_get_device_id(bus, slot, function);
+
+				print_hex32(bus);
+				printf(" ");
+				print_hex32(slot);
+				printf(" ");
+				print_hex32(function);
+				printf(" ");
+				print_hex((device_id >> 8) & 0xFF);
+				print_hex(device_id & 0xFF);
+				printf(" ");
+				print_hex((vendor_id >> 8) & 0xFF);
+				print_hex(vendor_id & 0xFF);
+				printf(" ");
+				print_hex32((size_t) bar->address);
+				printf("\n");
 
 				struct Driver* driver = get_driver(vendor_id, device_id);
 
@@ -108,7 +125,7 @@ uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function)
 
 	return result;
 }
-
+*/
 struct BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 {
 	struct BAR* result;
@@ -152,4 +169,4 @@ struct BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16
 	}
 
 	return result;
-}*/
+}

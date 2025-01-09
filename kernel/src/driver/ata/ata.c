@@ -1,4 +1,4 @@
-#include <driver/disk/ata.h>
+#include <driver/ata/ata.h>
 #include <hardware/port.h>
 #include <core/screen.h>
 

@@ -1,5 +1,5 @@
-#ifndef __MERCURY__DRIVER__DISK__ATA_H
-#define __MERCURY__DRIVER__DISK__ATA_H
+#ifndef __MERCURY__DRIVER__ATA__ATA_H
+#define __MERCURY__DRIVER__ATA__ATA_H
 
 #include <core/types.h>
 

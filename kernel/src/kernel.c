@@ -4,13 +4,15 @@
 #include <memory/gdt.h>
 #include <driver/driver.h>
 #include <driver/ps2/ps2keyboard.h>
-#include <driver/disk/ata.h>
+#include <driver/ata/ata.h>
 #include <hardware/interrupts.h>
 #include <hardware/pci.h>
 #include <memory/mem_manager.h>
 #include <memory/common.h>
 #include <memory/paging.h>
 #include <fs/bootfs/bootfs.h>
+
+//#define ATA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
@@ -28,6 +30,7 @@ void kernel_main()
 
 	segments_install_gdt();
 
+#ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
 	{
@@ -44,6 +47,7 @@ void kernel_main()
 
 	/*Disk ata1m = init_disk(0x170, true);
 	Disk ata1s = init_disk(0x170, false);*/
+#endif
 
 	install_idt();
 
@@ -80,7 +84,7 @@ void kernel_main()
 	pci_enumerate_devices();
 	printf("<Mercury> PCI Initialization done\n");
 
-	clear_screen();
+	/*clear_screen();
 
 	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
@@ -88,7 +92,8 @@ void kernel_main()
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
 	printf("                                 |___/ \n"); 
-
+*/
+#ifdef ATA
 	read_files();
 
 	uint8_t* buffer = malloc(64*512);
@@ -102,5 +107,6 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load((char*) buffer, sizeof(buffer), false);
 	entry();
+#endif
 	while(1);
 }

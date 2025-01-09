@@ -1,6 +1,6 @@
 #include <core/screen.h>
 #include <fs/bootfs/bootfs.h>
-#include <driver/disk/ata.h>
+#include <driver/ata/ata.h>
 #include <memory/mem_manager.h>
 
 BootFS_Entry* entries;
