@@ -30,29 +30,6 @@ void pci_enumerate_devices()
 			{
 				uint16_t vendor_id = pci_get_vendor_id(bus, slot, function);
 				if(vendor_id == 0xFFFF) continue;
-
-				struct BAR* bar = pci_get_bar(bus, slot, function, 0);
-
-				uint16_t device_id = pci_get_device_id(bus, slot, function);
-
-				print_hex32(bus);
-				printf(" ");
-				print_hex32(slot);
-				printf(" ");
-				print_hex32(function);
-				printf(" ");
-				print_hex((device_id >> 8) & 0xFF);
-				print_hex(device_id & 0xFF);
-				printf(" ");
-				print_hex((vendor_id >> 8) & 0xFF);
-				print_hex(vendor_id & 0xFF);
-				printf(" ");
-				print_hex32((size_t) bar->address);
-				printf("\n");
-
-				struct Driver* driver = get_driver(vendor_id, device_id);
-
-				if(driver != 0) add_driver(driver);
 			}
 		}
 	}
