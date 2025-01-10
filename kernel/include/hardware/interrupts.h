@@ -2,10 +2,8 @@
 #define __MERCURY__HARDWARE__INTERRUPTS_H
 
 #include <hardware/pic.h>
-#include <hardware/pci.h>
 #include <core/types.h>
 #include <memory/gdt.h>
-#include <core/screen.h>
 #include <hardware/port.h>
 
 struct IDT
@@ -60,7 +58,7 @@ typedef struct
 	uint32_t error;
 } __attribute__((packed)) CPUState;
 
-typedef void (*isr_t)(uint32_t interrupt);
+typedef void (*isr_t)(CPUState* cpu);
 
 void register_interrupt_handler(uint8_t n, isr_t handler);
 void interrupt_handler(CPUState cpu_state, uint32_t interrupt);

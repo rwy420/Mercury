@@ -1,3 +1,4 @@
+#include <syscalls.h>
 #include <core/screen.h>
 #include <core/types.h>
 #include <core/elf/elf_loader.h>
@@ -31,6 +32,10 @@ void kernel_main()
 	segments_install_gdt();
 
 	install_idt();
+
+	printf("<Mercury> Registering syscalls\n");
+	register_interrupt_handler(0x80, syscall);
+	register_syscall_handler(0x4, (syscall_t) syscall_printf);
 
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);

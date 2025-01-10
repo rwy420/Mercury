@@ -2,6 +2,9 @@
 #define __MERCURY__CORE__SCREEN_H
 
 #include <core/types.h>
+#include <hardware/interrupts.h>
+
+void syscall_printf(CPUState* cpu);
 
 void printf(string str);
 void clear_screen();

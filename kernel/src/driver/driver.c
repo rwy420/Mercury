@@ -1,6 +1,5 @@
 #include <driver/driver.h>
 #include <core/screen.h>
-#include <hardware/interrupts.h>
 
 static struct Driver* drivers[256];
 uint8_t driver_index = 0;
@@ -26,17 +25,6 @@ uint8_t create_driver(uint32_t interrupt, string name, enum DriverType type, isr
 	register_interrupt_handler(interrupt, interrupt_handler);
 
 	return driver.id;
-}
-
-void handle_driver_interrupt(uint8_t interrupt)
-{
-	for(uint8_t i = 0; i < driver_index; i++)
-	{
-		if(drivers[i]->interrupt == interrupt && drivers[i]->enabled)
-		{
-			drivers[i]->interrupt_handler(interrupt);
-		}
-	}
 }
 
 void add_driver(struct Driver* driver)

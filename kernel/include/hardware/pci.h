@@ -1,7 +1,6 @@
 #ifndef __MERCURY__HARDWARE__PCI_H
 #define __MERCURY__HARDWARE__PCI_H
 
-#include <hardware/interrupts.h>
 #include <hardware/port.h>
 #include <core/types.h>
 #include <driver/driver.h>

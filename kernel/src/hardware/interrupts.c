@@ -1,7 +1,7 @@
-#include "hardware/pic.h"
-#include "syscalls.h"
 #include <hardware/interrupts.h>
+#include <hardware/pic.h>
 #include <core/screen.h>
+#include <syscalls.h>
 
 #define MASTER_COMMAND_PORT 0x20
 #define SLAVE_COMMAND_PORT 0xA0
@@ -62,15 +62,9 @@ void install_idt()
 
 void interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 {
-	if(interrupt == 0x80) 
-	{
-		handle_syscall(&cpu_state);
-		pic_confirm(interrupt);
-	}
-
 	if(interrupt_handers[interrupt] != (isr_t) 0x00)
 	{
-		interrupt_handers[interrupt](interrupt);
+		interrupt_handers[interrupt](&cpu_state);
 		pic_confirm(interrupt);
 	}
 

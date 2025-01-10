@@ -5,6 +5,11 @@
 
 static uint8_t x = 0, y = 0;
 
+void syscall_printf(CPUState* cpu)
+{
+	printf((string) cpu->ebx);
+}
+
 void printf(string str)
 {
 	uint16_t* video_memory = (uint16_t*) 0xb8000;

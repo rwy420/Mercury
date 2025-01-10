@@ -2,14 +2,24 @@
 #include <hardware/interrupts.h>
 #include <core/screen.h>
 
-void handle_syscall(CPUState* cpu)
-{	
-	switch(cpu->eax)
+syscall_t handlers[256];
+
+void syscall(CPUState* cpu)
+{
+	uint32_t syscall = cpu->eax;
+
+	if(handlers[syscall] == NULL_PTR)
 	{
-		case 4:
-			printf((char*) cpu->ebx);
-			break;
-		default:
-			break;
+		printf("Unhandled syscall 0x");
+		print_hex32(syscall);
+		printf("\n");
+		return;
 	}
+
+	handlers[syscall](cpu);
+}
+
+void register_syscall_handler(uint32_t syscall, syscall_t handler)
+{
+	if(syscall <= 0xFF) handlers[syscall] = handler;
 }
