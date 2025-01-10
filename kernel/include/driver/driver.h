@@ -11,7 +11,8 @@ typedef void (*isr_t)(uint32_t interrupt);
 
 enum DriverType
 {
-	KEYBOARD = 0
+	KEYBOARD = 0,
+	ATA = 1,
 };
 
 struct Driver

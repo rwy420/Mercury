@@ -35,10 +35,10 @@ build/%.o: src/memory/%.c
 build/%.o: src/core/elf/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
-build/%.o: asm/%.s
+build/%.o: arch/x86/%.s
 	as $(ASPARAMS) -o $@ $<
 
-build/%.o: asm/%.asm
+build/%.o: arch/x86/%.asm
 	nasm -felf32 -o $@ $<
 
 kernel.bin: linker.ld $(OBJECTS)

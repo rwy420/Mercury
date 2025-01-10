@@ -30,6 +30,8 @@ void kernel_main()
 
 	segments_install_gdt();
 
+	install_idt();
+
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
@@ -44,12 +46,7 @@ void kernel_main()
 		printf("<Mercury> Selected ata0s as default disk\n");
 		set_default_disk(&ata0s);
 	}
-
-	/*Disk ata1m = init_disk(0x170, true);
-	Disk ata1s = init_disk(0x170, false);*/
 #endif
-
-	install_idt();
 
 	kernel_start_address = (uint32_t) &kernel_start;
 	kernel_end_address = (uint32_t) &kernel_end;
@@ -74,7 +71,7 @@ void kernel_main()
 	printf("<Mercury> Setting up paging\n");
 	paging_enable();
 
-	uint8_t keyboard_driver = create_driver(0x21, "PS2-Keyboard", KEYBOARD, 
+	uint8_t keyboard_driver = create_driver(0x21, "PS2-Keyboard", 0, 
 			ps2_kb_handle_interrupt, ps2_kb_enable, 
 			ps2_kb_disable);
 
@@ -84,7 +81,7 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
 
-	/*clear_screen();
+	clear_screen();
 
 	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
@@ -92,7 +89,7 @@ void kernel_main()
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
 	printf("                                 |___/ \n"); 
-*/
+
 #ifdef ATA
 	read_files();
 

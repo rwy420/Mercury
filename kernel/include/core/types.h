@@ -1,6 +1,8 @@
 #ifndef __MERCURY__CORE__TYPES_H
 #define __MERCURY__CORE__TYPES_H
 
+#define NULL_PTR ((void*) 0)
+
 typedef char int8_t;
 typedef unsigned char uint8_t;
 
