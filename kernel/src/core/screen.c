@@ -73,3 +73,28 @@ void print_hex32(uint32_t h)
 	print_hex((h >> 8) & 0xFF);
 	print_hex( h & 0xFF);
 }
+
+void print_uint8_t(uint8_t value)
+{
+	uint8_t buffer[4];
+	uint8_t_to_string(value, buffer);
+	printf(buffer);
+}
+
+void uint8_t_to_string(uint8_t value, uint8_t* buffer)
+{
+	int i = 0;
+	do
+	{
+		buffer[i++] = '0' + (value % 10);
+		value /= 10;
+	} while(value > 0);
+	buffer[i] = '\0';
+
+	for(int j = 0, k = i - 1; j < k; j++, k--)
+	{
+		char temp = buffer[j];
+		buffer[j] = buffer[k];
+		buffer[k] = temp;
+	}
+}

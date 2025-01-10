@@ -1,5 +1,5 @@
-#include "core/screen.h"
-#include "driver/driver.h"
+#include <core/screen.h>
+#include <driver/driver.h>
 #include <hardware/pci.h>
 
 #define DATA_PORT 0xCFC
@@ -20,16 +20,44 @@ void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset
 	outl(DATA_PORT, value);
 }
 
-void pci_enumerate_devices()
+void pci_enumerate_devices(bool debug)
 {
-	for(uint32_t bus = 0; bus < 256; bus++)
+	for(int bus = 0; bus < 8; bus++)
 	{
-		for(uint32_t slot = 0; slot < 32; slot++)
+		for(int device = 0; device < 32; device++)
 		{
-			for(uint32_t function = 0; function < 8; function++)
+			int function_count = has_functions(bus, device) ? 8 : 1; 
+			for(int function = 0; function < function_count; function++)
 			{
-				uint16_t vendor_id = pci_get_vendor_id(bus, slot, function);
-				if(vendor_id == 0xFFFF) continue;
+				uint16_t vendor_id = pci_get_vendor_id(bus, device, function);
+				uint16_t device_id = pci_get_device_id(bus, device, function);
+				uint32_t port_base = 0x0;
+
+				if(vendor_id == 0x0000 || vendor_id == 0xFFFF) continue;
+
+				for(int bar_idx = 0; bar_idx < 6; bar_idx++)
+				{
+					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
+					if(bar->address && (bar->type == IO)) port_base = (uint32_t) bar->address;
+				}
+
+				if(debug) 
+				{
+					print_hex(bus & 0xFF);
+					printf(" ");
+					print_hex(device & 0xFF);
+					printf(" ");
+					print_hex(function & 0xFF);
+					printf(" ");
+					print_hex((vendor_id & 0xFF00) >> 8);
+					print_hex(vendor_id & 0xFF);
+					printf(" ");
+					print_hex((device_id & 0xFF00) >> 8);
+					print_hex(device_id & 0xFF);
+					printf(" ");
+					print_hex32((uint32_t) port_base);
+					printf("\n");
+				}
 			}
 		}
 	}
@@ -80,32 +108,11 @@ uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function)
 {
 	uint32_t result = pci_read(bus, device, function, 0xA);
 	return (result & ~0xFF00);
-} 
-
-/*struct PCIDeviceDescriptor* pci_get_device_descriptor(uint16_t bus, uint16_t device, uint16_t function)
-{
-	struct PCIDeviceDescriptor* result;
-
-	result->bus = bus;
-	result->device = device;
-	result->function = function;
-
-	result->vendor_id = pci_read(bus, device, function, 0x00);
-	result->device_id = pci_read(bus, device, function, 0x02);
-
-	result->class_id = pci_read(bus, device, function, 0x0B);
-	result->subclass_id = pci_read(bus, device, function, 0x0A);
-	result->interface_id = pci_read(bus, device, function, 0x09);
-	
-	result->revision = pci_read(bus, device, function, 0x08);
-	result->interrupt = pci_read(bus, device, function, 0x3C);
-
-	return result;
 }
-*/
-struct BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
+
+BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 {
-	struct BAR* result;
+	BAR* result;
 
 	uint32_t header_type = pci_read(bus, device, function, 0x0E) & 0x7F;
 	int max_bars = 6 - (4 * header_type);
@@ -146,4 +153,9 @@ struct BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16
 	}
 
 	return result;
+}
+
+bool has_functions(uint16_t bus, uint16_t device)
+{
+	return pci_read(bus, device, 0, 0x0E) & (1 << 7);
 }

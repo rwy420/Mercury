@@ -12,7 +12,7 @@
 #include <memory/paging.h>
 #include <fs/bootfs/bootfs.h>
 
-//#define ATA
+#define ATA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
@@ -81,7 +81,7 @@ void kernel_main()
 	enable_driver(keyboard_driver);
 
 	printf("<Mercury> Searching PCI deivce drivers\n");
-	pci_enumerate_devices();
+	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
 
 	/*clear_screen();
@@ -108,5 +108,6 @@ void kernel_main()
 	entry = image_load((char*) buffer, sizeof(buffer), false);
 	entry();
 #endif
+
 	while(1);
 }

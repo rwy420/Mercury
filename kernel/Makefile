@@ -23,9 +23,6 @@ build/%.o: src/driver/%.c
 build/%.o: src/driver/ps2/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
-build/%.o: src/driver/disk/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
-
 build/%.o: src/driver/ata/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 

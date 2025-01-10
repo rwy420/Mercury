@@ -51,14 +51,7 @@ bool identify_disk(Disk* disk)
 		return false;
 	}
 
-	for(uint16_t i = 0; i < 256; i++)
-	{
-		uint16_t data = inw(DATA_PORT(disk->port_base));
-		char* foo = "  \0";
-		foo[1] = (data >> 8) & 0x00FF;
-		foo[0] = data & 0x00FF;
-		//printf(foo);
-	}
+	for(uint16_t i = 0; i < 256; i++) inw(DATA_PORT(disk->port_base));
 
 	return true;
 }
