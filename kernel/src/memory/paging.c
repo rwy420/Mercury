@@ -1,5 +1,5 @@
+#include <core/types.h>
 #include <memory/paging.h>
-
 #include <memory/mem_manager.h>
 #include <memory/common.h>
 #include <core/screen.h>
@@ -83,7 +83,7 @@ void map_page(void* physical_address, void* virtual_address)
 
 		pd_entry_t* entry = &pd->entries[PD_INDEX((uint32_t) virtual_address)];
 		SET_ATTRIBUTE(entry, PDE_PRESENT);
-		SET_ATTRIBUTE(entry, PDE_RW);
+		//SET_ATTRIBUTE(entry, PDE_RW);
 		SET_FRAME(entry, (uint32_t) table);
 	}
 
@@ -93,6 +93,8 @@ void map_page(void* physical_address, void* virtual_address)
 
 	SET_ATTRIBUTE(page, PTE_PRESENT);
 	SET_FRAME(page, (uint32_t) physical_address);
+
+	flush_tlb_entry((uint32_t) virtual_address);
 }
 
 void unmap_page(void* virtual_address)
@@ -105,49 +107,11 @@ void unmap_page(void* virtual_address)
 void paging_enable()
 {
 	page_directory_t* directory = (page_directory_t*) alloc_blocks(3);
-
 	memset(directory, 0, sizeof(page_directory_t));
-	
 	for(uint32_t i = 0; i < 1024; i++) directory->entries[i] = 0x02;
 
-	/*page_table_t* table = (page_table_t*) alloc_blocks(1);
-
-	page_table_t* table_3g = (page_table_t*) alloc_blocks(1);
-
-	memset(table, 0, sizeof(page_table_t));
-	memset(table, 0, sizeof(page_table_t));
-
-	for(uint32_t i = 0, frame = 0x0, virt = 0x0; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
-	{
-		pt_entry_t page = 0;
-		SET_ATTRIBUTE(&page, PTE_PRESENT);
-		SET_ATTRIBUTE(&page, PTE_RW);
-		SET_FRAME(&page, frame);
-
-		table_3g->entries[PT_INDEX(virt)] = page;
-	}
-	
-	for(uint32_t i = 0, frame = kernel_start_address, virt = 0xC0000000; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
-	{
-		pt_entry_t page = 0;
-		SET_ATTRIBUTE(&page, PTE_PRESENT);
-		SET_ATTRIBUTE(&page, PTE_RW);
-		SET_FRAME(&page, frame);
-
-		table->entries[PT_INDEX(virt)] = page;
-	}
-
-	pd_entry_t* entry = &directory->entries[PD_INDEX(0xC0000000)];
-	SET_ATTRIBUTE(entry, PDE_PRESENT);
-	SET_ATTRIBUTE(entry, PDE_RW);
-	SET_FRAME(entry, (uint32_t) table);
-
-	pd_entry_t* entry2 = &directory->entries[PD_INDEX(0x00000000)];
-	SET_ATTRIBUTE(entry2, PDE_PRESENT);
-	SET_ATTRIBUTE(entry2, PDE_RW);
-	SET_FRAME(entry2, (uint32_t) table_3g);*/
-
 	page_table_t* table = (page_table_t*) alloc_blocks(1);
+	memset(table, 0x0, sizeof(page_table_t));
 
 	for(uint32_t i = 0, frame = 0, virt = 0; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
 	{
@@ -163,7 +127,7 @@ void paging_enable()
 	SET_ATTRIBUTE(entry, PDE_PRESENT);
 	SET_ATTRIBUTE(entry, PDE_RW);
 	SET_FRAME(entry, (uint32_t) table);
-
+	
 	printf("<Mercury> Virtual memory critical step 1 success\n");
 
 	set_page_directory(directory);

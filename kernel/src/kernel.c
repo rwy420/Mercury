@@ -13,7 +13,7 @@
 #include <memory/paging.h>
 #include <fs/bootfs/bootfs.h>
 
-#define ATA
+//#define ATA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
@@ -75,7 +75,7 @@ void kernel_main()
 
 	printf("<Mercury> Setting up paging\n");
 	paging_enable();
-
+	
 	uint8_t keyboard_driver = create_driver(0x21, "PS2-Keyboard", 0, 
 			ps2_kb_handle_interrupt, ps2_kb_enable, 
 			ps2_kb_disable);
@@ -110,6 +110,11 @@ void kernel_main()
 	entry = image_load((char*) buffer, sizeof(buffer), false);
 	entry();
 #endif
+
+	map_page((void*) 0x300000, (void*) 0x600000);
+	((uint8_t*) 0x600000)[0] = 'A';
+
+	__asm__("xchg %BX, %BX");
 
 	while(1);
 }

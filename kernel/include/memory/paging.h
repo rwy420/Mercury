@@ -10,8 +10,8 @@
 #define PD_INDEX(address) ((address) >> 22)
 #define PT_INDEX(address) (((address) >> 12) & 0x3FF) 
 #define PAGE_PHYS_ADDRESS(dir_entry) ((*dir_entry) & ~0xFFF)  
-#define SET_ATTRIBUTE(entry, attr) (*entry |= attr)
-#define CLEAR_ATTRIBUTE(entry, attr) (*entry &= ~attr)
+#define SET_ATTRIBUTE(entry, attr) (*entry |= (attr))
+#define CLEAR_ATTRIBUTE(entry, attr) (*entry &= ~(attr))
 #define TEST_ATTRIBUTE(entry, attr) (*entry & attr)
 #define SET_FRAME(entry, address) (*entry = (*entry & ~0x7FFFF000) | address)
 
@@ -24,12 +24,12 @@ typedef enum
 	PTE_RW				= 0x02,
 	PTE_USER			= 0x04,
 	PTE_WRITE_THROUGH	= 0x08,
-	PTE_CAHCHE_DISABLE	= 0x10,
+	PTE_CACHE_DISABLE	= 0x10,
 	PTE_ACCESSED		= 0x20,
 	PTE_DIRTY			= 0x40,
 	PTE_PAT				= 0x80,
 	PTE_GLOBAL			= 0x100,
-	PTE_FRAME			= 0x7FFFF000,
+	PTE_FRAME			= 0xFFFFF000,
 } PageTableFlags;
 
 typedef enum
