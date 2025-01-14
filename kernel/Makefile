@@ -8,6 +8,12 @@ OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o b
 		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
 		  build/bootfs.o build/elf_loader.o build/elf.o
 
+GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
+		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
+		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
+		  build/bootfs.o build/elf_loader.o build/elf.o
+
+
 build/%.o: src/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
@@ -38,11 +44,17 @@ build/%.o: src/core/elf/%.c
 build/%.o: arch/x86/%.s
 	as $(ASPARAMS) -o $@ $<
 
+build/%.o: arch/grub_x86/%.s
+	as $(ASPARAMS) -o $@ $<
+
 build/%.o: arch/x86/%.asm
 	nasm -felf32 -o $@ $<
 
 kernel.bin: linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
+
+grub: grub_linker.ld $(GRUB_OBJECTS)
+	ld $(LDPARAMS) -T $< -o grub-kernel.bin $(GRUB_OBJECTS)
 
 clean:
 	rm -rf ./build/*

@@ -86,7 +86,7 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
 
-	clear_screen();
+	//clear_screen();
 
 	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
@@ -94,7 +94,7 @@ void kernel_main()
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
 	printf("                                 |___/ \n"); 
-
+	
 #ifdef ATA
 	read_files();
 
@@ -111,10 +111,8 @@ void kernel_main()
 	entry();
 #endif
 
-	map_page((void*) 0x300000, (void*) 0x600000);
-	((uint8_t*) 0x600000)[0] = 'A';
-
-	__asm__("xchg %BX, %BX");
+	//map_page((void*) 0x300000, (void*) 0x600000);
+	//((uint8_t*) 0x600000)[0] = 'A';
 
 	while(1);
 }
