@@ -15,7 +15,7 @@
 #include <fs/bootfs/bootfs.h>
 
 //#define ATA
-#define VGA
+//#define VGA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
@@ -113,9 +113,6 @@ void kernel_main()
 	entry();
 #endif
 
-	//map_page((void*) 0x300000, (void*) 0x600000);
-	//((uint8_t*) 0x600000)[0] = 'A';
-	
 #ifdef VGA
 	vga_set_mode(320, 200, 8);
 	vga_bluescreen();

@@ -1,4 +1,5 @@
 #include <memory/gdt.h>
+#include <core/screen.h>
 
 static struct GDTDescriptor gdt_descriptors[3];
 
@@ -33,4 +34,14 @@ void segments_install_gdt()
 
 	segments_load_gdt(*gdt);
 	segments_load_registers();
+}
+
+uint16_t gdt_code_segment_selector()
+{
+	return (uint8_t*) &gdt_descriptors[1] - (uint8_t*) gdt_descriptors;
+}
+
+uint16_t gdt_data_segment_selector()
+{
+	return (uint8_t*) &gdt_descriptors[2] - (uint8_t*) gdt_descriptors;
 }

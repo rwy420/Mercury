@@ -11,6 +11,6 @@ image:
 grub:
 	cd kernel && make grub
 	mkdir -p iso/boot/grub
-	cp kernel/grub-kernel.bin iso/boot/kernel.bin
+	mv kernel/grub-kernel.bin iso/boot/kernel.bin
 	cp grub.cfg iso/boot/grub/grub.cfg
 	grub-mkrescue -o mercury.iso iso

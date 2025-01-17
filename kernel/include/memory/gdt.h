@@ -25,4 +25,7 @@ void segments_install_gdt();
 void segments_load_gdt(struct GDT gdt);
 void segments_load_registers();
 
+uint16_t gdt_code_segment_selector();
+uint16_t gdt_data_segment_selector();
+
 #endif 
