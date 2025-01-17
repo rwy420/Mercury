@@ -6,6 +6,7 @@
 #include <driver/driver.h>
 #include <driver/ps2/ps2keyboard.h>
 #include <driver/ata/ata.h>
+#include <driver/vga/vga.h>
 #include <hardware/interrupts.h>
 #include <hardware/pci.h>
 #include <memory/mem_manager.h>
@@ -14,6 +15,7 @@
 #include <fs/bootfs/bootfs.h>
 
 //#define ATA
+#define VGA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
@@ -60,9 +62,9 @@ void kernel_main()
 
 	kernel_size = kernel_end_address - kernel_start_address;
 	print_memory_info();
-	size_t mem_manager_size = 512 * 1024;
-	init_memory_manager(kernel_start_address - mem_manager_size - 0x10000, mem_manager_size);
-	init_memory_region(kernel_start_address - mem_manager_size - 0x10000, mem_manager_size);
+	size_t mem_manager_size = 64 * 1024;
+	init_memory_manager(kernel_start_address - mem_manager_size, mem_manager_size);
+	init_memory_region(kernel_start_address - mem_manager_size, mem_manager_size);
 
 	heap_init(0x200000, 0x50000);
 
@@ -113,6 +115,11 @@ void kernel_main()
 
 	//map_page((void*) 0x300000, (void*) 0x600000);
 	//((uint8_t*) 0x600000)[0] = 'A';
+	
+#ifdef VGA
+	vga_set_mode(320, 200, 8);
+	vga_bluescreen();
+#endif
 
 	while(1);
 }

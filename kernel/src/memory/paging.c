@@ -37,8 +37,9 @@ pt_entry_t* get_page(uint32_t virtual_address)
 
 void* alloc_page(pt_entry_t* page)
 {
-	void* block = alloc_blocks(1);
-
+	//void* block = alloc_blocks(1);
+	void* block = malloc(4096);
+	
 	if(block)
 	{
 		SET_FRAME(page, (uint32_t) block);
@@ -52,8 +53,9 @@ void free_page(pt_entry_t* page)
 {
 	void* address = (void*) PAGE_PHYS_ADDRESS(page);
 
-	if(address) free_blocks(address, 1);
-
+	//if(address) free_blocks(address, 1);
+	if(address) free(address);
+	
 	CLEAR_ATTRIBUTE(page, PTE_PRESENT);
 }
 
@@ -77,7 +79,7 @@ void map_page(void* physical_address, void* virtual_address)
 
 	if((*entry & PTE_PRESENT) != PTE_PRESENT)
 	{
-		page_table_t* table = (page_table_t*) alloc_blocks(1);
+		page_table_t* table = (page_table_t*) /*alloc_blocks(1);*/ malloc(4096);
 
 		memset(table, 0, sizeof(page_table_t));
 
@@ -106,11 +108,11 @@ void unmap_page(void* virtual_address)
 
 void paging_enable()
 {
-	page_directory_t* directory = (page_directory_t*) alloc_blocks(3);
+	page_directory_t* directory = (page_directory_t*) alloc_blocks(3); //malloc(4096 * 3);
 	memset(directory, 0, sizeof(page_directory_t));
 	for(uint32_t i = 0; i < 1024; i++) directory->entries[i] = 0x02;
 
-	page_table_t* table = (page_table_t*) alloc_blocks(1);
+	page_table_t* table = (page_table_t*) alloc_blocks(1); //malloc(4096);
 	memset(table, 0x0, sizeof(page_table_t));
 
 	for(uint32_t i = 0, frame = 0, virt = 0; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
