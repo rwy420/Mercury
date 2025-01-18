@@ -26,7 +26,7 @@ void interrupts_init_descriptor(int32_t index, uint32_t address)
 	idt_descriptors[index].offset_high = (address >> 16) & 0xFFFF;
 	idt_descriptors[index].offset_low = (address & 0xFFFF);
 
-	idt_descriptors[index].segment_selector = gdt_code_segment_selector();
+	idt_descriptors[index].segment_selector = 0x08;
 	idt_descriptors[index].reserved = 0x00;
 
 	idt_descriptors[index].type_attribute = (0x01 << 7) | (0x00 << 6) | (0x00 << 5) | 0xE;
