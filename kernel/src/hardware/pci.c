@@ -1,6 +1,7 @@
 #include <core/screen.h>
 #include <driver/driver.h>
 #include <hardware/pci.h>
+#include <memory/mem_manager.h>
 
 #define DATA_PORT 0xCFC
 #define COMMAND_PORT 0xCF8
@@ -39,6 +40,7 @@ void pci_enumerate_devices(bool debug)
 				{
 					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
 					if(bar->address && (bar->type == IO)) port_base = (uint32_t) bar->address;
+					free(bar);
 				}
 
 				if(debug) 
@@ -55,7 +57,7 @@ void pci_enumerate_devices(bool debug)
 					print_hex((device_id & 0xFF00) >> 8);
 					print_hex(device_id & 0xFF);
 					printf(" ");
-					print_hex32((uint32_t) port_base);
+					if(port_base) print_hex32((uint32_t) port_base);
 					printf("\n");
 				}
 			}
@@ -112,7 +114,7 @@ uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function)
 
 BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 {
-	BAR* result;
+	BAR* result = malloc(sizeof(BAR));
 
 	uint32_t header_type = pci_read(bus, device, function, 0x0E) & 0x7F;
 	int max_bars = 6 - (4 * header_type);

@@ -84,19 +84,22 @@ void kernel_main()
 
 	enable_driver(keyboard_driver);
 
+	clear_screen();
+
 	printf("<Mercury> Searching PCI deivce drivers\n");
-	pci_enumerate_devices(false);
+	pci_enumerate_devices(true);
 	printf("<Mercury> PCI Initialization done\n");
 
 	//clear_screen();
-
+	
+	/*
 	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
 	printf("| |\\/| |/ _ \\ '__/ __| | | | '__| | | | | | \\___ \\ \n");
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
 	printf("                                 |___/ \n"); 
-	
+	*/
 #ifdef ATA
 	read_files();
 
