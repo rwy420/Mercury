@@ -90,14 +90,12 @@ void kernel_main()
 
 	//clear_screen();
 	
-	/*
 	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
 	printf("| |\\/| |/ _ \\ '__/ __| | | | '__| | | | | | \\___ \\ \n");
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
-	printf("                                 |___/ \n"); 
-	*/
+	printf("                                 |___/ \n");
 #ifdef ATA
 	read_files();
 
@@ -119,7 +117,5 @@ void kernel_main()
 	vga_bluescreen();
 #endif
 	
-	asm("xchg %BX, %BX");
-
 	while(1);
 }

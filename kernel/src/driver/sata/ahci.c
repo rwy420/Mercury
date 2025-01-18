@@ -123,72 +123,52 @@ int32_t find_cmd_slot(HBA_PORT* port)
 
 bool sata_read(HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buf)
 {
-	port->is = (uint32_t) -1;		// Clear pending interrupt bits
-	int spin = 0; // Spin lock timeout counter
+	port->is = (uint32_t) -1;
+	int spin = 0;
 	int slot = find_cmd_slot(port);
-	if (slot == -1)
-		return false;
+	if (slot == -1) return false;
 	
-	HBA_CMD_HEADER *cmdheader = (HBA_CMD_HEADER*)port->clb;
-	cmdheader += slot;
-	cmdheader->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);	// Command FIS size
-	cmdheader->w = 0;		// Read from device
-	cmdheader->prdtl = (uint16_t)((count-1)>>4) + 1;	// PRDT entries count
-														//
+	HBA_CMD_HEADER *cmd_header = (HBA_CMD_HEADER*) port->clb;
+	cmd_header += slot;
+	cmd_header->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);
+	cmd_header->w = 0;	
+	cmd_header->prdtl = (uint16_t)((count - 1) >> 4) + 1;
 	
-	HBA_CMD_TBL *cmdtbl = (HBA_CMD_TBL*)(cmdheader->ctba);
-	//memset(cmdtbl, 0, sizeof(HBA_CMD_TBL) +
- 	//	(cmdheader->prdtl-1)*sizeof(HBA_PRDT_ENTRY));
-	
-	
+	HBA_CMD_TBL *cmd_tbl = (HBA_CMD_TBL*)(cmd_header->ctba);
+
 	int i = 0;
-	// 8K bytes (16 sectors) per PRDT
-	for (i=0; i<cmdheader->prdtl-1; i++)
+	for (i = 0; i < cmd_header->prdtl - 1; i++)
 	{
-		cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
-		cmdtbl->prdt_entry[i].dbc = 8*1024-1;	// 8K bytes (this value should always be set to 1 less than the actual value)
-		cmdtbl->prdt_entry[i].i = 1;
-		buf += 4*1024;	// 4K words
-		count -= 16;	// 16 sectors
+		cmd_tbl->prdt_entry[i].dba = (uint32_t) buf;
+		cmd_tbl->prdt_entry[i].dbc = 8 * 1024 - 1;
+
+		cmd_tbl->prdt_entry[i].i = 1;
+		buf += 4 * 1024;
+		count -= 16;
 	}
-	// Last entry
-	cmdtbl->prdt_entry[i].dba = (uint32_t) buf;
-	cmdtbl->prdt_entry[i].dbc = (count<<9)-1;	// 512 bytes per sector
-	cmdtbl->prdt_entry[i].i = 1;
 
-	// Setup command
-	FIS_REG_H2D *cmdfis = (FIS_REG_H2D*)(&cmdtbl->cfis);
+	cmd_tbl->prdt_entry[i].dba = (uint32_t) buf;
+	cmd_tbl->prdt_entry[i].dbc = (count << 9) - 1;
+	cmd_tbl->prdt_entry[i].i = 1;
 
-	printf("\n*CMDFIS: ");
-	print_hex32((uint32_t) cmdfis);
+	FIS_REG_H2D *cmd_fis = (FIS_REG_H2D*)(&cmd_tbl->cfis);
 
-	printf("\n*CMDTBL: ");
-	print_hex32((uint32_t) cmdtbl);
-	
-	printf("\n*CMDHDR: ");
-	print_hex32((uint32_t) cmdheader);
+	cmd_fis->fis_type = FIS_TYPE_REG_H2D;
+	cmd_fis->c = 1;
+	cmd_fis->command = ATA_CMD_READ_DMA_EX;
 
+	cmd_fis->lba0 = (uint8_t) startl;
+	cmd_fis->lba1 = (uint8_t)(startl >> 8);
+	cmd_fis->lba2 = (uint8_t)(startl >> 16);
+	cmd_fis->device = 1 << 6;
 
-	printf("*\n");
+	cmd_fis->lba3 = (uint8_t)(startl >> 24);
+	cmd_fis->lba4 = (uint8_t) starth;
+	cmd_fis->lba5 = (uint8_t)(starth >> 8);
 
-	cmdfis->fis_type = FIS_TYPE_REG_H2D;
-	cmdfis->c = 1;	// Command
-	cmdfis->command = ATA_CMD_READ_DMA_EX;
+	cmd_fis->countl = count & 0xFF;
+	cmd_fis->counth = (count >> 8) & 0xFF;
 
-	cmdfis->lba0 = (uint8_t)startl;
-	cmdfis->lba1 = (uint8_t)(startl>>8);
-	cmdfis->lba2 = (uint8_t)(startl>>16);
-	cmdfis->device = 1<<6;	// LBA mode
-
-	cmdfis->lba3 = (uint8_t)(startl>>24);
-	cmdfis->lba4 = (uint8_t)starth;
-	cmdfis->lba5 = (uint8_t)(starth>>8);
-
-	cmdfis->countl = count & 0xFF;
-	cmdfis->counth = (count >> 8) & 0xFF;
-
-	
-	// The below loop waits until the port is no longer busy before issuing a new command
 	while ((port->tfd & (ATA_DEV_BUSY | ATA_DEV_DRQ)) && spin < 1000000)
 	{
 		spin++;
@@ -199,23 +179,19 @@ bool sata_read(HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count,
 		return false;
 	}
 
-	port->ci = 1<<slot;	// Issue command
+	port->ci = 1 << slot;
 
-	// Wait for completion
 	while (1)
 	{
-		// In some longer duration reads, it may be helpful to spin on the DPS bit 
-		// in the PxIS port field as well (1 << 5)
 		if ((port->ci & (1<<slot)) == 0) 
 			break;
-		if (port->is & HBA_PxIS_TFES)	// Task file error
+		if (port->is & HBA_PxIS_TFES)
 		{
 			printf("Read disk error\n");
 			return false;
 		}
 	}
 
-	// Check again
 	if (port->is & HBA_PxIS_TFES)
 	{
 		printf("Read disk error\n");
@@ -223,5 +199,4 @@ bool sata_read(HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count,
 	}
 
 	return true;
-
 }

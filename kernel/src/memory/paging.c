@@ -37,8 +37,7 @@ pt_entry_t* get_page(uint32_t virtual_address)
 
 void* alloc_page(pt_entry_t* page)
 {
-	//void* block = alloc_blocks(1);
-	void* block = malloc(4096);
+	void* block = alloc_blocks(1);
 	
 	if(block)
 	{
@@ -53,8 +52,7 @@ void free_page(pt_entry_t* page)
 {
 	void* address = (void*) PAGE_PHYS_ADDRESS(page);
 
-	//if(address) free_blocks(address, 1);
-	if(address) free(address);
+	if(address) free_blocks(address, 1);
 	
 	CLEAR_ATTRIBUTE(page, PTE_PRESENT);
 }
