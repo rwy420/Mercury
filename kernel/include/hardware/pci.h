@@ -14,7 +14,7 @@ enum BARType
 typedef struct
 {
 	bool prefetchable;
-	uint8_t* address;
+	uint32_t address;
 	uint32_t size;
  	enum BARType type;
 } __attribute__((packed)) BAR;

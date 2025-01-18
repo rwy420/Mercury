@@ -84,10 +84,8 @@ void kernel_main()
 
 	enable_driver(keyboard_driver);
 
-	clear_screen();
-
 	printf("<Mercury> Searching PCI deivce drivers\n");
-	pci_enumerate_devices(true);
+	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
 
 	//clear_screen();
@@ -120,6 +118,8 @@ void kernel_main()
 	vga_set_mode(320, 200, 8);
 	vga_bluescreen();
 #endif
+	
+	asm("xchg %BX, %BX");
 
 	while(1);
 }

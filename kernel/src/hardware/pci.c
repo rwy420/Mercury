@@ -1,7 +1,9 @@
-#include <core/screen.h>
-#include <driver/driver.h>
 #include <hardware/pci.h>
 #include <memory/mem_manager.h>
+#include <memory/paging.h>
+#include <driver/sata/sata.h>
+#include <core/screen.h>
+#include <driver/driver.h>
 
 #define DATA_PORT 0xCFC
 #define COMMAND_PORT 0xCF8
@@ -36,10 +38,22 @@ void pci_enumerate_devices(bool debug)
 
 				if(vendor_id == 0x0000 || vendor_id == 0xFFFF) continue;
 
-				for(int bar_idx = 0; bar_idx < 6; bar_idx++)
+				for(uint8_t bar_idx = 0; bar_idx < 6; bar_idx++)
 				{
 					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
-					if(bar->address && (bar->type == IO)) port_base = (uint32_t) bar->address;
+					if(bar->address && (bar->type == IO)) 
+					{
+						port_base = bar->address;
+					}
+					
+					if(bar->type == MM)
+					{
+						if(bar->address && bar_idx == 5)
+						{
+							port_base = bar->address;
+						}
+					}
+
 					free(bar);
 				}
 
@@ -57,8 +71,24 @@ void pci_enumerate_devices(bool debug)
 					print_hex((device_id & 0xFF00) >> 8);
 					print_hex(device_id & 0xFF);
 					printf(" ");
-					if(port_base) print_hex32((uint32_t) port_base);
+					if(port_base) print_hex32(port_base);
 					printf("\n");
+				}
+
+				switch(vendor_id)
+				{
+					case 0x8086:
+						switch (device_id)
+						{
+							case 0x2829:
+								for(int page = 0; page < 6; page++)
+								{
+									map_page((void*)(port_base + (4096 * page)), (void*)(port_base + (4096 * page)));
+								}
+								init_sata(port_base);
+							break;
+						}
+					break;
 				}
 			}
 		}
@@ -67,23 +97,7 @@ void pci_enumerate_devices(bool debug)
 
 struct Driver* get_driver(uint16_t vendor, uint16_t device)
 {
-	switch(vendor)
-	{
-		case 0x1022: // AMD
-		{
-			switch(device)
-			{
-				case 0x2000: //79c970
-					break;
-			}
-			break;
-		}
 
-		case 0x8086: // Intel
-		{
-
-		}
-	}
 	
 	return 0;
 }
@@ -127,30 +141,12 @@ BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 
 	if(result->type == MM)
 	{
-		switch ((bar_value >> 1) & 0x3)
-		{
-			case 0:
-			{
-				// 32 Bit mode
-				break;
-			}
-			case 1:
-			{
-				// 20 Bit mode
-				break;
-			}
-			case 2:
-			{
-				// 64 Bit mode
-				break;
-			}
-		}
+		result->address = bar_value & 0xFFFFFFF0;
 		result->prefetchable = ((bar_value >> 3) & 0x1) == 0x1;
 	}
 	else
 	{
-		// IO
-		result->address = (uint8_t*) (bar_value & ~0x3);
+		result->address = bar_value & ~0x3;
 		result->prefetchable = false;
 	}
 

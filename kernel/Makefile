@@ -6,12 +6,12 @@ LDPARAMS = -melf_i386
 OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
 		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
-		  build/bootfs.o build/elf_loader.o build/elf.o build/vga.o
+		  build/bootfs.o build/elf_loader.o build/elf.o build/vga.o build/sata.o build/ahci.o
 
 GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
 		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
-		  build/bootfs.o build/elf_loader.o build/elf.o build/vga.o
+		  build/bootfs.o build/elf_loader.o build/elf.o build/vga.o build/sata.o build/ahci.o
 
 
 build/%.o: src/%.c
@@ -30,6 +30,9 @@ build/%.o: src/driver/ps2/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/vga/%.c
+	gcc $(GPPPARAMS) -o $@ -c $<
+
+build/%.o: src/driver/sata/%.c
 	gcc $(GPPPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/ata/%.c

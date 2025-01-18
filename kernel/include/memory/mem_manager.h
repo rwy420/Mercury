@@ -20,4 +20,7 @@ void heap_init(size_t start, size_t size);
 void* malloc(size_t size);
 void free(void* pointer);
 
+void* malloc_aligned(size_t alignment, size_t size);
+void free_aligned(void* pointer);
+
 #endif

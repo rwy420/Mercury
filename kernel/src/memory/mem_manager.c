@@ -222,3 +222,18 @@ void free(void* ptr)
     }
     
 }
+
+void* malloc_aligned(size_t alignment, size_t size)
+{
+	void* pointer = malloc(size + alignment - 1 + sizeof(void*));
+	void** aligned_pointer = (void**)((void*) pointer + alignment - 1 + sizeof(void*));
+	aligned_pointer[-1] = pointer;
+
+	return (void*)(((size_t) aligned_pointer) & ~(alignment - 1));
+}
+
+void free_aligned(void* pointer)
+{
+	void* original_pointer = ((void**) pointer)[-1];
+	free(original_pointer);
+}
