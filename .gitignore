@@ -12,3 +12,4 @@ mercury_image.img
 iso/
 bootloader/header.bin
 .ignore
+build

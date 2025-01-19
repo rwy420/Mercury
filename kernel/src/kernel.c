@@ -14,7 +14,7 @@
 #include <memory/paging.h>
 #include <fs/bootfs/bootfs.h>
 
-//#define ATA
+#define ATA
 //#define VGA
 
 extern uint8_t kernel_start;
