@@ -1,1 +1,1 @@
-__attribute__((weak)) void printf(const char* name);
+__attribute__((weak)) void printf(const char*);
