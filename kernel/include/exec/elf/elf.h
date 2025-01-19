@@ -1,5 +1,5 @@
-#ifndef __MERCURY__CORE__ELF__ELF_C
-#define __MERCURY__CORE__ELF__ELF_C
+#ifndef __MERCURY__EXEC__ELF__ELF_H
+#define __MERCURY__EXEC__ELF__ELF_H
 
 #include <core/types.h>
 
@@ -15,6 +15,9 @@
 #define SHT_REL 0x9
 
 #define PT_LOAD 0x1
+
+#define R_386_GLOB_DAT 6
+#define R_386_JMP_SLOT 7
 
 #define ELF32_R_SYM(INFO)	((INFO) >> 8)
 #define ELF32_R_TYPE(INFO)	((uint8_t)(INFO))

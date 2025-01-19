@@ -1,7 +1,7 @@
 #include <syscalls.h>
 #include <core/screen.h>
 #include <core/types.h>
-#include <core/elf/elf_loader.h>
+#include <exec/elf/elf_loader.h>
 #include <memory/gdt.h>
 #include <driver/driver.h>
 #include <driver/ps2/ps2keyboard.h>
@@ -90,12 +90,12 @@ void kernel_main()
 
 	//clear_screen();
 	
-	printf(" __  __                                 ___  ____ \n");
+	/*printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
 	printf("| |\\/| |/ _ \\ '__/ __| | | | '__| | | | | | \\___ \\ \n");
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
-	printf("                                 |___/ \n");
+	printf("                                 |___/ \n");*/
 #ifdef ATA
 	read_files();
 

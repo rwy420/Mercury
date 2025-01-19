@@ -1,4 +1,4 @@
-#include <core/elf/elf.h>
+#include <exec/elf/elf.h>
 
 bool is_elf_image(Elf32_Ehdr *hdr)
 {

@@ -1,7 +1,8 @@
-#include <core/elf/elf_loader.h>
+#include <exec/elf/elf.h>
 #include <memory/common.h>
 #include <core/screen.h>
 #include <memory/mem_manager.h>
+#include <exec/elf/symtable.h>
 
 void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst)
 {
@@ -10,16 +11,14 @@ void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, cons
     for(int j = 0; j < shdr->sh_size / sizeof(Elf32_Rel); j += 1)
     {
         const char* sym = strings + syms[ELF32_R_SYM(rel[j].r_info)].st_name;
-
-		/*
+		
         switch (ELF32_R_TYPE(rel[j].r_info))
         {
             case R_386_JMP_SLOT:
+				*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
             case R_386_GLOB_DAT:
-                (Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word)resolve(sym);
                 break;
         }
-		*/
     }
 }
 
@@ -82,7 +81,7 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
 
 	if (!is_elf_image(hdr))
     {
-        printf("Invalid ELF image\n");
+        printf("<ELF> Invalid ELF image\n");
         return 0;
     }
 
@@ -90,7 +89,7 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
 
     if (!exec)
     {
-        printf("Error allocating memory\n");
+        printf("<ELF> Error allocating memory\n");
         return 0;
     }
 
@@ -134,13 +133,13 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
 
 	if(debug)
 	{
-		printf("<ELF32 Loader> ELF32 image at: 0x");
+		printf("<ELF> ELF32 image at: 0x");
 		print_hex32((uint32_t) elf_start);
 		printf("\n");
-		printf("<ELF32 Loader> ELF32 executable buffer at: 0x");
+		printf("<ELF> ELF32 executable buffer at: 0x");
 		print_hex32((uint32_t) exec);
 		printf("\n");
-		printf("<ELF32 Loader> ELF32 executable entry at: 0x");
+		printf("<ELF> ELF32 executable entry at: 0x");
 		print_hex32((uint32_t) entry);
 		printf("\n");
 	}

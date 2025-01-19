@@ -34,7 +34,7 @@ void* memmove(void* dest, const void* src, size_t len)
 bool strcmp(const char *a, const char *b)
 {
     while (*a && *a == *b) { ++a; ++b; }
-    return (int)(unsigned char)(*a) - (int)(unsigned char)(*b);
+    return ((int)(unsigned char)(*a) - (int)(unsigned char)(*b));
 }
 
 void print_memory_info()
