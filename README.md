@@ -5,7 +5,8 @@ Check kernel/TODO.txt for future features.
 Report problems or give suggestions [Here](https://github.com/rwy420/MercuryOS/issues) (Issue page)
 
 To run the kernel (VirtualBox):
-
+    
+    make setup
     make image
     VBoxManage convertdd ./mercury_image.img mercury.vdi --format VDI
 Then just simply add the VDI as a hard drive to an empty virtual machine in VirtualBox.

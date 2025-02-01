@@ -2,7 +2,17 @@ clean:
 	cd kernel && make clean
 	cd bootloader && make clean
 
+setup: fs.bin
+	cd scripts/mercuryfs && make toolkit
+	mv scripts/mercuryfs/fs ./mercuryfs-toolkit
+	./mercuryfs-toolkit mkroot
+	./mercuryfs-toolkit wroot
+
+fs.bin:
+	dd if=/dev/zero of=fs.bin bs=1 count=687109
+
 image:
+	cd mercury && make mercury
 	cd kernel && make kernel.bin
 	cp kernel/kernel.bin bootloader
 	cd bootloader && make
