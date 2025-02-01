@@ -29,13 +29,13 @@ uint32_t mem_manager_end;
 void kernel_main()
 {
 	clear_screen();
-	printf("<Mercury> Loading MercuryOS... \n");
+	printf("<Quicksilver> Loading Quicksilver kernel... \n");
 
 	segments_install_gdt();
 
 	install_idt();
 
-	printf("<Mercury> Registering syscalls\n");
+	printf("<Quicksilver> Registering syscalls\n");
 	register_interrupt_handler(0x80, syscall);
 	register_syscall_handler(0x4, (syscall_t) syscall_printf);
 
@@ -43,14 +43,14 @@ void kernel_main()
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
 	{
-		printf("<Mercury> Selected ata0m as default disk\n");
+		printf("<Quicksilver> Selected ata0m as default disk\n");
 		set_default_disk(&ata0m);
 	}
 
 	Disk ata0s = init_disk(0x1F0, false);
 	if(identify_disk(&ata0s))
 	{
-		printf("<Mercury> Selected ata0s as default disk\n");
+		printf("<Quicksilver> Selected ata0s as default disk\n");
 		set_default_disk(&ata0s);
 	}
 #endif
@@ -68,14 +68,14 @@ void kernel_main()
 
 	heap_init(0x200000, 0x50000);
 
-	printf("<Mercury> Block manager size: 0x");
+	printf("<Quicksilver> Block manager size: 0x");
 	print_hex((mem_manager_size >> 24) & 0xFF);
 	print_hex((mem_manager_size >> 16) & 0xFF);
 	print_hex((mem_manager_size >> 8) & 0xFF);
 	print_hex(mem_manager_size & 0xFF);
 	printf("\n");
 
-	printf("<Mercury> Setting up paging\n");
+	printf("<Quicksilver> Setting up paging\n");
 	paging_enable();
 	
 	uint8_t keyboard_driver = create_driver(0x21, "PS2-Keyboard", 0, 
@@ -84,9 +84,9 @@ void kernel_main()
 
 	enable_driver(keyboard_driver);
 
-	printf("<Mercury> Searching PCI deivce drivers\n");
+	printf("<Quicksilver> Searching PCI deivce drivers\n");
 	pci_enumerate_devices(false);
-	printf("<Mercury> PCI Initialization done\n");
+	printf("<Quicksilver> PCI Initialization done\n");
 
 	//clear_screen();
 	

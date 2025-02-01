@@ -127,17 +127,8 @@ void paging_enable()
 	SET_ATTRIBUTE(entry, PDE_PRESENT);
 	SET_ATTRIBUTE(entry, PDE_RW);
 	SET_FRAME(entry, (uint32_t) table);
-	
-	printf("<Mercury> Virtual memory critical step 1 success\n");
-
 	set_page_directory(directory);
-
-	printf("<Mercury> Virtual memory critical step 2 success\n");
-
 	__asm__ __volatile__ ("orl $0x80000011, %EAX; movl %EAX, %CR0");
-
-	printf("<Mercury> Virtual memory critical step 3 success\n");
-
 	register_interrupt_handler(14, handle_page_fault);
 }
 

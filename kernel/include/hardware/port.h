@@ -1,5 +1,5 @@
-#ifndef __MERCURY__HARDWARE__PORT_H
-#define __MERCURY__HARDWARE__PORT_H
+#ifndef __QS__HARDWARE__PORT_H
+#define __QS__HARDWARE__PORT_H
 
 #include <core/types.h>
 

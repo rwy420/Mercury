@@ -1,5 +1,5 @@
-#ifndef __MERCURYOS__MEMORY__PAGING_H
-#define __MERCURYOS__MEMORY__PAGING_H
+#ifndef __QS__MEMORY__PAGING_H
+#define __QS__MEMORY__PAGING_H
 
 #include <core/types.h>
 

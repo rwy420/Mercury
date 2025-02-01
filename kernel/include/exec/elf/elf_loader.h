@@ -1,5 +1,5 @@
-#ifndef __MERCURY__EXEC__ELF__ELF_LOADER_H
-#define __MERCURY__EXEC__ELF__ELF_LOADER_H
+#ifndef __QS__EXEC__ELF__ELF_LOADER_H
+#define __QS__EXEC__ELF__ELF_LOADER_H
 
 #include <core/types.h>
 #include <exec/elf/elf.h>

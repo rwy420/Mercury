@@ -1,5 +1,5 @@
-#ifndef __MERCURY__FS__BOOTFS__BOOTFS_H
-#define __MERCURY__FS__BOOTFS__BOOTFS_H
+#ifndef __QS__FS__BOOTFS__BOOTFS_H
+#define __QS__FS__BOOTFS__BOOTFS_H
 
 #include <core/types.h>
 

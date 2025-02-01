@@ -39,21 +39,21 @@ bool strcmp(const char *a, const char *b)
 
 void print_memory_info()
 {
-	printf("<Mercury> Kernel start: 0x");
+	printf("<Quicksilver> Kernel start: 0x");
 	print_hex((kernel_start_address >> 24) & 0xFF);
 	print_hex((kernel_start_address >> 16) & 0xFF);
 	print_hex((kernel_start_address >> 8) & 0xFF);
 	print_hex(kernel_start_address & 0xFF);
 	printf("\n");
 
-	printf("<Mercury> Kernel end: 0x");
+	printf("<Quicksilver> Kernel end: 0x");
 	print_hex((kernel_end_address >> 24) & 0xFF);
 	print_hex((kernel_end_address >> 16) & 0xFF);
 	print_hex((kernel_end_address >> 8) & 0xFF);
 	print_hex(kernel_end_address & 0xFF);
 	printf("\n");
 
-	printf("<Mercury> Kernel size: 0x");
+	printf("<Quicksilver> Kernel size: 0x");
 	print_hex((kernel_size >> 24) & 0xFF);
 	print_hex((kernel_size >> 16) & 0xFF);
 	print_hex((kernel_size >> 8) & 0xFF);

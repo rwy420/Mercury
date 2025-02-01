@@ -1,5 +1,5 @@
-#ifndef __MERCURY__HARDWARE__PCI_H
-#define __MERCURY__HARDWARE__PCI_H
+#ifndef __QS__HARDWARE__PCI_H
+#define __QS__HARDWARE__PCI_H
 
 #include <hardware/port.h>
 #include <core/types.h>

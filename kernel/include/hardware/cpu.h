@@ -1,5 +1,5 @@
-#ifndef __MERCURY__HARDWARE__CPU_H
-#define __MERCURY__HARDWARE__CPU_H
+#ifndef __QS__HARDWARE__CPU_H
+#define __QS__HARDWARE__CPU_H
 /*
 #include <core/types.h>
 

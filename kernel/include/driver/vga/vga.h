@@ -1,5 +1,5 @@
-#ifndef __MERCURY__DRIVER__VGA__VGA_H
-#define __MERCURY__DRIVER__VGA__VGA_H
+#ifndef __QS__DRIVER__VGA__VGA_H
+#define __QS__DRIVER__VGA__VGA_H
 
 #define MISC_PORT 0x3C2
 #define CRTC_INDEX_PORT 0x3D4
