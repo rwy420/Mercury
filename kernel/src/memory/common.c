@@ -31,6 +31,17 @@ void* memmove(void* dest, const void* src, size_t len)
 	return dest;
 }
 
+void memcpy(void* dest, void* src, size_t n)
+{
+	uint8_t* csrc = (uint8_t*) src;
+	uint8_t* cdest = (uint8_t*) dest;
+
+	for(uint32_t i = 0; i < n; i++)
+	{
+		cdest[i] = csrc[i];
+	}
+}
+
 bool strcmp(const char *a, const char *b)
 {
     while (*a && *a == *b) { ++a; ++b; }

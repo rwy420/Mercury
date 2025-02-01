@@ -1,6 +1,7 @@
 clean:
 	cd kernel && make clean
 	cd bootloader && make clean
+	rm build/mercury_image.img
 
 setup: fs.bin
 	cd scripts/mercuryfs && make toolkit
@@ -20,6 +21,9 @@ image:
 
 vdi: image
 	dd if=build/mercury_image.img of=build/disk.vdi conv=notrunc oflag=seek_bytes seek=2097152
+
+clean_disk:
+	dd if=/dev/zero of=build/disk.vdi conv=notrunc  bs=1 count=10MB oflag=seek_bytes seek=2097152
 
 grub:
 	cd kernel && make grub

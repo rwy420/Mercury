@@ -13,6 +13,7 @@
 #include <memory/common.h>
 #include <memory/paging.h>
 #include <fs/bootfs/bootfs.h>
+#include <fs/mercuryfs/mercuryfs.h>
 
 #define ATA
 //#define VGA
@@ -66,7 +67,7 @@ void kernel_main()
 	init_memory_manager(kernel_start_address - mem_manager_size, mem_manager_size);
 	init_memory_region(kernel_start_address - mem_manager_size, mem_manager_size);
 
-	heap_init(0x200000, 0x50000);
+	heap_init(0x200000, 0x200000);
 
 	printf("<Quicksilver> Block manager size: 0x");
 	print_hex((mem_manager_size >> 24) & 0xFF);
@@ -107,15 +108,35 @@ void kernel_main()
 		read28(73 + i, (buffer + i * 512), 512);
 	}
 
-	void(*entry)();
-	entry = image_load((char*) buffer, sizeof(buffer), false);
-	entry();
+	void(*m_entry)();
+	m_entry = image_load((char*) buffer, sizeof(buffer), false);
+	m_entry();
+	printf("\n");
 #endif
 
 #ifdef VGA
 	vga_set_mode(320, 200, 8);
 	vga_bluescreen();
 #endif
-	
+	mercuryfs_init();
+
+	Directory* sbin = get_dir_from_name("sbin", get_root());
+	Inode* mercury = get_inode_name(sbin, "mercury");
+
+	uint8_t* mercury_buffer = malloc(40 * BLOCK_SIZE);
+	memset(mercury_buffer, 0x0, sizeof(mercury_buffer));
+
+	for(int i = 0; i < 40; i++)
+	{
+		Block* block = load_block(mercury->block_pointers[i]);
+		memcpy((uint8_t*) mercury_buffer + ((BLOCK_SIZE - 1) * i), block->data, BLOCK_SIZE - 1);
+		free(block);
+	}
+
+	void(*entry)();
+	entry = image_load((char*) mercury_buffer, sizeof(mercury_buffer), false);
+	free(mercury_buffer);
+	entry();
+
 	while(1);
 }
