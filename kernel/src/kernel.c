@@ -2,6 +2,7 @@
 #include <core/screen.h>
 #include <core/types.h>
 #include <exec/elf/elf_loader.h>
+#include <exec/elf/symtable.h>
 #include <memory/gdt.h>
 #include <driver/driver.h>
 #include <driver/ps2/ps2keyboard.h>
@@ -78,7 +79,9 @@ void kernel_main()
 
 	printf("<Quicksilver> Setting up paging\n");
 	paging_enable();
-	
+
+	init_symtable();
+
 	uint8_t keyboard_driver = create_driver(0x21, "PS2-Keyboard", 0, 
 			ps2_kb_handle_interrupt, ps2_kb_enable, 
 			ps2_kb_disable);
@@ -91,12 +94,12 @@ void kernel_main()
 
 	//clear_screen();
 	
-	/*printf(" __  __                                 ___  ____ \n");
+	printf(" __  __                                 ___  ____ \n");
 	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
 	printf("| |\\/| |/ _ \\ '__/ __| | | | '__| | | | | | \\___ \\ \n");
 	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
-	printf("                                 |___/ \n");*/
+	printf("                                 |___/ \n");
 #ifdef ATA
 	read_files();
 
@@ -123,6 +126,8 @@ void kernel_main()
 	Directory* sbin = get_dir_from_name("sbin", get_root());
 	Inode* mercury = get_inode_name(sbin, "mercury");
 
+	list_directory(sbin);
+
 	uint8_t* mercury_buffer = malloc(40 * BLOCK_SIZE);
 	memset(mercury_buffer, 0x0, sizeof(mercury_buffer));
 
@@ -134,7 +139,7 @@ void kernel_main()
 	}
 
 	void(*entry)();
-	entry = image_load((char*) mercury_buffer, sizeof(mercury_buffer), false);
+	entry = image_load((char*) mercury_buffer, sizeof(mercury_buffer), true);
 	free(mercury_buffer);
 	entry();
 

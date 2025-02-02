@@ -61,7 +61,7 @@ relocate_kernel:
 	mov [0x100000 + ebx], eax
 	add ebx, 4
 
-	cmp ebx, 32000
+	cmp ebx, 51200
 	jne .reloc_loop
 
 .done:

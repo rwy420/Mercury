@@ -3,12 +3,16 @@
 
 #include <core/screen.h>
 
+#define MAX_SYMBOLS 256
+
 typedef struct
 {
-	const char* name;
+	string name;
 	void* address;
 } Symbol;
 
+void init_symtable();
+void register_symbol(string name, void* address);
 void* resolve_symbol(const char* name);
 
 #endif

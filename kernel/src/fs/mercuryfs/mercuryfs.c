@@ -34,7 +34,7 @@ void write_block(int block_idx, uint8_t* data)
 
 	for(int i = 0; i < sizeof(Block) / 512; i++)
 	{
-		read_sector(sector + i, (uint8_t*)(data + (i * 512)));
+		write_sector(sector + i, (uint8_t*)(data + (i * 512)));
 	}
 }
 
@@ -162,7 +162,7 @@ int count_entries(Directory* directory)
 
 int file_used_blocks(Inode* file)
 {
-	int used = 0;
+	/*int used = 0;
 
 	for(int i = 0; i < MAX_FILE_BLOCKS; i++)
 	{
@@ -171,7 +171,11 @@ int file_used_blocks(Inode* file)
 		used++;
 	}
 
-	return used;
+	if(file->extent_block != 0)
+	{
+	}*/
+
+	return file->blocks;
 }
 
 int find_free_dir_entry(Directory* directory)
@@ -233,6 +237,53 @@ void mark_block_used(int block_idx)
 	write_sector(sector, write_buffer);
 }
 
+void extend_file(Inode* file)
+{
+	int block_pointer = find_free_block();
+	file->extent_block = block_pointer;
+
+	mark_block_used(block_pointer);
+	write_inode(file);
+}
+
+void alloc_extend(Inode* file, uint32_t blocks)
+{
+	int start = 0;
+	Block* block_buffer = load_block(file->extent_block);
+	memset(block_buffer, 0x0, sizeof(Block));
+	Extent* extends = (Extent*) block_buffer->data;
+
+	for(int i = 0; i < (BLOCK_SIZE - 1) / sizeof(Extent); i++)
+	{
+		if(extends[i].start_block == 0)
+		{
+			start = i;
+			break;
+		}
+	}
+
+	//FIXME
+	//for(int i = 0; i < blocks; i++)
+	//{
+	//}
+	
+	uint32_t block = find_free_block();
+	extends[start].start_block = block;
+	extends[start].size = blocks;
+
+	block_buffer->used = 0x01;
+	mark_block_used(file->extent_block);
+	write_block(file->extent_block, (uint8_t*) block_buffer);
+
+	for(uint32_t b = 0; b < blocks; b++)
+	{
+		mark_block_used(block + b);
+	}
+
+	file->blocks += blocks;
+	write_inode(file);
+}
+
 int create_directory(char* name, Directory* parent)
 {
 	int directory_idx = find_free_dir_entry(parent);
@@ -247,15 +298,15 @@ int create_directory(char* name, Directory* parent)
 	Inode* inode = get_inode(inode_idx);
 	
 	entry->inode_number = inode_idx;
-	//FIXME might not work
 	memcpy(entry->name, name, 14);
 
+	//FIXME
+	//fs->blocks[block_idx].used = 1;
 	Block* temp = load_block(block_idx);
 	temp->used = 1;
 	write_block(block_idx, (uint8_t*) temp);
 	free(temp);
 
-	//FIXME
 	memcpy(inode->name, name, 14);
 	inode->block_pointers[0] = block_idx;
 	inode->permissions = 1;
@@ -270,16 +321,14 @@ int create_directory(char* name, Directory* parent)
 	write_block(parent->self.block_pointers[0], (uint8_t*) entries);
 	write_inode(inode);
 
-	//printf("Directory '%s' created at %d:%d\n", entry->name, directory_idx, inode_idx);
-
 	return directory_idx;
 }
 
 void list_directory(Directory* directory)
 {
-	printf("Contents of ");
+	printf("Contents of :");
 	printf(directory->self.name);
-	printf(":\n");
+	printf("\n");
 	//DirEntry* entries = (DirEntry*) &directory->entries;
 	DirEntry* entries = (DirEntry*) load_block(directory->self.block_pointers[0]);
 	
@@ -313,7 +362,6 @@ int create_file(char* name, uint8_t type, Directory* parent)
 	
 	entry->inode_number = inode_idx;
 	
-	//FIXME
 	memcpy(entry->name, name, MAX_FILENAME_LEN);
 
 	memcpy(inode->name, name, MAX_FILENAME_LEN);
@@ -325,11 +373,10 @@ int create_file(char* name, uint8_t type, Directory* parent)
 	inode->block_pointers[0] = root_block_idx;
 	inode->type = type;
 	inode->real_idx = inode_idx;
+	inode->blocks = 1;
 
 	root_block->used = 1;
 	write_block(root_block_idx, (uint8_t*) root_block);
-
-	//printf("%d;%d\n", cache->cached_directory->self.block_pointers[0], parent->self.block_pointers[0]);
 
 	if(cache->cached_directory->self.block_pointers[0] == parent->self.block_pointers[0])
 	{
@@ -342,7 +389,6 @@ int create_file(char* name, uint8_t type, Directory* parent)
 	write_block(parent->self.block_pointers[0], (uint8_t*) entries);
 	write_inode(inode);
 
-	//printf("File '%s' created at %d:%d:%d\n", entry->name, directory_entry_idx, inode_idx, root_block_idx);	
 	return directory_entry_idx;
 }
 
@@ -354,6 +400,8 @@ void prealloc_file(Inode* file, int blocks)
 		mark_block_used(block_id);
 		file->block_pointers[i] = block_id;
 	}
+
+	file->blocks += blocks;
 
 	write_inode(file);
 }
@@ -443,6 +491,22 @@ void write_header()
 	free(write_buffer);
 }
 
+void mk_root_fs()
+{
+	header = malloc(sizeof(fsHeader));
+	header->next_block = 2;
+	header->next_inode = 1;
+
+	root = malloc(sizeof(Directory));
+	uint8_t* name_buffer = "root";
+	memcpy(root->self.name, name_buffer, 4);
+	root->self.block_pointers[0] = 1;
+	root->self.type = 0xFF;
+
+	write_root();
+	write_header();
+}
+
 Directory* get_dir_from_name(char* name, Directory* parent)
 {
 
@@ -475,6 +539,8 @@ void mercuryfs_init()
 
 	root = malloc(sizeof(Directory));
 	memcpy(root, root_buffer, sizeof(Directory));
+
+	//printf(root->self.name);
 
 	//FIXME not working (??)
 	//write_header();

@@ -85,6 +85,8 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
         return 0;
     }
 
+	printf("2");
+
     exec = malloc(size);
 
     if (!exec)
@@ -94,6 +96,8 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
     }
 
     memset(exec, 0x0, size);
+
+	printf("45");
 
     phdr = (Elf32_Phdr *)(elf_start + hdr->e_phoff);
 
@@ -113,6 +117,8 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
         taddr = phdr[i].p_vaddr + exec;
         memmove(taddr, start, phdr[i].p_filesz);
     }
+
+	printf("1");
 
     shdr = (Elf32_Shdr *)(elf_start + hdr->e_shoff);
 
