@@ -12,5 +12,7 @@ mercury_image.img
 *.iso
 iso/
 bootloader/header.bin
-.ignore
+.gitignore
+bx_enh_dbg.ini
+bochs_config
 build
