@@ -20,6 +20,8 @@ typedef struct
 {
 	uint32_t size;
 	uint32_t block_pointers[MAX_FILE_BLOCKS];
+	uint32_t extent_block;
+	uint32_t blocks;
 	uint32_t permissions;
 	uint32_t creation_time;
 	uint32_t modification_time;
@@ -28,6 +30,12 @@ typedef struct
 	uint8_t type;
 	uint32_t real_idx;
 } __attribute__((packed)) Inode;
+
+typedef struct
+{
+	uint32_t start_block;
+	uint32_t size;
+} __attribute__((packed)) Extent;
 
 typedef struct
 {

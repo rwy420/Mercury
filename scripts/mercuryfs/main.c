@@ -201,7 +201,7 @@ int count_entries(Directory* directory)
 
 int file_used_blocks(Inode* file)
 {
-	int used = 0;
+	/*int used = 0;
 
 	for(int i = 0; i < MAX_FILE_BLOCKS; i++)
 	{
@@ -210,7 +210,11 @@ int file_used_blocks(Inode* file)
 		used++;
 	}
 
-	return used;
+	if(file->extent_block != 0)
+	{
+	}*/
+
+	return file->blocks;
 }
 
 int find_free_dir_entry(Directory* directory)
@@ -270,6 +274,53 @@ void mark_block_used(int block_idx)
 	write_buffer[0] = 1;
 
 	write_sector(sector, write_buffer);
+}
+
+void extend_file(Inode* file)
+{
+	int block_pointer = find_free_block();
+	file->extent_block = block_pointer;
+
+	mark_block_used(block_pointer);
+	write_inode(file);
+}
+
+void alloc_extend(Inode* file, uint32_t blocks)
+{
+	int start = 0;
+	Block* block_buffer = load_block(file->extent_block);
+	memset(block_buffer, 0x0, sizeof(Block));
+	Extent* extends = (Extent*) block_buffer->data;
+
+	for(int i = 0; i < (BLOCK_SIZE - 1) / sizeof(Extent); i++)
+	{
+		if(extends[i].start_block == 0)
+		{
+			start = i;
+			break;
+		}
+	}
+
+	//FIXME
+	//for(int i = 0; i < blocks; i++)
+	//{
+	//}
+	
+	uint32_t block = find_free_block();
+	extends[start].start_block = block;
+	extends[start].size = blocks;
+
+	block_buffer->used = 0x01;
+	mark_block_used(file->extent_block);
+	write_block(file->extent_block, (uint8_t*) block_buffer);
+
+	for(uint32_t b = 0; b < blocks; b++)
+	{
+		mark_block_used(block + b);
+	}
+
+	file->blocks += blocks;
+	write_inode(file);
 }
 
 int create_directory(char* name, Directory* parent)
@@ -360,6 +411,7 @@ int create_file(char* name, uint8_t type, Directory* parent)
 	inode->block_pointers[0] = root_block_idx;
 	inode->type = type;
 	inode->real_idx = inode_idx;
+	inode->blocks = 1;
 
 	root_block->used = 1;
 	write_block(root_block_idx, (uint8_t*) root_block);
@@ -389,6 +441,8 @@ void prealloc_file(Inode* file, int blocks)
 		mark_block_used(block_id);
 		file->block_pointers[i] = block_id;
 	}
+
+	file->blocks += blocks;
 
 	write_inode(file);
 }
@@ -508,20 +562,22 @@ Directory* get_dir_from_name(char* name, Directory* parent)
 }
 
 
-void write_os(char* os_file_path)
+void write_file_bin(char* file_path, char* name, Directory* parent)
 {
-	Directory* sbin = get_dir_from_name("sbin", root);
-	Inode* os = get_inode_name(sbin, "mercury");
+	//Directory* sbin = get_dir_from_name("sbin", root);
+	//Inode* os = get_inode_name(sbin, "mercury");
+	
+	Inode* inode = get_inode_name(parent, name);
 
-	int blocks = file_used_blocks(os);
-	printf("'%s' preallocated size: %d KB\n", os->name, (blocks * BLOCK_SIZE) / 1024);
+	int blocks = file_used_blocks(inode);
+	printf("'%s' preallocated size: %d KB\n", inode->name, (blocks * BLOCK_SIZE) / 1024);
 
 	FILE* file;
 	uint8_t* file_buffer;
-	file = fopen(os_file_path, "rb");
+	file = fopen(file_path, "rb");
 	if(file == NULL)
 	{
-		printf("Error opening %s\n", os_file_path);
+		printf("Error opening %s\n", file_path);
 		return;
 	}
 
@@ -547,7 +603,7 @@ void write_os(char* os_file_path)
 		v_blocks[i].used = 0x01;
 		memcpy(&v_blocks[i].data, (uint8_t*) file_buffer + ((BLOCK_SIZE - 1) * i), BLOCK_SIZE - 1);
 
-		write_block(os->block_pointers[i], (uint8_t*) &v_blocks[i]);
+		write_block(inode->block_pointers[i], (uint8_t*) &v_blocks[i]);
 	}
 
 	free(file_buffer);
@@ -568,9 +624,14 @@ void write_root_fs()
 	Directory* sbin_d = get_dir_from_name("sbin", root);
 
 	create_file("config", 0x10, root);
+
 	create_file("mercury", 0x01, sbin_d);
 	Inode* mercury_f = get_inode_name(sbin_d, "mercury");
 	prealloc_file(mercury_f, MAX_FILE_BLOCKS);
+	extend_file(mercury_f);
+	alloc_extend(mercury_f, 128);
+
+	printf("%x\n", block_offset + (mercury_f->extent_block * BLOCK_SIZE));
 
 	write_root();
 	write_header();
@@ -578,8 +639,24 @@ void write_root_fs()
 	list_directory(root);
 }
 
+void cmd_ls(char* name)
+{
+	Directory* dir = get_dir_from_name(name, root);
+
+	list_directory(dir);
+}
+
 int main(int argc, char* argv[])
 {
+	if(argc == 2 && !strcmp(argv[1], "help"))
+	{
+		printf("MercuryFS Toolkit: \nmkroot - Make rootFS\nwroot - Write rootFS\nwos [file] - Write bin to mercuryOS bin file\n");
+		printf("fsmaster ls [dir] - List directory, leave empty to list root\n");
+		printf("fsmaster mkfile [name] [parentname] -  Make file\n");
+		printf("fsmaster cpfile [path] [name] [parentname] - Copy file into mercuryFS\n");
+		return 0;
+	}
+
 	if(argc == 2 && !strcmp(argv[1], "mkroot"))
 	{
 		printf("Making rootFS\n");
@@ -613,12 +690,49 @@ int main(int argc, char* argv[])
 	if(argc == 3 && !strcmp(argv[1], "wos"))
 	{
 		printf("Writing OS bin\n");
-		write_os(argv[2]);
+		//write_os(argv[2]);
+		write_file_bin(argv[2], "mercury", get_dir_from_name("sbin", root));
 		return 0;
 	}
 
-	list_directory(root);
+	if(argc >= 3 && !strcmp(argv[1], "fsmaster"))
+	{
 
+		if(!strcmp(argv[2], "ls"))
+		{
+			if(argc == 3)
+			{
+				list_directory(root);
+				return 0;
+			}
+
+			cmd_ls(argv[3]);
+			return 0;
+		}
+
+		if(!strcmp(argv[2], "mkfile"))
+		{
+			char* name = argv[3];
+			Directory* parent = get_dir_from_name(argv[4], root);
+			create_file(name, 0x01, parent);
+		}
+
+		if(!strcmp(argv[2], "cpfile"))
+		{
+			char* path = argv[3];
+			char* name = argv[4];
+			char* parent_name = argv[5];
+
+			Directory* parent = get_dir_from_name(parent_name, root);
+			create_file(name, 0x01, parent);
+			prealloc_file(get_inode_name(parent, name), MAX_FILE_BLOCKS);
+
+			write_file_bin(path, name, parent);
+		}
+	}
+
+	list_directory(root);
+	
 	write_header();
 	write_root();
 }
