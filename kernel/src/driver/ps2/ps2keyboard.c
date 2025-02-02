@@ -23,4 +23,5 @@ void ps2_kb_disable()
 void ps2_kb_handle_interrupt()
 {
 	uint8_t key = inb(DATA_PORT);
+	printf("KEY");
 }

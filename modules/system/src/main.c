@@ -1,6 +1,6 @@
-#include "stdio.h"
+#include "qslibc/qs_log.h"
 
 int main()
 {
-	printf("Test");
+	kprintf("Test");
 }

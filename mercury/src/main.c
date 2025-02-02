@@ -1,9 +1,9 @@
-#include "stdio.h"
+#include "qslibc/qs_log.h"
 
 int main()
 {
-	clear_screen();
-	printf("Welcome to MercuryOS\n");
+	kscreen_clear();
+	kprintf("Welcome to MercuryOS\n");
 
 	while(1);
 }

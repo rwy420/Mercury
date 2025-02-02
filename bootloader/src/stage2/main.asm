@@ -40,7 +40,7 @@ entry:
 	call 8h:relocate_kernel
 
 .enter_kernel:
-	jmp 8h:100000h
+	;jmp 8h:100000h
 
 	cli 
 	hlt
@@ -61,7 +61,7 @@ relocate_kernel:
 	mov [0x100000 + ebx], eax
 	add ebx, 4
 
-	cmp ebx, 51200
+	cmp ebx, 40000
 	jne .reloc_loop
 
 .done:

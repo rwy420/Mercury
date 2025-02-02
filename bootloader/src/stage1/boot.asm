@@ -25,18 +25,27 @@ main:
 	mov ah, 08h
 	int 13h
 	jc disk_error
+
 	pop es
 
-	mov ax, 9 ;0x01
-	mov dl, [drive_number]
-	mov cl, 100
-	mov bx, 0x8E00
+	/*mov ax, 9               ; Set up the disk read (e.g., LBA=9)
+	mov dl, [drive_number]   ; Set the drive number
+	mov cx, 50              ; Set CX to 100 (sectors to read)
+	mov ax, 0x1000
+	mov es, ax           ; Set SI to the buffer segment
+	mov bx, 0
+	;mov bx, 0x8e00
+
 	call disk_read
 
 	mov si, msg_done
 	call puts
 
-	jmp 0x8E00
+	;jmp 0x8e00
+	jmp 0x1000:0x0000*/
+
+	mov si, msg_disk_error
+	call puts
 
 	cli
 	hlt
@@ -66,6 +75,35 @@ puts:
 	pop ax
 	pop si
 	ret
+
+print_hex:
+    pusha                   ; Save all registers
+    mov cx, 4               ; We have 4 hex digits (16-bit value)
+    mov bx, si              ; BX holds the number to print
+
+.hex_loop:
+    rol bx, 4               ; Rotate left to get the next hex digit
+    mov al, bl              ; Copy lowest 4 bits into AL
+    and al, 0x0F            ; Mask out everything except the lowest nibble
+    add al, '0'             ; Convert to ASCII ('0'-'9' or 'A'-'F')
+    cmp al, '9'             ; If greater than '9', adjust for 'A'-'F'
+    jbe .print
+    add al, 7               ; Convert 'A'-'F'
+
+.print:
+    mov ah, 0x0E            ; BIOS teletype mode
+    int 0x10                ; Print character
+
+    loop .hex_loop          ; Repeat for all 4 hex digits
+
+    ; Print newline (CR + LF)
+    mov al, 0x0D            ; Carriage return (CR)
+    int 0x10
+    mov al, 0x0A            ; Line feed (LF)
+    int 0x10
+
+    popa                    ; Restore registers
+    ret                     ; Return to caller
 
 ; --> ax: LBA address
 ; <-- cx bits 0 - 5: Sector
@@ -106,37 +144,41 @@ disk_read:
     push di
 
     push cx
-    call lba_to_chs
+    call lba_to_chs          ; Convert LBA to CHS
     pop ax
-    
-    mov ah, 02h
-    mov di, 3
+
+	pusha
+	mov si, ax
+	call print_hex
+	popa
+
+    mov ah, 02h              ; BIOS read disk function
+    mov di, 3                ; Retry 3 times
 
 .retry:
     pusha
-	stc
-	int 13h
-	jnc .done
+    stc
+    int 13h                  ; Call BIOS disk read
+    jnc .done                ; If successful, continue
 
     popa
-    call disk_reset
-
+    call disk_reset          ; Reset disk if failed
     dec di
     test di, di
-    jnz .retry
+    jnz .retry               ; Retry if attempts remain
 
 .fail:
-	jmp disk_error
+    jmp disk_error           ; Jump to error handler
 
 .done:
     popa
-
     pop di
     pop dx
     pop cx
     pop bx
     pop ax
     ret
+
 
 ; --> dl: Drive number
 disk_reset:
