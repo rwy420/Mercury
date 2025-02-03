@@ -84,47 +84,64 @@ void vga_write_registers()
 
 void vga_set_plane(unsigned char plane)
 {
-    outb(0x3C4, 0x02); // Select Map Mask register
-    outb(0x3C5, 1 << plane); // Enable only the specified plane
+    outb(0x3C4, 0x02);
+    outb(0x3C5, 1 << plane);
 }
 
 void vga_set_pixel(int x, int y, unsigned char color)
 {
-	int byte_offset = (y * (VGA_WIDTH / 8)) + (x / 8);
-	unsigned char bit_mask = 1 << (7 - (x % 8));
+	int offset = (y * VGA_WIDTH + x) / 8;
 
-	for(int plane = 0; plane < 4; plane++)
-	{
-		vga_set_plane(plane);
+    int bit_pos = x % 8;
 
-		unsigned char pixel_data = vga_memory[byte_offset];
-		if(color & (1 << plane))
-			pixel_data |= bit_mask;
-		else 
-			pixel_data &= ~bit_mask;
+    unsigned char *byte_ptr = (unsigned char*)vga_memory + offset;
 
-		vga_memory[byte_offset] = pixel_data;
-	}
+    // Read the current byte value (to preserve other bits)
+    unsigned char current_byte = *byte_ptr;
+
+    // Iterate over the 4 planes and set or clear the respective bits
+    for (int plane = 0; plane < 4; plane++) {
+        // Set the current plane
+        vga_set_plane(plane);
+
+        char bit_set = (color & (1 << plane)) != 0;  // If the bit is 1, bit_set will be true
+        if (bit_set == 1) {
+            *byte_ptr |= (1 << (7 - bit_pos));  // Set the bit in the correct position of the byte
+        } else {
+            *byte_ptr &= ~(1 << (7 - bit_pos));  // Clear the bit in the correct position of the byte
+        }
+    }
+
+    *byte_ptr = current_byte;
 }
 
 void vga_fill(unsigned char color) {
 	for (int plane = 0; plane < 4; plane++) {
         vga_set_plane(plane);
         unsigned char fill_value = (color & (1 << plane)) ? 0xFF : 0x00;
-
-        // Use memset to fill the plane memory efficiently
         memset((void*)vga_memory, fill_value, VGA_WIDTH * VGA_HEIGHT / 8);
     }
+}
+
+void draw_rect()
+{
+	int start_x = 400;
+	int start_y = 400;
+
+	for(int x = start_x; x < start_x + 40; x++)
+		for(int y = start_y; y < start_y + 40; y++)
+			vga_set_pixel(x, y, 0xa);
 }
 
 void vga_init()
 {
 	vga_write_registers();
-	while(1)
-	{
-		for(char c = 1; c < 10; c++)
-		{
-			vga_fill(c);
-		}
-	}
+	//while(1)
+	//{
+		//for(char c = 1; c < 10; c++)
+		//{
+			vga_fill(0xf);
+			draw_rect();
+		//}
+	//}
 }
