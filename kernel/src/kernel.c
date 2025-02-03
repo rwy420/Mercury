@@ -7,7 +7,6 @@
 #include <driver/driver.h>
 #include <driver/ps2/ps2keyboard.h>
 #include <driver/ata/ata.h>
-#include <driver/vga/vga.h>
 #include <hardware/interrupts.h>
 #include <hardware/pci.h>
 #include <memory/mem_manager.h>
@@ -17,7 +16,6 @@
 #include <fs/mercuryfs/mercuryfs.h>
 
 #define ATA
-//#define VGA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
@@ -92,12 +90,7 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Quicksilver> PCI Initialization done\n");
 
-#ifdef VGA
-	vga_set_mode(320, 200, 8);
-	vga_bluescreen();
-#endif
 	mercuryfs_init();
-
 	Directory* sbin = get_dir_from_name("sbin", get_root());
 	Inode* mercury = get_inode_name(sbin, "mercury");
 

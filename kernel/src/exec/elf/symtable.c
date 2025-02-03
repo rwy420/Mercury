@@ -28,6 +28,8 @@ void init_symtable()
 	register_symbol("kfree", free);
 	register_symbol("kmalloc_aligned", malloc_aligned);
 	register_symbol("kfree_aligned", free_aligned);
+	register_symbol("memset", memset);
+	register_symbol("memmove", memmove);
 }
 
 void register_symbol(string name, void* address)

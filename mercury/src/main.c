@@ -1,4 +1,5 @@
 #include "qslibc/qs_log.h"
+#include "drivers/vga.h"
 
 int main()
 {
@@ -9,6 +10,8 @@ int main()
 	kprintf("          | |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
 	kprintf("          |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
 	kprintf("                                           |___/ \n");
+
+	vga_init();
 
 	while(1);
 }
