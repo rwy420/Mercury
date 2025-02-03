@@ -1,5 +1,5 @@
-;org 0x7E00
-org 0x8E00
+;org 0x8E00
+org 0x500
 bits 16
 
 [map all stage2.map]
@@ -40,7 +40,7 @@ entry:
 	call 8h:relocate_kernel
 
 .enter_kernel:
-	;jmp 8h:100000h
+	jmp 8h:100000h
 
 	cli 
 	hlt
@@ -57,7 +57,9 @@ relocate_kernel:
 .reloc_loop:
 	[bits 32]
 
-	mov eax, [0xA000 + ebx]
+	;mov eax, [0xA000 + ebx]
+	mov eax, [0x1700 + ebx]
+
 	mov [0x100000 + ebx], eax
 	add ebx, 4
 

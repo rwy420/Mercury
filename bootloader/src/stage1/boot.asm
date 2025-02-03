@@ -25,27 +25,25 @@ main:
 	mov ah, 08h
 	int 13h
 	jc disk_error
-
 	pop es
 
-	/*mov ax, 9               ; Set up the disk read (e.g., LBA=9)
-	mov dl, [drive_number]   ; Set the drive number
-	mov cx, 50              ; Set CX to 100 (sectors to read)
-	mov ax, 0x1000
-	mov es, ax           ; Set SI to the buffer segment
-	mov bx, 0
-	;mov bx, 0x8e00
+	;xchg bx, bx
+
+	mov ax, 9
+	mov dl, [drive_number]
+	mov cl, 55
+	;mov ax, 0x1000
+	;mov es, ax
+	mov bx, 0x500
 
 	call disk_read
+	jc disk_error
 
 	mov si, msg_done
 	call puts
 
-	;jmp 0x8e00
-	jmp 0x1000:0x0000*/
-
-	mov si, msg_disk_error
-	call puts
+	;jmp 0x1000:0x0000
+	jmp 0x500
 
 	cli
 	hlt
@@ -96,6 +94,7 @@ print_hex:
 
     loop .hex_loop          ; Repeat for all 4 hex digits
 
+
     ; Print newline (CR + LF)
     mov al, 0x0D            ; Carriage return (CR)
     int 0x10
@@ -109,6 +108,10 @@ print_hex:
 ; <-- cx bits 0 - 5: Sector
 ; <-- cx bits 6 - 15: Cylinder
 ; <-- dh: head
+; --> ax: LBA address
+; <-- cx bits 0 - 5: Sector
+; <-- cx bits 6 - 15: Cylinder
+; <-- dh: Head
 lba_to_chs:
 	push ax
 	push dx
@@ -144,31 +147,27 @@ disk_read:
     push di
 
     push cx
-    call lba_to_chs          ; Convert LBA to CHS
-    pop ax
+    call lba_to_chs  ; Convert LBA to CHS
+    pop ax           ; Restore sectors to read
 
-	pusha
-	mov si, ax
-	call print_hex
-	popa
-
-    mov ah, 02h              ; BIOS read disk function
-    mov di, 3                ; Retry 3 times
+    mov ah, 0x02     ; BIOS read function
+    mov di, 3        ; Retry counter
 
 .retry:
     pusha
-    stc
-    int 13h                  ; Call BIOS disk read
-    jnc .done                ; If successful, continue
+    stc              ; Set carry flag before calling
+    int 0x13         ; BIOS disk read
+    jnc .done        ; If no error, jump to done
 
     popa
-    call disk_reset          ; Reset disk if failed
-    dec di
-    test di, di
-    jnz .retry               ; Retry if attempts remain
+    call disk_reset  ; Reset disk controller
+
+    dec di           ; Decrement retry counter
+    test di, di      ; If di == 0, fail
+    jnz .retry
 
 .fail:
-    jmp disk_error           ; Jump to error handler
+    jmp disk_error   ; Handle read failure
 
 .done:
     popa
@@ -178,6 +177,7 @@ disk_read:
     pop bx
     pop ax
     ret
+
 
 
 ; --> dl: Drive number

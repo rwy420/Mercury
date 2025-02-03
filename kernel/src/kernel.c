@@ -16,7 +16,7 @@
 #include <fs/bootfs/bootfs.h>
 #include <fs/mercuryfs/mercuryfs.h>
 
-//#define ATA
+#define ATA
 //#define VGA
 
 extern uint8_t kernel_start;
@@ -92,36 +92,11 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Quicksilver> PCI Initialization done\n");
 
-	//clear_screen();
-	
-	printf(" __  __                                 ___  ____ \n");
-	printf("|  \\/  | ___ _ __ ___ _   _ _ __ _   _ / _ \\/ ___| \n");
-	printf("| |\\/| |/ _ \\ '__/ __| | | | '__| | | | | | \\___ \\ \n");
-	printf("| |  | |  __/ | | (__| |_| | |  | |_| | |_| |___) | \n");
-	printf("|_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\\___/|____/ \n"); 
-	printf("                                 |___/ \n");
-#ifdef ATA
-	read_files();
-
-	uint8_t* buffer = malloc(64*512);
-	memset(buffer, 0x0, sizeof(buffer));
-
-	for(int i = 0; i < 32; i++)
-	{
-		read28(73 + i, (buffer + i * 512), 512);
-	}
-
-	void(*m_entry)();
-	m_entry = image_load((char*) buffer, sizeof(buffer), false);
-	m_entry();
-	printf("\n");
-#endif
-
 #ifdef VGA
 	vga_set_mode(320, 200, 8);
 	vga_bluescreen();
 #endif
-	/*mercuryfs_init();
+	mercuryfs_init();
 
 	Directory* sbin = get_dir_from_name("sbin", get_root());
 	Inode* mercury = get_inode_name(sbin, "mercury");
@@ -141,7 +116,7 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load((char*) mercury_buffer, sizeof(mercury_buffer), true);
 	free(mercury_buffer);
-	//entry();*/
+	entry();
 
 	while(1);
 }

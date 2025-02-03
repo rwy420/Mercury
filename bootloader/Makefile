@@ -13,7 +13,7 @@ build/image.img: stage1 stage2
 	dd if=kernel.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=5120
 	dd if=../modules/system/module of=build/image.img conv=notrunc oflag=seek_bytes seek=37376
 	cd ../ && ./mercuryfs-toolkit wos mercury/build/mercury
-	#dd if=../fs.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=51200
+	dd if=../fs.bin of=build/image.img conv=notrunc oflag=seek_bytes seek=51200
 
 stage1: build/stage1.bin
 

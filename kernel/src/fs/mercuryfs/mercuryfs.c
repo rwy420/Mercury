@@ -527,7 +527,6 @@ void mercuryfs_init()
 	root_offset = 512 + ((sizeof(Block) * MAX_BLOCKS) + (sizeof(Inode) * MAX_INODES));
 	cached_inodes_count = 1;
 
-
 	header = malloc(512);
 	read_sector(0, header);
 
@@ -539,8 +538,6 @@ void mercuryfs_init()
 
 	root = malloc(sizeof(Directory));
 	memcpy(root, root_buffer, sizeof(Directory));
-
-	//printf(root->self.name);
 
 	//FIXME not working (??)
 	//write_header();
