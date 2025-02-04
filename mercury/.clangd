@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: -I/home/arjan/Development/MercuryOS/lib
+  Add: [-I/home/arjan/Development/MercuryOS/lib, -I/home/arjan/Development/MercuryOS/mercury/include]
