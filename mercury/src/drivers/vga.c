@@ -37,7 +37,7 @@ unsigned char g_640x480x16[61] =
 	0x01, 0x00, 0x0F, 0x00, 0x00
 };
 
-volatile unsigned char* vga_memory = (unsigned char*)0xA0000;
+unsigned char* vga_memory = (unsigned char*)0xA0000;
 
 void vga_write_registers()
 {
@@ -82,38 +82,42 @@ void vga_write_registers()
 	outb(ATTRIBUTE_CONTROLLER_INDEX_PORT, 0x20);
 }
 
-void vga_set_plane(unsigned char plane)
+void vga_set_plane(unsigned char p)
 {
-    outb(0x3C4, 0x02);
-    outb(0x3C5, 1 << plane);
+	static unsigned curr_p = -1u;
+	unsigned char pmask;
+
+	p &= 3;
+	if(p == curr_p)
+		return;
+	curr_p = p;
+	pmask = 1 << p;
+
+	outw(CONTROLLER_INDEX_PORT, (p << 8) | 4);
+	outw(SEQUENCER_INDEX_PORT, (pmask << 8) | 2);
 }
 
 void vga_set_pixel(int x, int y, unsigned char color)
 {
-	int offset = (y * VGA_WIDTH + x) / 8;
+	unsigned int wd_in_bytes, off, mask, p, pmask;
 
-    int bit_pos = x % 8;
-
-    unsigned char *byte_ptr = (unsigned char*)vga_memory + offset;
-
-    // Read the current byte value (to preserve other bits)
-    unsigned char current_byte = *byte_ptr;
-
-    // Iterate over the 4 planes and set or clear the respective bits
-    for (int plane = 0; plane < 4; plane++) {
-        // Set the current plane
-        vga_set_plane(plane);
-
-        char bit_set = (color & (1 << plane)) != 0;  // If the bit is 1, bit_set will be true
-        if (bit_set == 1) {
-            *byte_ptr |= (1 << (7 - bit_pos));  // Set the bit in the correct position of the byte
-        } else {
-            *byte_ptr &= ~(1 << (7 - bit_pos));  // Clear the bit in the correct position of the byte
-        }
-    }
-
-    *byte_ptr = current_byte;
+	wd_in_bytes = VGA_WIDTH / 8;
+	off = wd_in_bytes * y + x / 8;
+	x = (x & 7) * 1;
+	mask = 0x80 >> x;
+	pmask = 1;
+	unsigned char* mem = (unsigned char*) vga_memory + off;
+	for(p = 0; p < 4; p++)
+	{
+		vga_set_plane(p);
+		if(pmask & color)
+			*mem |= mask;
+		else
+			*mem &= ~mask;
+		pmask <<= 1;
+	}
 }
+
 
 void vga_fill(unsigned char color) {
 	for (int plane = 0; plane < 4; plane++) {
@@ -123,25 +127,31 @@ void vga_fill(unsigned char color) {
     }
 }
 
-void draw_rect()
-{
-	int start_x = 400;
-	int start_y = 400;
+void draw_rectangle(int x, int y, int w, int h, unsigned char color) {
+    for (int plane = 0; plane < 4; plane++) {
+        vga_set_plane(plane);
+        for (int dy = 0; dy < h; dy++) {
+            for (int dx = 0; dx < w; dx++) {
+                int px = x + dx;
+                int py = y + dy;
+                unsigned char* fb_byte_ptr = (unsigned char*)vga_memory + ((py * 640 + px) >> 3);
+                unsigned char bit_mask = (1 << (7 - (px & 0x07)));
+                unsigned char b = *fb_byte_ptr;
 
-	for(int x = start_x; x < start_x + 40; x++)
-		for(int y = start_y; y < start_y + 40; y++)
-			vga_set_pixel(x, y, 0xa);
+                if (color & (1 << plane)) {
+                    b |= bit_mask;
+                } else {
+                    b &= ~bit_mask;
+                }
+
+               *fb_byte_ptr = b;
+            }
+        }
+    }
 }
 
 void vga_init()
 {
 	vga_write_registers();
-	//while(1)
-	//{
-		//for(char c = 1; c < 10; c++)
-		//{
-			vga_fill(0xf);
-			draw_rect();
-		//}
-	//}
+	vga_fill(0x1);
 }
