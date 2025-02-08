@@ -612,8 +612,8 @@ void write_file_bin(char* file_path, char* name, Directory* parent)
 
 void write_root_fs()
 {
-	create_directory("dev", root);
-	Directory* dev_d = get_dir_from_name("dev", root);
+	create_directory("drvr", root);
+	Directory* dev_d = get_dir_from_name("drvr", root);
 	create_directory("mnt", root);
 	Directory* mnt_d = get_dir_from_name("mnt", root);
 	create_directory("var", root);
