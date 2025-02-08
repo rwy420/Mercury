@@ -5,6 +5,7 @@ bits 16
 [map all stage2.map]
 
 entry:
+	; Set up segments and stack
 	mov ax, 0
 	mov ds, ax
 	mov es, ax
@@ -24,7 +25,7 @@ entry:
 	or al, 1
 	mov cr0, eax
 
-
+	; Jump into 32 bit segment
 	jmp dword 8h:.pmode
 
 .pmode:

@@ -4,10 +4,12 @@ bits 16
 %define ENDL 0x0D, 0x0A
 
 main:
+	; Set up segments
 	mov ax, 0
 	mov ds, ax
 	mov es, ax
-
+	
+	; Set stack
 	mov ss, ax
 	mov sp, 0x7C00
 
@@ -21,30 +23,29 @@ main:
 	mov si, msg_loading
 	call puts
 
+	; Test read 
 	push es
 	mov ah, 08h
 	int 13h
 	jc disk_error
 	pop es
 
-	;xchg bx, bx
-
 	mov ax, 9
 	mov dl, [drive_number]
 	mov cl, 55
-	;mov ax, 0x1000
-	;mov es, ax
 	mov bx, 0x500
 
 	call disk_read
+	; Throw error if flag is set
 	jc disk_error
 
 	mov si, msg_done
 	call puts
 
-	;jmp 0x1000:0x0000
+	; Enter stage 2
 	jmp 0x500
-
+ 
+	; Halt device - should not happen though
 	cli
 	hlt
 
@@ -59,6 +60,7 @@ puts:
 	push bx
 
 .loop:
+	; Print each character
 	lodsb
 	or al, al
 	jz .done
