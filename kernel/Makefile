@@ -1,13 +1,14 @@
-GPPPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
-			-fno-leading-underscore -fno-stack-protector -Wwrite-strings
+GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
+			-fno-leading-underscore -fno-stack-protector -Wwrite-strings -Os
+
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
 OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
 		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
-		  build/bootfs.o build/elf_loader.o build/elf.o build/symtable.o build/sata.o build/ahci.o \
-		  build/mercuryfs.o
+		  build/elf_loader.o build/elf.o build/symtable.o build/sata.o build/ahci.o \
+		  #build/mercuryfs.o build/bootfs.o 
 
 GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
@@ -17,37 +18,37 @@ GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o buil
 
 
 build/%.o: src/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/core/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/hardware/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/ps2/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/sata/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/ata/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/fs/bootfs/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/fs/mercuryfs/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/memory/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/exec/elf/%.c
-	gcc $(GPPPARAMS) -o $@ -c $<
+	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: arch/x86/%.s
 	as $(ASPARAMS) -o $@ $<
@@ -60,6 +61,7 @@ build/%.o: arch/x86/%.asm
 
 kernel.bin: linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
+	strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)
 	ld $(LDPARAMS) -T $< -o grub-kernel.bin $(GRUB_OBJECTS)

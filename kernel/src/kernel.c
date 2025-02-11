@@ -12,8 +12,8 @@
 #include <memory/mem_manager.h>
 #include <memory/common.h>
 #include <memory/paging.h>
-#include <fs/bootfs/bootfs.h>
-#include <fs/mercuryfs/mercuryfs.h>
+//#include <fs/bootfs/bootfs.h>
+//#include <fs/mercuryfs/mercuryfs.h>
 
 #define ATA
 
@@ -90,7 +90,7 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Quicksilver> PCI Initialization done\n");
 
-	mercuryfs_init();
+	/*mercuryfs_init();
 	Directory* sbin = get_dir_from_name("sbin", get_root());
 	Inode* mercury = get_inode_name(sbin, "mercury");
 
@@ -109,7 +109,7 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load((char*) mercury_buffer, sizeof(mercury_buffer), true);
 	free(mercury_buffer);
-	entry();
+	entry();*/
 
 	while(1);
 }
