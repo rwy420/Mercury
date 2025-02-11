@@ -20,10 +20,8 @@ image:
 	mv bootloader/build/image.img ./build/mercury_image.img
 
 vdi: image
-	dd if=build/mercury_image.img of=build/disk.vdi conv=notrunc oflag=seek_bytes seek=2097152
-
-clean_disk:
-	dd if=/dev/zero of=build/disk.vdi conv=notrunc  bs=1 count=10MB oflag=seek_bytes seek=2097152
+	dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
+	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352
 
 grub:
 	cd kernel && make grub

@@ -1,5 +1,5 @@
 GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
-			-fno-leading-underscore -fno-stack-protector -Wwrite-strings -Os
+			-fno-leading-underscore -fno-stack-protector -Wwrite-strings
 
 ASPARAMS = --32
 LDPARAMS = -melf_i386
@@ -8,7 +8,7 @@ OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o b
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
 		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
 		  build/elf_loader.o build/elf.o build/symtable.o build/sata.o build/ahci.o \
-		  #build/mercuryfs.o build/bootfs.o 
+		  build/fat16.o build/fat16_path.o build/fat16_priv.o build/fat16_rootdir.o build/fat16_subdir.o  
 
 GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
@@ -41,7 +41,7 @@ build/%.o: src/driver/ata/%.c
 build/%.o: src/fs/bootfs/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
-build/%.o: src/fs/mercuryfs/%.c
+build/%.o: src/fs/fat16/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/memory/%.c
@@ -61,7 +61,7 @@ build/%.o: arch/x86/%.asm
 
 kernel.bin: linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
-	strip --strip-all kernel.bin
+	#strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)
 	ld $(LDPARAMS) -T $< -o grub-kernel.bin $(GRUB_OBJECTS)

@@ -14,6 +14,7 @@
 #include <memory/paging.h>
 //#include <fs/bootfs/bootfs.h>
 //#include <fs/mercuryfs/mercuryfs.h>
+#include <fs/fat16/fat16.h>
 
 #define ATA
 
@@ -90,26 +91,13 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Quicksilver> PCI Initialization done\n");
 
-	/*mercuryfs_init();
-	Directory* sbin = get_dir_from_name("sbin", get_root());
-	Inode* mercury = get_inode_name(sbin, "mercury");
-
-	list_directory(sbin);
-
-	uint8_t* mercury_buffer = malloc(40 * BLOCK_SIZE);
-	memset(mercury_buffer, 0x0, sizeof(mercury_buffer));
-
-	for(int i = 0; i < 40; i++)
-	{
-		Block* block = load_block(mercury->block_pointers[i]);
-		memcpy((uint8_t*) mercury_buffer + ((BLOCK_SIZE - 1) * i), block->data, BLOCK_SIZE - 1);
-		free(block);
-	}
-
-	void(*entry)();
-	entry = image_load((char*) mercury_buffer, sizeof(mercury_buffer), true);
-	free(mercury_buffer);
-	entry();*/
+	storage_dev_t* fat_dev = malloc(sizeof(storage_dev_t));
+	fat_dev->read = _read;
+	fat_dev->read_byte = _read_byte;
+	fat_dev->seek = _seek;
+	fat_dev->write = _write;
+	fat16_init(fat_dev , 0);
 
 	while(1);
+
 }
