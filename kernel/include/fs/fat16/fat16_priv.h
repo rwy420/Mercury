@@ -1,6 +1,11 @@
 #ifndef __QS__FS__FAT16__FAT16_PRIV_H
 #define __QS__FS__FAT16__FAT16_PRIV_H
 
+#define FIRST_CLUSTER_INDEX_IN_FAT 3
+#define MAX_BYTES_PER_CLUSTER (32768LU)
+#define VFAT_DIR_ENTRY 0x0F
+#define AVAILABLE_DIR_ENTRY 0xE5
+
 #include <core/types.h>
 
 typedef struct
@@ -35,5 +40,32 @@ typedef struct
 	uint16_t offset;
 	uint32_t remaining_bytes;
 } EntryHandle;
+
+typedef struct
+{
+	char name[11];
+	uint8_t attribute;
+	uint8_t reserved[10];
+	uint8_t time[2];
+	uint8_t date[2];
+	uint16_t starting_cluster;
+	uint32_t size;
+} __attribute__((packed)) DirEntry;
+
+enum FileAttribute
+{
+	READ_ONLY	= 0x01,
+	HIDDEN		= 0x02,
+	SYSTEM		= 0x04,
+	VOULME		= 0x08,
+	SUBDIR		= 0x10,
+	ARCHIVE		= 0x20
+};
+
+int get_next_cluster(uint16_t* next_cluster, uint16_t cluster);
+uint32_t move_to_root_directory_region(uint16_t entry_index);
+uint32_t move_to_fat_region(uint16_t cluster);
+uint32_t move_to_data_region(uint16_t cluster, uint16_t offset);
+int navigate_to_subdir(EntryHandle* handle, char* entry_name, const char* path);
 
 #endif

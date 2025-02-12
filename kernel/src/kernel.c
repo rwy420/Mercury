@@ -91,12 +91,24 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Quicksilver> PCI Initialization done\n");
 
+
+	clear_screen();
+
 	storage_dev_t* fat_dev = malloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
 	fat_dev->read_byte = _read_byte;
 	fat_dev->seek = _seek;
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
+
+
+	char fname[11] = {0};
+	uint32_t i = 0;
+	while(fat16_ls(&i, fname, "/") == 1)
+	{
+		printf(fname);
+		printf("\n");
+	}
 
 	while(1);
 

@@ -48,6 +48,19 @@ bool strcmp(const char *a, const char *b)
     return ((int)(unsigned char)(*a) - (int)(unsigned char)(*b));
 }
 
+int memcmp(const void* s1, const void* s2, uint32_t size)
+{
+	const uint8_t* p1 = (const uint8_t*) s1;
+	const uint8_t* p2 = (const uint8_t*) s2;
+
+	for(uint32_t i = 0; i < size; i++)
+	{
+		if(p1[i] != p2[i]) return p1[i] - p2[i];
+	}
+
+	return 0;
+}
+
 void print_memory_info()
 {
 	printf("<Quicksilver> Kernel start: 0x");

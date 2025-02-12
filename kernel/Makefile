@@ -1,5 +1,6 @@
 GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
-			-fno-leading-underscore -fno-stack-protector -Wwrite-strings
+			-fno-leading-underscore -fno-stack-protector -Wwrite-strings \
+			-Os -ffunction-sections -fdata-sections -mno-sse -msoft-float -finline-small-functions
 
 ASPARAMS = --32
 LDPARAMS = -melf_i386
@@ -38,9 +39,6 @@ build/%.o: src/driver/sata/%.c
 build/%.o: src/driver/ata/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
-build/%.o: src/fs/bootfs/%.c
-	gcc $(GCCPARAMS) -o $@ -c $<
-
 build/%.o: src/fs/fat16/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
@@ -61,7 +59,7 @@ build/%.o: arch/x86/%.asm
 
 kernel.bin: linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
-	#strip --strip-all kernel.bin
+	strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)
 	ld $(LDPARAMS) -T $< -o grub-kernel.bin $(GRUB_OBJECTS)
