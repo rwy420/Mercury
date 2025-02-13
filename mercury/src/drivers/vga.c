@@ -1,6 +1,6 @@
 #include <drivers/vga.h>
-#include <qslibc/qs_io.h>
-#include <qslibc/qs_mem.h>
+#include <k_qslibc/qs_io.h>
+#include <k_qslibc/qs_mem.h>
 
 #define VGA_WIDTH 640
 #define VGA_HEIGHT 480

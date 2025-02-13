@@ -1,5 +1,4 @@
-#include "qslibc/qs_log.h"
-#include "drivers/vga.h"
+#include "k_qslibc/qs_log.h"
 
 int main()
 {

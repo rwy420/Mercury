@@ -1,11 +1,12 @@
 [X] Paging and virtual memory
 [ ] Module system
+[ ] Multitasking system
 [X] ELF32 loader
 [ ] API
-[ ] MercuryOS runtime API
 [ ] Terminal
 [X] Disk driver 
-[ ] File systems
-[ ] MercuryOS website
-[ ] Own executable format (.mre -> Mercury Runtime Executable)
+[X] File systems
+[ ] Documentation
+[ ] User mode apps
+[ ] Python port
 [X] Syscalls
