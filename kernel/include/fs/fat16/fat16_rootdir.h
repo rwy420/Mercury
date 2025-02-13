@@ -5,6 +5,7 @@
 #include <core/types.h>
 
 int ls_in_root(uint32_t* index, char* filename);
+int open_file_in_root(EntryHandle* handle, char* filename, char mode);
 int open_directory_in_root(EntryHandle* handle, char* dirname);
 
 #endif

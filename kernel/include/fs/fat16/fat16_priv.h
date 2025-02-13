@@ -63,6 +63,7 @@ enum FileAttribute
 };
 
 int get_next_cluster(uint16_t* next_cluster, uint16_t cluster);
+int read_from_handle(EntryHandle* handle, void* buffer, uint32_t count);
 uint32_t move_to_root_directory_region(uint16_t entry_index);
 uint32_t move_to_fat_region(uint16_t cluster);
 uint32_t move_to_data_region(uint16_t cluster, uint16_t offset);

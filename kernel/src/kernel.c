@@ -91,9 +91,6 @@ void kernel_main()
 	pci_enumerate_devices(false);
 	printf("<Quicksilver> PCI Initialization done\n");
 
-
-	clear_screen();
-
 	storage_dev_t* fat_dev = malloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
 	fat_dev->read_byte = _read_byte;
@@ -104,11 +101,20 @@ void kernel_main()
 
 	char fname[11] = {0};
 	uint32_t i = 0;
-	while(fat16_ls(&i, fname, "/") == 1)
+	while(fat16_ls(&i, fname, "/SBIN") == 1)
 	{
 		printf(fname);
 		printf("\n");
 	}
+
+	int fd = fat16_open("/SBIN/MERCURY.ELF", 'r');
+	uint8_t* mercury_buffer = malloc(0x4000);
+	fat16_read(fd, mercury_buffer, 14196);
+	
+	void(*entry)();
+	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);
+	free(mercury_buffer);
+	entry();
 
 	while(1);
 

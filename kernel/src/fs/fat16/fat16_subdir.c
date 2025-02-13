@@ -97,6 +97,11 @@ static int open_entry_in_subdir(EntryHandle* handle, char* name, char mode, bool
 	return 0;
 }
 
+int open_file_in_subdir(EntryHandle* handle, char* filename, char mode)
+{
+	return open_entry_in_subdir(handle, filename, mode, true);
+}
+
 int open_directory_in_subdir(EntryHandle* handle, char* dirname)
 {
 	return open_entry_in_subdir(handle, dirname, 'r', false);

@@ -29,9 +29,6 @@ static int find_root_directory_entry(uint16_t* entry_index, char* name)
 		}
 	}
 
-	printf("FAT16: FILE ");
-	printf(name);
-	printf(" NOT FOUND\n");
 	return -1;
 }
 
@@ -81,6 +78,11 @@ static int open_entry_in_root(EntryHandle* handle, char* name, char mode, bool i
 	else handle->remaining_bytes = 0;
 
 	return 0;
+}
+
+int open_file_in_root(EntryHandle* handle, char* filename, char mode)
+{
+	return open_entry_in_root(handle, filename, mode, true);
 }
 
 int open_directory_in_root(EntryHandle* handle, char* dirname)
