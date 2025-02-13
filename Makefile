@@ -3,12 +3,6 @@ clean:
 	cd bootloader && make clean
 	rm build/mercury_image.img
 
-setup: fs.bin
-	cd scripts/mercuryfs && make toolkit
-	mv scripts/mercuryfs/fs ./mercuryfs-toolkit
-	./mercuryfs-toolkit mkroot
-	./mercuryfs-toolkit wroot
-
 fs.bin:
 	dd if=/dev/zero of=fs.bin bs=1 count=687109
 
@@ -21,7 +15,8 @@ image:
 
 vdi: image
 	dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
-	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352
+	mcopy -i ./fs.bin mercury/build/mercury -o "::/SBIN/MERCURY.ELF"
+	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352	
 
 grub:
 	cd kernel && make grub

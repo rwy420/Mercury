@@ -40,9 +40,6 @@ static int open_entry_in_root(EntryHandle* handle, char* name, char mode, bool i
 	if(find_root_directory_entry(&entry_index, name) < 0)
 		return -1;
 
-	//print_hex((entry_index >> 8) & 0xFF);
-	//print_hex(entry_index & 0xFF);
-	
 	handle->pos_entry = move_to_root_directory_region(entry_index);
 	dev->read(&entry, sizeof(DirEntry));
 
