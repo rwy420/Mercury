@@ -29,7 +29,7 @@ static int find_root_directory_entry(uint16_t* entry_index, char* name)
 		}
 	}
 
-	printf("FAT16 FILE ");
+	printf("FAT16: FILE ");
 	printf(name);
 	printf(" NOT FOUND\n");
 	return -1;
@@ -37,16 +37,14 @@ static int find_root_directory_entry(uint16_t* entry_index, char* name)
 
 static int open_entry_in_root(EntryHandle* handle, char* name, char mode, bool is_file)
 {
-	uint16_t entry_index;
+	uint16_t entry_index = 0;
 	DirEntry entry;
 	
-	//if(find_root_directory_entry(&entry_index, name) < 0)
-	//	return -1;
+	if(find_root_directory_entry(&entry_index, name) < 0)
+		return -1;
 
 	//print_hex((entry_index >> 8) & 0xFF);
 	//print_hex(entry_index & 0xFF);
-	
-	entry_index = 0;
 	
 	handle->pos_entry = move_to_root_directory_region(entry_index);
 	dev->read(&entry, sizeof(DirEntry));

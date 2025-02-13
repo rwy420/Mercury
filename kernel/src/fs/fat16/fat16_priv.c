@@ -22,9 +22,9 @@ uint32_t move_to_root_directory_region(uint16_t entry_index)
 	uint32_t pos = layout.start_root_directory_region;
 	pos += layout.offset;
 	pos += entry_index * 32;
-	printf("FAT16: ROOT MOVING TO: ");
-	print_hex32(pos);
-	printf("\n");
+	//printf("FAT16: ROOT MOVING TO: ");
+	//print_hex32(pos);
+	//printf("\n");
 	dev->seek(pos);
 	return pos;
 }
@@ -34,31 +34,26 @@ uint32_t move_to_fat_region(uint16_t cluster)
 	uint32_t pos = layout.start_fat_region;
 	pos += layout.offset;
 	pos += cluster * 2;
-	printf("FAT16: FAT MOVING TO: ");
-	print_hex32(pos);
-	printf("\n");
+	//printf("FAT16: FAT MOVING TO: ");
+	//print_hex32(pos);
+	//printf("\n");
 	dev->seek(pos);
 	return pos;
 }
 
 uint32_t move_to_data_region(uint16_t cluster, uint16_t offset)
 {
-	print_hex((cluster >> 8) & 0xFF);
-	print_hex(cluster & 0xFF);
-	printf(" ");
 	uint32_t tmp = cluster - 2;
 
 	tmp *= bpb.sectors_per_cluster;
 	tmp *= bpb.bytes_per_sector;
-	print_hex32(tmp);
-	printf(" ");
 	uint32_t pos = layout.start_data_region;
 	pos += layout.offset;
 	pos += tmp;
 	pos += offset;
-	printf("FAT16: DATA MOVING TO: ");
-	print_hex32(pos);
-	printf("\n");
+	//printf("FAT16: DATA MOVING TO: ");
+	//print_hex32(pos);
+	//printf("\n");
 	dev->seek(pos);
 	return pos;
 }

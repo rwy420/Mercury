@@ -9,7 +9,6 @@ extern storage_dev_t* dev;
 
 static int read_entry_from_subdir(DirEntry* entry, EntryHandle* handle)
 {
-	printf("READ_ENTRY_SUBDIR\n");
 	if(handle->offset == bpb.sectors_per_cluster * bpb.bytes_per_sector)
 	{
 		uint16_t next_cluster;
@@ -30,7 +29,6 @@ static int read_entry_from_subdir(DirEntry* entry, EntryHandle* handle)
 
 static int find_entry_in_subdir(DirEntry* entry, uint32_t* entry_pos, EntryHandle* handle, char* name)
 {
-	printf("FIND_ENTRY_SUBDIR\n");
 	int ret = -1;
 	uint32_t starting_cluster = handle->cluster;
 
@@ -63,8 +61,6 @@ static int find_entry_in_subdir(DirEntry* entry, uint32_t* entry_pos, EntryHandl
 
 static int open_entry_in_subdir(EntryHandle* handle, char* name, char mode, bool is_file)
 {
-	printf("OPEN_ENTRY_IN_SUBDIR\n");
-
 	DirEntry entry;
 	uint32_t entry_pos;
 
@@ -103,13 +99,11 @@ static int open_entry_in_subdir(EntryHandle* handle, char* name, char mode, bool
 
 int open_directory_in_subdir(EntryHandle* handle, char* dirname)
 {
-	printf("OPEN_DIR_SUBDIR");
 	return open_entry_in_subdir(handle, dirname, 'r', false);
 }
 
 int ls_in_subdir(uint32_t* index, char* name, EntryHandle* handle)
 {
-	printf("LS_SUBDIR\n");
 	DirEntry entry;
 	uint32_t entry_index = *index;
 
@@ -120,16 +114,12 @@ int ls_in_subdir(uint32_t* index, char* name, EntryHandle* handle)
 		entry_index--;
 	}
 
-	printf("WHILE DONE\n");
-
 	if(read_entry_from_subdir(&entry, handle) < 0) return -1;
 
 	if(entry.name[0] == 0) return 0;
 
 	++*index;
 	memcpy(name, entry.name, sizeof(entry.name));
-
-	printf("LS DONE\n");
 
 	return 1;
 }
