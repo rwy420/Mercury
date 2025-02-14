@@ -30,9 +30,9 @@ main:
 	jc disk_error
 	pop es
 
-	mov ax, 9
+	mov ax, 1
 	mov dl, [drive_number]
-	mov cl, 55
+	mov cl, 20
 	mov bx, 0x500
 
 	call disk_read

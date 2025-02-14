@@ -1,9 +1,10 @@
 ;org 0x8E00
-org 0x500
+;org 0x500
 bits 16
 
-[map all stage2.map]
-
+global entry
+extern stage2_main 
+	
 entry:
 	; Set up segments and stack
 	mov ax, 0
@@ -38,10 +39,11 @@ entry:
 	; Kernel is located at 0xA000
 	; We want it at 0x100000
 
-	call 8h:relocate_kernel
+	;call 8h:relocate_kernel
 
 .enter_kernel:
-	jmp 8h:100000h
+	call 8h:stage2_main
+	;jmp 8h:100000h
 
 	cli 
 	hlt

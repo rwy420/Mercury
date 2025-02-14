@@ -1,3 +1,6 @@
+MFILE = ../mercury/build/mercury
+MSIZE := $(shell stat --format=%s $(MFILE))
+
 GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
 			-fno-leading-underscore -fno-stack-protector -Wwrite-strings \
 			-Os -ffunction-sections -fdata-sections -mno-sse -msoft-float -finline-small-functions
@@ -58,7 +61,7 @@ build/%.o: arch/x86/%.asm
 	nasm -felf32 -o $@ $<
 
 kernel.bin: linker.ld $(OBJECTS)
-	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
+	ld -M $(LDPARAMS) -T $< --defsym msize=$(MSIZE) -o $@ $(OBJECTS)
 	strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)
