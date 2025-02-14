@@ -47,7 +47,6 @@ bool identify_disk(Disk* disk)
 
 	if(status & 0x01)
 	{
-		printf("DISK ERROR\n");
 		return false;
 	}
 
@@ -59,8 +58,6 @@ bool identify_disk(Disk* disk)
 bool read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
 {
 	if(sector & 0xF0000000) return false;
-
-	/*if(length > sector_bytes) return false;*/
 
 	outb(DEVICE_PORT(disk->port_base), (disk->master ? 0xE0 : 0xF0) | ((sector & 0x0F000000) >> 24));
 	outb(ERROR_PORT(disk->port_base), 0);
@@ -77,7 +74,6 @@ bool read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
 
 	if(status & 0x1) 
 	{
-		printf("ERROR");
 		return false;
 	}
 
@@ -98,15 +94,8 @@ bool write28_disk(Disk* disk, uint32_t sector, uint8_t* data, int length)
 {
 	if(sector & 0xF0000000) 
 	{
-		printf("ERROR 1");
 		return false;
 	}
-
-	/*if(length > sector_bytes) 
-	{
-		printf("ERROR 2");
-		return false;
-	}*/
 
 	outb(DEVICE_PORT(disk->port_base), (disk->master ? 0xE0 : 0xF0) | ((sector & 0x0F000000) >> 24));
 	outb(ERROR_PORT(disk->port_base), 0);
@@ -145,7 +134,6 @@ bool flush_disk(Disk* disk)
 
 	if(status & 0x01)
 	{
-		printf("DISK ERROR\n");
 		return false;
 	}
 

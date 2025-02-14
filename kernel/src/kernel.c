@@ -12,8 +12,6 @@
 #include <memory/mem_manager.h>
 #include <memory/common.h>
 #include <memory/paging.h>
-//#include <fs/bootfs/bootfs.h>
-//#include <fs/mercuryfs/mercuryfs.h>
 #include <fs/fat16/fat16.h>
 
 #define ATA
@@ -33,7 +31,6 @@ void kernel_main()
 	printf("<Quicksilver> Loading Quicksilver kernel... \n");
 
 	segments_install_gdt();
-
 	install_idt();
 
 	printf("<Quicksilver> Registering syscalls\n");
@@ -110,12 +107,13 @@ void kernel_main()
 	int fd = fat16_open("/SBIN/MERCURY.ELF", 'r');
 	uint8_t* mercury_buffer = malloc(0x4000);
 	fat16_read(fd, mercury_buffer, 14196);
-	
+
 	void(*entry)();
 	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);
 	free(mercury_buffer);
-	entry();
+	//entry();
+	
 
+	
 	while(1);
-
 }
