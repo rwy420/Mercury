@@ -107,7 +107,7 @@ void kernel_main()
 
 	int fd = fat16_open("/SBIN/MERCURY.ELF", 'r');
 	uint8_t* mercury_buffer = malloc(0x4000);
-	fat16_read(fd, mercury_buffer, (unsigned long) msize);
+	fat16_read(fd, mercury_buffer, (unsigned long) &msize);
 
 	void(*entry)();
 	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);

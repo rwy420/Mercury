@@ -25,7 +25,7 @@ void ps2_kb_handle_interrupt()
 {
 	uint8_t key = inb(DATA_PORT);
 
-    /*if(key < 0x80)
+    if(key < 0x80)
     {
         switch(key)
         {
@@ -80,5 +80,5 @@ void ps2_kb_handle_interrupt()
                 break;
             }
         }
-    }*/
+    }
 }

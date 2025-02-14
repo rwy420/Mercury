@@ -1,5 +1,3 @@
-;org 0x8E00
-;org 0x500
 bits 16
 
 global entry
@@ -36,46 +34,11 @@ entry:
 	mov ds, ax
 	mov ss, ax
 
-	; Kernel is located at 0xA000
-	; We want it at 0x100000
-
-	;call 8h:relocate_kernel
-
-.enter_kernel:
+.continue:
 	call 8h:stage2_main
-	;jmp 8h:100000h
 
 	cli 
 	hlt
-
-relocate_kernel:
-	[bits 32]
-	push eax
-	push ebx
-
-	;mov eax, 0x100000
-	;mov ebx, 0xA000
-	xor ebx, ebx
-
-.reloc_loop:
-	[bits 32]
-
-	;mov eax, [0xA000 + ebx]
-	mov eax, [0x1700 + ebx]
-
-	mov [0x100000 + ebx], eax
-	add ebx, 4
-
-	cmp ebx, 40000
-	jne .reloc_loop
-
-.done:
-	[bits 32]
-	pop ebx
-	pop eax
-
-	ret
-
 
 ; --> si: Pointer to the string to print
 puts:

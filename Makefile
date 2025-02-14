@@ -16,6 +16,7 @@ image:
 vdi: image
 	dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
 	mcopy -i ./fs.bin mercury/build/mercury -o "::/SBIN/MERCURY.ELF"
+	mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
 	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352	
 
 grub:

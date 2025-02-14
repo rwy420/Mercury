@@ -61,7 +61,8 @@ build/%.o: arch/x86/%.asm
 	nasm -felf32 -o $@ $<
 
 kernel.bin: linker.ld $(OBJECTS)
-	ld -M $(LDPARAMS) -T $< --defsym msize=$(MSIZE) -o $@ $(OBJECTS)
+	@echo "Mercury Size: $(MSIZE)"
+	ld $(LDPARAMS) -T $< --defsym msize=$(MSIZE) -o $@ $(OBJECTS)
 	strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)
