@@ -1,7 +1,7 @@
 #ifndef __QS__DRIVER__ATA__ATA_H
 #define __QS__DRIVER__ATA__ATA_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 typedef struct
 {

@@ -1,7 +1,7 @@
 #ifndef __QS__FS__FAT16__FAT16_PATH_H
 #define __QS__FS__FAT16__FAT16_PATH_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 #define MAX_FILENAME_LEN 12
 

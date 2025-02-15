@@ -1,7 +1,7 @@
 #ifndef __QS__MEMORY__KHEAP_H
 #define __QS__MEMORY__KHEAP_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 void set_block(uint32_t bit);
 void unset_block(uint32_t bit);

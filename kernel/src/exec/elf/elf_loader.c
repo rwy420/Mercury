@@ -1,6 +1,6 @@
 #include <exec/elf/elf.h>
 #include <memory/common.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <memory/mem_manager.h>
 #include <exec/elf/symtable.h>
 

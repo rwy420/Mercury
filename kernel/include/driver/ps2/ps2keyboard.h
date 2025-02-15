@@ -2,8 +2,8 @@
 #define __QS__DRIVER__PS2__PS2KEYBOARD_H
 
 #include <hardware/port.h>
-#include <core/types.h>
-#include <core/screen.h>
+#include <common/types.h>
+#include <common/screen.h>
 #include <hardware/interrupts.h>
 #include <driver/driver.h>
 

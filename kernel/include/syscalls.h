@@ -2,7 +2,7 @@
 #define __QS__SYSCALLS_H
 
 #include <hardware/interrupts.h>
-#include <core/types.h>
+#include <common/types.h>
 
 typedef void (*syscall_t)(CPUState* cpu);
 

@@ -2,7 +2,7 @@
 #include <fs/fat16/fat16_priv.h>
 #include <fs/fat16/fat16_subdir.h>
 #include <memory/common.h>
-#include <core/screen.h>
+#include <common/screen.h>
 
 extern FAT16BPB bpb;
 extern storage_dev_t* dev;

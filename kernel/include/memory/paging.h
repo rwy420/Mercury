@@ -1,7 +1,7 @@
 #ifndef __QS__MEMORY__PAGING_H
 #define __QS__MEMORY__PAGING_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 #define PAGES_PER_TABLE 1024
 #define TABLES_PER_DIRECTORY 1024
@@ -10,7 +10,7 @@
 #define PD_INDEX(address) ((address) >> 22)
 #define PT_INDEX(address) (((address) >> 12) & 0x3FF) 
 #define PAGE_PHYS_ADDRESS(dir_entry) ((*dir_entry) & ~0xFFF)  
-#define SET_ATTRIBUTE(entry, attr) (*entry |= (attr))
+#define SET_ATTRIBUTE(entry, attr) (*(entry) |= (attr))
 #define CLEAR_ATTRIBUTE(entry, attr) (*entry &= ~(attr))
 #define TEST_ATTRIBUTE(entry, attr) (*entry & attr)
 #define SET_FRAME(entry, address) (*entry = (*entry & ~0x7FFFF000) | address)
@@ -67,7 +67,7 @@ void free_page(pt_entry_t* page);
 void set_page_directory(page_directory_t* pd);
 void flush_tlb_entry(uint32_t virtual_address);
 
-void map_page(void* physical_address, void* virtual_address);
+void map_page(void* physical_address, void* virtual_address, int flags);
 void unmap_page(void* virtual_address);
 
 void paging_enable();

@@ -1,9 +1,9 @@
-#include "fs/fat16/fat16_path.h"
-#include "fs/fat16/fat16_rootdir.h"
-#include "fs/fat16/fat16_subdir.h"
+#include <fs/fat16/fat16_path.h>
+#include <fs/fat16/fat16_rootdir.h>
+#include <fs/fat16/fat16_subdir.h>
 #include <fs/fat16/fat16.h>
 #include <fs/fat16/fat16_priv.h>
-#include <core/screen.h>
+#include <common/screen.h>
 
 extern storage_dev_t* dev;
 extern FAT16Layout layout;

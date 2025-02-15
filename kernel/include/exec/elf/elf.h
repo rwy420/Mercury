@@ -1,7 +1,7 @@
 #ifndef __QS__EXEC__ELF__ELF_H
 #define __QS__EXEC__ELF__ELF_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 #define ELF_IDENT 16
 

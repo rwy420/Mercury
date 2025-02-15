@@ -1,7 +1,9 @@
+#include <common/types.h>
 #include <memory/gdt.h>
+#include <memory/common.h>
 #include <hardware/interrupts.h>
 #include <hardware/pic.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <syscalls.h>
 
 #define MASTER_COMMAND_PORT 0x20
@@ -9,7 +11,7 @@
 #define MASTER_DATA_PORT 0x21
 #define SLAVE_DATA_PORT 0xA1
 
-static isr_t interrupt_handers[256];
+isr_t interrupt_handers[256];
 
 uint16_t hardware_interrupt_offset;
 
@@ -34,6 +36,8 @@ void interrupts_init_descriptor(int32_t index, uint32_t address)
 
 void install_idt()
 {
+	memset(interrupt_handers, 0, sizeof(interrupt_handers));
+
 	interrupts_init_descriptor(0x00, (uint32_t) handle_irq_00);
 	interrupts_init_descriptor(0x01, (uint32_t) handle_irq_01);
 	interrupts_init_descriptor(0x02, (uint32_t) handle_irq_02);
@@ -63,7 +67,7 @@ void install_idt()
 
 void interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 {
-	if(interrupt_handers[interrupt] != (isr_t) 0x00)
+	if(interrupt_handers[interrupt] != NULL_PTR)
 	{
 		interrupt_handers[interrupt](&cpu_state);
 		pic_confirm(interrupt);

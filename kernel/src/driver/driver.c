@@ -1,5 +1,5 @@
 #include <driver/driver.h>
-#include <core/screen.h>
+#include <common/screen.h>
 
 static struct Driver* drivers[256];
 uint8_t driver_index = 0;

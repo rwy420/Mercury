@@ -2,7 +2,7 @@
 #define __QS__HARDWARE__PCI_H
 
 #include <hardware/port.h>
-#include <core/types.h>
+#include <common/types.h>
 #include <driver/driver.h>
 
 enum BARType

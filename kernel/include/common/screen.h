@@ -1,7 +1,7 @@
-#ifndef __QS__CORE__SCREEN_H
-#define __QS__CORE__SCREEN_H
+#ifndef __QS__COMMON__SCREEN_H
+#define __QS__COMMON__SCREEN_H
 
-#include <core/types.h>
+#include <common/types.h>
 #include <hardware/interrupts.h>
 
 void syscall_printf(CPUState* cpu);

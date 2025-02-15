@@ -1,7 +1,7 @@
 #ifndef __QS__HARDWARE__PORT_H
 #define __QS__HARDWARE__PORT_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 uint8_t inb(uint16_t port);
 void outb(uint16_t port, uint8_t data);

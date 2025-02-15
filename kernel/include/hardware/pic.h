@@ -1,7 +1,7 @@
 #ifndef __QS__HARDWARE__PIC_H
 #define __QS__HARDWARE__PIC_H
 
-#include <core/types.h>
+#include <common/types.h>
 #include <hardware/port.h>
 
 void pic_remap(uint32_t offset1, uint32_t offset2);

@@ -1,6 +1,6 @@
 #include <syscalls.h>
 #include <hardware/interrupts.h>
-#include <core/screen.h>
+#include <common/screen.h>
 
 syscall_t handlers[256];
 

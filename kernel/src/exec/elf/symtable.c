@@ -1,7 +1,7 @@
 #include <exec/elf/symtable.h>
 #include <exec/elf/elf_loader.h>
 #include <memory/common.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <memory/mem_manager.h>
 #include <hardware/port.h>
 #include <fs/fat16/fat16.h>

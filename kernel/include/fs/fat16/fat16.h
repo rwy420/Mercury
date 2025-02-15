@@ -1,7 +1,7 @@
 #ifndef __QS__FS__FAT16__FAT16_H
 #define __QS__FS__FAT16__FAT16_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 enum FATError
 {

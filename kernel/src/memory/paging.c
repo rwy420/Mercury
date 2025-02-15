@@ -1,8 +1,8 @@
-#include <core/types.h>
+#include <common/types.h>
 #include <memory/paging.h>
 #include <memory/mem_manager.h>
 #include <memory/common.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <hardware/interrupts.h>
 
 extern uint32_t kernel_start_address;
@@ -69,7 +69,7 @@ void flush_tlb_entry(uint32_t virtual_address)
 	__asm__ __volatile__ ("cli; invlpg (%0); sti" : : "r" (virtual_address));
 }
 
-void map_page(void* physical_address, void* virtual_address)
+void map_page(void* physical_address, void* virtual_address, int flags)
 {
 	page_directory_t* pd = current_page_directory;
 
@@ -77,13 +77,12 @@ void map_page(void* physical_address, void* virtual_address)
 
 	if((*entry & PTE_PRESENT) != PTE_PRESENT)
 	{
-		page_table_t* table = (page_table_t*) /*alloc_blocks(1);*/ malloc(4096);
+		page_table_t* table = (page_table_t*) malloc_aligned(0x1000, 0x1000);
 
 		memset(table, 0, sizeof(page_table_t));
 
 		pd_entry_t* entry = &pd->entries[PD_INDEX((uint32_t) virtual_address)];
-		SET_ATTRIBUTE(entry, PDE_PRESENT);
-		//SET_ATTRIBUTE(entry, PDE_RW);
+		SET_ATTRIBUTE(entry, PDE_PRESENT | PDE_RW);
 		SET_FRAME(entry, (uint32_t) table);
 	}
 
@@ -91,7 +90,7 @@ void map_page(void* physical_address, void* virtual_address)
 
 	pt_entry_t* page = &table->entries[PT_INDEX((uint32_t) virtual_address)];
 
-	SET_ATTRIBUTE(page, PTE_PRESENT);
+	SET_ATTRIBUTE(page, flags | PTE_PRESENT);
 	SET_FRAME(page, (uint32_t) physical_address);
 
 	flush_tlb_entry((uint32_t) virtual_address);

@@ -1,7 +1,7 @@
 #ifndef __QS__DRIVER__SATA__AHCI_H
 #define __QS__DRIVER__SATA__AHCI_H
 
-#include <core/types.h>
+#include <common/types.h>
 
 #define SATA_SIG_ATA    0x00000101  // SATA drive
 #define SATA_SIG_ATAPI  0xEB140101  // SATAPI drive

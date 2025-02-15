@@ -1,4 +1,4 @@
-#include <core/screen.h>
+#include <common/screen.h>
 #include <fs/fat16/fat16.h>
 #include <fs/fat16/fat16_priv.h>
 #include <fs/fat16/fat16_rootdir.h>

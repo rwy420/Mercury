@@ -1,6 +1,6 @@
 #include <memory/mem_manager.h>
 
-#include <core/screen.h>
+#include <common/screen.h>
 #include <memory/common.h>
 
 #define BLOCK_SIZE 4096

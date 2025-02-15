@@ -1,7 +1,7 @@
 #ifndef __QS__EXEC__ELF__ELF_LOADER_H
 #define __QS__EXEC__ELF__ELF_LOADER_H
 
-#include <core/types.h>
+#include <common/types.h>
 #include <exec/elf/elf.h>
 
 void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst);

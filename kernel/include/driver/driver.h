@@ -1,7 +1,7 @@
 #ifndef __QS__DRIVER__DRIVER_H
 #define __QS__DRIVER__DRIVER_H
 
-#include <core/types.h>
+#include <common/types.h>
 #include <hardware/interrupts.h>
 
 typedef void (*enable_handler_t)();

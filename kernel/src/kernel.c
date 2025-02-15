@@ -1,6 +1,6 @@
 #include <syscalls.h>
-#include <core/screen.h>
-#include <core/types.h>
+#include <common/screen.h>
+#include <common/types.h>
 #include <exec/elf/elf_loader.h>
 #include <exec/elf/symtable.h>
 #include <memory/gdt.h>
@@ -113,6 +113,6 @@ void kernel_main()
 	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);
 	free(mercury_buffer);
 	//entry();
-
+	
 	while(1);
 }

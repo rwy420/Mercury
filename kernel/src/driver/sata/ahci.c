@@ -1,6 +1,6 @@
-#include "core/types.h"
+#include <common/types.h>
 #include <driver/sata/ahci.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <memory/mem_manager.h>
 #include <memory/common.h>
 #include <memory/paging.h>

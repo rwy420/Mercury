@@ -1,7 +1,7 @@
 #ifndef __QS__MEMORY__GDT_H
 #define __QS__MEMORY__GDT_H
 
-#include <core/types.h> 
+#include <common/types.h> 
 
 #define KERNEL_CODE_SEGMENT 0x08
 #define KERNEL_DATA_SEGMENT 0x10

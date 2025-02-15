@@ -5,6 +5,9 @@ global segments_load_registers
 global flush_tss
 global jump_usermode
 
+global switch_context
+global new_task_setup
+
 segments_load_gdt:
 	lgdt [esp + 4]
 	ret

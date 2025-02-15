@@ -1,5 +1,5 @@
 #include <memory/common.h>
-#include <core/screen.h>
+#include <common/screen.h>
 
 extern uint32_t kernel_start_address;
 extern uint32_t kernel_end_address;

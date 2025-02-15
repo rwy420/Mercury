@@ -1,4 +1,4 @@
-#include <core/screen.h>
+#include <common/screen.h>
 
 #define MAX_X 80
 #define MAX_Y 25

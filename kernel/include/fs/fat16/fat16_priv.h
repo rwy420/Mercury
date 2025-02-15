@@ -6,7 +6,7 @@
 #define VFAT_DIR_ENTRY 0x0F
 #define AVAILABLE_DIR_ENTRY 0xE5
 
-#include <core/types.h>
+#include <common/types.h>
 
 typedef struct
 {

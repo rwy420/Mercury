@@ -2,7 +2,7 @@
 #define __QS__HARDWARE__INTERRUPTS_H
 
 #include <hardware/pic.h>
-#include <core/types.h>
+#include <common/types.h>
 #include <memory/gdt.h>
 #include <hardware/port.h>
 

@@ -2,7 +2,7 @@
 #include <memory/mem_manager.h>
 #include <memory/paging.h>
 #include <driver/sata/sata.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <driver/driver.h>
 
 #define DATA_PORT 0xCFC
@@ -83,7 +83,9 @@ void pci_enumerate_devices(bool debug)
 							case 0x2829:
 								for(int page = 0; page < 6; page++)
 								{
-									map_page((void*)(port_base + (4096 * page)), (void*)(port_base + (4096 * page)));
+									//TODO TEST THIS
+									map_page((void*)(port_base + (4096 * page)), (void*)(port_base + (4096 * page)),
+											PTE_RW);
 								}
 								init_sata(port_base);
 							break;

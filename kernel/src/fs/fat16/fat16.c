@@ -1,10 +1,10 @@
-#include "fs/fat16/fat16_subdir.h"
+#include <fs/fat16/fat16_subdir.h>
 #include <fs/fat16/fat16.h>
 #include <fs/fat16/fat16_priv.h>
 #include <fs/fat16/fat16_rootdir.h>
 #include <fs/fat16/fat16_path.h>
 #include <memory/common.h>
-#include <core/screen.h>
+#include <common/screen.h>
 #include <driver/ata/ata.h>
 
 //#define FAT_DEBUG

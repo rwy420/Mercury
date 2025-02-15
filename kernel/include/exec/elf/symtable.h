@@ -1,7 +1,7 @@
 #ifndef __QS__EXEC__ELF__SYMTABLE_H
 #define __QS__EXEC__ELF__SYMTABLE_H
 
-#include <core/screen.h>
+#include <common/screen.h>
 
 #define MAX_SYMBOLS 256
 
