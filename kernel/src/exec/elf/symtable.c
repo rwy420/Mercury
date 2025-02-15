@@ -57,7 +57,6 @@ void* resolve_symbol(const char* name)
 			return symtable[i].address;
 		}
 	}
-	printf(name);
-	
+
 	return NULL_PTR; 
 }
