@@ -112,7 +112,7 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);
 	free(mercury_buffer);
-	entry();
+	//entry();
 
 	while(1);
 }
