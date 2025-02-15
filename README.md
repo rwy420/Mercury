@@ -11,9 +11,9 @@ Report problems or give suggestions [Here](https://github.com/rwy420/MercuryOS/i
 [X] ELF32 loader \
 [ ] API \
 [ ] Terminal \
-[X] Disk driver \ 
+[X] Disk driver \
 [X] File systems \
 [ ] Documentation \
 [X] User mode apps \
 [ ] Python port \
-[X] Syscalls \
+[X] Syscalls
