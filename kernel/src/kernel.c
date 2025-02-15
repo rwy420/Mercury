@@ -14,11 +14,14 @@
 #include <memory/paging.h>
 #include <fs/fat16/fat16.h>
 
+#include <exec/usermode.h>
+
 #define ATA
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
 extern uint8_t msize;
+extern TSS tss;
 
 uint32_t kernel_start_address;
 uint32_t kernel_end_address;
@@ -75,7 +78,7 @@ void kernel_main()
 	printf("\n");
 
 	printf("<Quicksilver> Setting up paging\n");
-	paging_enable();
+	//paging_enable();
 
 	init_symtable();
 
@@ -105,14 +108,61 @@ void kernel_main()
 		printf("\n");
 	}
 
-	int fd = fat16_open("/SBIN/MERCURY.ELF", 'r');
+	/*int fd = fat16_open("/SBIN/MERCURY.ELF", 'r');
 	uint8_t* mercury_buffer = malloc(0x4000);
 	fat16_read(fd, mercury_buffer, (unsigned long) &msize);
 
 	void(*entry)();
 	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);
 	free(mercury_buffer);
-	//entry();
+	//entry();*/
 	
+	int fd = fat16_open("/BIN/SYSTEST.ELF", 'r');
+	uint8_t* buffer = malloc(13512);
+	fat16_read(fd, buffer, 13512);
+
+	void(*entry)();
+	entry = image_load(buffer, sizeof(buffer), true);
+	free(buffer);
+	//entry();
+	//
+	memmove((void*) 0x500000, entry, 0x4000);
+	uint32_t* user_stack = (uint32_t*) 0x600000;
+	uint32_t* user_stack_ptr = (uint32_t*)(user_stack) + 4096;
+memset(user_stack, 0, 4096);
+
+	/**(--user_stack_ptr) = 0x20;
+	*(--user_stack_ptr) = (uint32_t)(user_stack) + 4096;
+	*(--user_stack_ptr) = 0x202;
+	*(--user_stack_ptr) = 0x18;
+	*(--user_stack_ptr) = (uint32_t) entry;	*/
+
+	print_hex32((uint32_t) user_stack);
+	printf(" ");
+	print_hex32((uint32_t) user_stack + 4096);
+
+	tss.cs = 0x18;
+	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x20;
+
+	asm volatile(
+		"cli;"
+		"mov $0x20, %%ax;"
+		"mov %%ax, %%ds;"
+		"mov %%ax, %%es;"
+		"mov %%ax, %%fs;"
+		"mov %%ax, %%gs;"
+		"mov %0, %%esp;"
+		"push $0x20;"
+		"push %0;"
+		"pushf;"
+		"push $0x18;"
+		"push %1;"
+		"iret;"
+		:
+		: "r" (((uint32_t) user_stack) + 4096), "r" ((void*) entry)
+	);
+
+	printf("DONEEE");
+
 	while(1);
 }

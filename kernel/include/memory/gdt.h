@@ -15,13 +15,14 @@ typedef struct
 	uint32_t address;
 } __attribute__((packed)) GDT;
 
-typedef struct {
-	uint16_t limit_low;
-	uint16_t base_low;
-	uint8_t  base_mid;
-	uint8_t  access;
-	uint8_t  granularity;
-	uint8_t  base_high;
+typedef struct
+{
+    uint16_t limit_low;      // Lower 16 bits of the limit
+    uint16_t base_low;       // Lower 16 bits of the base
+    uint8_t base_middle;     // Middle 8 bits of the base
+    uint8_t access;          // Access byte
+    uint8_t granularity;     // High 4 bits of the limit and flags
+    uint8_t base_high;       // Upper 8 bits of the base
 } __attribute__((packed)) GDTEntry;
 
 typedef struct {
