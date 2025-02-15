@@ -2,8 +2,9 @@
 #include <core/screen.h>
 #include <memory/common.h>
 
-static GDTEntry gdt_entries[3];
+GDTEntry gdt_entries[6];
 GDT gdt;
+TSS tss;
 
 void gdt_set_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags)
 {
@@ -18,12 +19,20 @@ void gdt_set_entry(int32_t index, uint32_t base, uint32_t limit, uint8_t access,
 void segments_install_gdt()
 {
 	gdt.address = (uint32_t) gdt_entries;
-	gdt.size = (sizeof(GDTEntry) * 3) - 1;
+	gdt.size = (sizeof(GDTEntry) * 6) - 1;
+
+	memset(&tss, 0, sizeof(TSS));
+	tss.ss0 = KERNEL_DATA_SEGMENT;
 
 	gdt_set_entry(0, 0, 0, 0, 0);
 	gdt_set_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xC0);
 	gdt_set_entry(2, 0, 0xFFFFFFFF, 0x92, 0xC0);
+	gdt_set_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xC0);
+	gdt_set_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xC0);
+	gdt_set_entry(5, (uint32_t) &tss, sizeof(TSS), 0x89, 0x40);
 
 	segments_load_gdt(gdt);
 	segments_load_registers();
+
+	asm("ltr %%ax" :: "a" ((uint16_t) TSS_SEGMENT));
 }
