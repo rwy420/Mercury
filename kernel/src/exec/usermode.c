@@ -1,3 +1,4 @@
+#include <memory/paging.h>
 #include <exec/usermode.h>
 #include <memory/common.h>
 #include <memory/gdt.h>
@@ -7,7 +8,16 @@ extern TSS tss;
 
 void execute_user_mode(void* entry)
 {
-	memmove((void*) 0x500000, entry, 0x4000);
+	for(int i = 0; i < 0x4000; i += PAGE_SIZE)
+	{
+		map_page((void*) 0x500000 + i, (void*) 0x500000 + i, PTE_PRESENT | PTE_USER | PTE_RW);
+	}
+
+	memcpy((void*) 0x500000, entry, 0x4000);
+
+	map_page((void*) 0x5ff000, (void*) 0x5ff000, PTE_PRESENT | PTE_USER | PTE_RW);
+	map_page((void*) 0x600000, (void*) 0x600000, PTE_PRESENT | PTE_USER | PTE_RW);
+
 	uint32_t* user_stack = (uint32_t*) 0x600000;
 	uint32_t* user_stack_ptr = (uint32_t*)(user_stack) + 4096;
 	memset(user_stack, 0, 4096);
@@ -37,6 +47,8 @@ void execute_user_mode(void* entry)
 static void kernel_mode()
 {
 	printf("\nBACK TO KERNEL MODE!!\n");
+
+	while(1);
 }
 
 void kernel_switch_back()
@@ -44,13 +56,13 @@ void kernel_switch_back()
 	asm volatile(
 		"cli;"
 		"mov %0, %%esp;"
-		"push $0x20;"
+		"push $0x10;"
 		"push %0;"
 		"pushf;"
-		"push $0x18;"
+		"push $0x08;"
 		"push %1;"
 		"iret;"
 		:
-		: "r" (0x900000), "r" ((void*) kernel_mode)
+		: "r" (0x90000), "r" ((void*) kernel_mode)
 	);
 }

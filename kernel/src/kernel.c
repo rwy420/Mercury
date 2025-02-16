@@ -77,18 +77,7 @@ void kernel_main()
 	printf("\n");
 
 	printf("<Mercury> Setting up paging\n");
-	//paging_enable();#include "syscall.h"
-
-void syscall(int syscall_number, void* arg) {
-    asm volatile (
-        "int $0x80"             // Trigger syscall interrupt
-        :                       // No outputs
-        : "a"(syscall_number),  // Syscall number in EAX
-          "b"(arg)              // Argument in EBX
-        : "memory"
-    );
-}
-
+	paging_enable();
 
 	init_symtable();
 
