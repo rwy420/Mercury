@@ -1,5 +1,5 @@
-#ifndef __QS__MEMORY__COMMON_H
-#define __QS__MEMORY__COMMON_H
+#ifndef __MERCURY__MEMORY__COMMON_H
+#define __MERCURY__MEMORY__COMMON_H
 
 #include <common/types.h>
 

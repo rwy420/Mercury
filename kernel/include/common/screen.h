@@ -1,5 +1,5 @@
-#ifndef __QS__COMMON__SCREEN_H
-#define __QS__COMMON__SCREEN_H
+#ifndef __MERCURY__COMMON__SCREEN_H
+#define __MERCURY__COMMON__SCREEN_H
 
 #include <common/types.h>
 #include <hardware/interrupts.h>

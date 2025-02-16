@@ -39,7 +39,7 @@ void enable_driver(uint8_t id)
 	drivers[id]->enabled = true;
 	drivers[id]->enable_handler();
 
-	printf("<Quicksilver> Driver '");
+	printf("<Mercury> Driver '");
 	printf(drivers[id]->name);
 	printf("' enabled \n");
 }
@@ -49,7 +49,7 @@ void disbale_driver(uint8_t id)
 	drivers[id]->enabled = false;
 	drivers[id]->disbale_handler();
 
-	printf("<Quicksilver> Driver '");
+	printf("<Mercury> Driver '");
 	printf(drivers[id]->name);
 	printf("' disabled \n");
 }

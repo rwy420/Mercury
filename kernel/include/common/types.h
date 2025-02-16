@@ -1,5 +1,5 @@
-#ifndef __QS__COMMON__TYPES_H
-#define __QS__COMMON__TYPES_H
+#ifndef __MERCURY__COMMON__TYPES_H
+#define __MERCURY__COMMON__TYPES_H
 
 #define NULL_PTR ((void*) 0)
 

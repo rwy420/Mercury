@@ -1,5 +1,5 @@
-#ifndef __QS__EXEC__ELF__SYMTABLE_H
-#define __QS__EXEC__ELF__SYMTABLE_H
+#ifndef __MERCURY__EXEC__ELF__SYMTABLE_H
+#define __MERCURY__EXEC__ELF__SYMTABLE_H
 
 #include <common/screen.h>
 

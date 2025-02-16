@@ -1,5 +1,5 @@
-#ifndef __QS__DRIVER__DRIVER_H
-#define __QS__DRIVER__DRIVER_H
+#ifndef __MERCURY__DRIVER__DRIVER_H
+#define __MERCURY__DRIVER__DRIVER_H
 
 #include <common/types.h>
 #include <hardware/interrupts.h>

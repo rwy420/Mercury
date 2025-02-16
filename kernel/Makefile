@@ -1,6 +1,3 @@
-MFILE = ../mercury/build/mercury
-MSIZE := $(shell stat --format=%s $(MFILE))
-
 GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
 			-fno-leading-underscore -fno-stack-protector -Wwrite-strings \
 			-Os -ffunction-sections -fdata-sections -mno-sse -msoft-float -finline-small-functions
@@ -13,7 +10,7 @@ OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o b
 		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
 		  build/elf_loader.o build/elf.o build/symtable.o build/sata.o build/ahci.o \
 		  build/fat16.o build/fat16_path.o build/fat16_priv.o build/fat16_rootdir.o build/fat16_subdir.o \
-		  build/usermode.o build/tss.o
+		  build/usermode.o
 
 GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
@@ -66,7 +63,7 @@ build/%.o: arch/x86/%.asm
 
 kernel.bin: linker.ld $(OBJECTS)
 	@echo "Mercury Size: $(MSIZE)"
-	ld $(LDPARAMS) -T $< --defsym msize=$(MSIZE) -o $@ $(OBJECTS)
+	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
 	strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)

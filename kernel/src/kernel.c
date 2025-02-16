@@ -20,7 +20,6 @@
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
-extern uint8_t msize;
 extern TSS tss;
 
 uint32_t kernel_start_address;
@@ -32,12 +31,12 @@ uint32_t mem_manager_end;
 void kernel_main()
 {
 	clear_screen();
-	printf("<Quicksilver> Loading Quicksilver kernel... \n");
+	printf("<Mercury> Loading Mercury kernel... \n");
 
 	segments_install_gdt();
 	install_idt();
 
-	printf("<Quicksilver> Registering syscalls\n");
+	printf("<Mercury> Registering syscalls\n");
 	register_interrupt_handler(0x80, syscall);
 	register_syscall_handler(0x4, (syscall_t) syscall_printf);
 
@@ -45,14 +44,14 @@ void kernel_main()
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
 	{
-		printf("<Quicksilver> Selected ata0m as default disk\n");
+		printf("<Mercury> Selected ata0m as default disk\n");
 		set_default_disk(&ata0m);
 	}
 
 	Disk ata0s = init_disk(0x1F0, false);
 	if(identify_disk(&ata0s))
 	{
-		printf("<Quicksilver> Selected ata0s as default disk\n");
+		printf("<Mercury> Selected ata0s as default disk\n");
 		set_default_disk(&ata0s);
 	}
 #endif
@@ -70,14 +69,14 @@ void kernel_main()
 
 	heap_init(0x200000, 0x200000);
 
-	printf("<Quicksilver> Block manager size: 0x");
+	printf("<Mercury> Block manager size: 0x");
 	print_hex((mem_manager_size >> 24) & 0xFF);
 	print_hex((mem_manager_size >> 16) & 0xFF);
 	print_hex((mem_manager_size >> 8) & 0xFF);
 	print_hex(mem_manager_size & 0xFF);
 	printf("\n");
 
-	printf("<Quicksilver> Setting up paging\n");
+	printf("<Mercury> Setting up paging\n");
 	//paging_enable();
 
 	init_symtable();
@@ -88,9 +87,9 @@ void kernel_main()
 
 	enable_driver(keyboard_driver);
 
-	printf("<Quicksilver> Searching PCI deivce drivers\n");
+	printf("<Mercury> Searching PCI deivce drivers\n");
 	pci_enumerate_devices(false);
-	printf("<Quicksilver> PCI Initialization done\n");
+	printf("<Mercury> PCI Initialization done\n");
 
 	storage_dev_t* fat_dev = malloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
@@ -100,22 +99,13 @@ void kernel_main()
 	fat16_init(fat_dev , 0);
 
 
-	char fname[11] = {0};
+	char fname[11];
 	uint32_t i = 0;
-	while(fat16_ls(&i, fname, "/SBIN") == 1)
+	while(fat16_ls(&i, fname, "/") == 1)
 	{
 		printf(fname);
 		printf("\n");
 	}
-
-	/*int fd = fat16_open("/SBIN/MERCURY.ELF", 'r');
-	uint8_t* mercury_buffer = malloc(0x4000);
-	fat16_read(fd, mercury_buffer, (unsigned long) &msize);
-
-	void(*entry)();
-	entry = image_load(mercury_buffer, sizeof(mercury_buffer), false);
-	free(mercury_buffer);
-	//entry();*/
 	
 	int fd = fat16_open("/BIN/SYSTEST.ELF", 'r');
 	uint8_t* buffer = malloc(13512);

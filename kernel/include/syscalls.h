@@ -1,5 +1,5 @@
-#ifndef __QS__SYSCALLS_H
-#define __QS__SYSCALLS_H
+#ifndef __MERCURY__SYSCALLS_H
+#define __MERCURY__SYSCALLS_H
 
 #include <hardware/interrupts.h>
 #include <common/types.h>

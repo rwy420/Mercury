@@ -1,8 +1,7 @@
-# MercuryOS
+# Mercury
 
-MercuryOS is an operating system running on top of my kernel `Quicksilver`. 
-Check kernel/TODO.txt for future features. \
-Report problems or give suggestions [Here](https://github.com/rwy420/MercuryOS/issues) (Issue page)
+Mercury is a WIP x86-32 kernel. \
+Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/issues) (Issue page)
 
 # Features and TODO
 [X] Paging and virtual memory \

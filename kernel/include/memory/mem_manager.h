@@ -1,5 +1,5 @@
-#ifndef __QS__MEMORY__KHEAP_H
-#define __QS__MEMORY__KHEAP_H
+#ifndef __MERCURY__MEMORY__KHEAP_H
+#define __MERCURY__MEMORY__KHEAP_H
 
 #include <common/types.h>
 

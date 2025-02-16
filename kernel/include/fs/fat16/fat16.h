@@ -1,5 +1,5 @@
-#ifndef __QS__FS__FAT16__FAT16_H
-#define __QS__FS__FAT16__FAT16_H
+#ifndef __MERCURY__FS__FAT16__FAT16_H
+#define __MERCURY__FS__FAT16__FAT16_H
 
 #include <common/types.h>
 

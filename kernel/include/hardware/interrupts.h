@@ -1,5 +1,5 @@
-#ifndef __QS__HARDWARE__INTERRUPTS_H
-#define __QS__HARDWARE__INTERRUPTS_H
+#ifndef __MERCURY__HARDWARE__INTERRUPTS_H
+#define __MERCURY__HARDWARE__INTERRUPTS_H
 
 #include <hardware/pic.h>
 #include <common/types.h>

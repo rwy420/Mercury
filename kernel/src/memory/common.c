@@ -63,21 +63,21 @@ int memcmp(const void* s1, const void* s2, uint32_t size)
 
 void print_memory_info()
 {
-	printf("<Quicksilver> Kernel start: 0x");
+	printf("<Mercury> Kernel start: 0x");
 	print_hex((kernel_start_address >> 24) & 0xFF);
 	print_hex((kernel_start_address >> 16) & 0xFF);
 	print_hex((kernel_start_address >> 8) & 0xFF);
 	print_hex(kernel_start_address & 0xFF);
 	printf("\n");
 
-	printf("<Quicksilver> Kernel end: 0x");
+	printf("<Mercury> Kernel end: 0x");
 	print_hex((kernel_end_address >> 24) & 0xFF);
 	print_hex((kernel_end_address >> 16) & 0xFF);
 	print_hex((kernel_end_address >> 8) & 0xFF);
 	print_hex(kernel_end_address & 0xFF);
 	printf("\n");
 
-	printf("<Quicksilver> Kernel size: 0x");
+	printf("<Mercury> Kernel size: 0x");
 	print_hex((kernel_size >> 24) & 0xFF);
 	print_hex((kernel_size >> 16) & 0xFF);
 	print_hex((kernel_size >> 8) & 0xFF);

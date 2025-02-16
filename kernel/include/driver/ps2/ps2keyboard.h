@@ -1,5 +1,5 @@
-#ifndef __QS__DRIVER__PS2__PS2KEYBOARD_H
-#define __QS__DRIVER__PS2__PS2KEYBOARD_H
+#ifndef __MERCURY__DRIVER__PS2__PS2KEYBOARD_H
+#define __MERCURY__DRIVER__PS2__PS2KEYBOARD_H
 
 #include <hardware/port.h>
 #include <common/types.h>

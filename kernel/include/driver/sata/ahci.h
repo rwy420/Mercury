@@ -1,5 +1,5 @@
-#ifndef __QS__DRIVER__SATA__AHCI_H
-#define __QS__DRIVER__SATA__AHCI_H
+#ifndef __MERCURY__DRIVER__SATA__AHCI_H
+#define __MERCURY__DRIVER__SATA__AHCI_H
 
 #include <common/types.h>
 
