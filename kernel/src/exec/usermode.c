@@ -26,7 +26,6 @@ void execute_user_mode(void* entry)
 	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x20;
 
 	asm volatile(
-		"cli;"
 		"mov $0x20, %%ax;"
 		"mov %%ax, %%ds;"
 		"mov %%ax, %%es;"
@@ -54,7 +53,12 @@ static void kernel_mode()
 void kernel_switch_back()
 {
 	asm volatile(
-		"cli;"
+		"sti;"
+		"mov $0x10, %%ax;"
+		"mov %%ax, %%ds;"
+		"mov %%ax, %%es;"
+		"mov %%ax, %%fs;"
+		"mov %%ax, %%gs;"
 		"mov %0, %%esp;"
 		"push $0x10;"
 		"push %0;"

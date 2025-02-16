@@ -2,14 +2,7 @@ section .text
 
 extern interrupt_handler
 
-%macro no_error_interrupt_handler 1
-global handle_irq_%1
-handle_irq_%1:
-	push dword %1
-	jmp common_interrupt_handler
-%endmacro
-
-%macro error_interrupt_handler 1
+%macro interrupt 1
 global handle_irq_%1
 handle_irq_%1:
 	push dword %1
@@ -43,23 +36,25 @@ common_interrupt_handler:
 
 	iret
 
-no_error_interrupt_handler 00
-no_error_interrupt_handler 01
-no_error_interrupt_handler 02
-no_error_interrupt_handler 03
-no_error_interrupt_handler 04
-no_error_interrupt_handler 05
-no_error_interrupt_handler 06
-no_error_interrupt_handler 07
-no_error_interrupt_handler 08
-no_error_interrupt_handler 09
-no_error_interrupt_handler 10
-no_error_interrupt_handler 11
-no_error_interrupt_handler 12
-no_error_interrupt_handler 13
-no_error_interrupt_handler 14	
-no_error_interrupt_handler 15
-no_error_interrupt_handler 32
-no_error_interrupt_handler 33
-no_error_interrupt_handler 49
-no_error_interrupt_handler 128
+; Exceptions
+interrupt 00
+interrupt 01
+interrupt 02
+interrupt 03
+interrupt 04
+interrupt 05
+interrupt 06
+interrupt 07
+interrupt 08
+interrupt 09
+interrupt 10
+interrupt 11
+interrupt 12
+interrupt 13
+interrupt 14	
+interrupt 15
+; Non-exception interrups
+interrupt 32
+interrupt 33
+interrupt 49
+interrupt 128
