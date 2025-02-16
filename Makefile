@@ -7,7 +7,6 @@ fs.bin:
 	dd if=/dev/zero of=fs.bin bs=1 count=687109
 
 image:
-	cd mercury && make mercury
 	cd kernel && make kernel.bin
 	cp kernel/kernel.bin bootloader
 	cd bootloader && make
@@ -15,7 +14,6 @@ image:
 
 vdi: image
 	dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
-	mcopy -i ./fs.bin mercury/build/mercury -o "::/SBIN/MERCURY.ELF"
 	mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
 	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352	
 

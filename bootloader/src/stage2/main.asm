@@ -12,6 +12,10 @@ entry:
 
 	mov sp, 0x8E00
 
+	;mov	ax,1112h
+	;xor	bl,bl
+	;int	10h
+
 	mov si, stage2_message
 	call puts
 

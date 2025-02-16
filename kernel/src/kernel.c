@@ -3,8 +3,10 @@
 #include <common/types.h>
 #include <exec/elf/elf_loader.h>
 #include <exec/elf/symtable.h>
+#include <exec/usermode.h>
 #include <memory/gdt.h>
 #include <driver/driver.h>
+#include <driver/vga/vga.h>
 #include <driver/ps2/ps2keyboard.h>
 #include <driver/ata/ata.h>
 #include <hardware/interrupts.h>
@@ -13,8 +15,6 @@
 #include <memory/common.h>
 #include <memory/paging.h>
 #include <fs/fat16/fat16.h>
-
-#include <exec/usermode.h>
 
 #define ATA
 
@@ -106,7 +106,7 @@ void kernel_main()
 		printf(fname);
 		printf("\n");
 	}
-	
+
 	int fd = fat16_open("/BIN/SYSTEST.ELF", 'r');
 	uint8_t* buffer = malloc(13512);
 	fat16_read(fd, buffer, 13512);
@@ -114,18 +114,11 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load(buffer, sizeof(buffer), true);
 	free(buffer);
-	//entry();
-	//
+
 	memmove((void*) 0x500000, entry, 0x4000);
 	uint32_t* user_stack = (uint32_t*) 0x600000;
 	uint32_t* user_stack_ptr = (uint32_t*)(user_stack) + 4096;
-memset(user_stack, 0, 4096);
-
-	/**(--user_stack_ptr) = 0x20;
-	*(--user_stack_ptr) = (uint32_t)(user_stack) + 4096;
-	*(--user_stack_ptr) = 0x202;
-	*(--user_stack_ptr) = 0x18;
-	*(--user_stack_ptr) = (uint32_t) entry;	*/
+	memset(user_stack, 0, 4096);
 
 	print_hex32((uint32_t) user_stack);
 	printf(" ");
@@ -151,8 +144,6 @@ memset(user_stack, 0, 4096);
 		:
 		: "r" (((uint32_t) user_stack) + 4096), "r" ((void*) entry)
 	);
-
-	printf("DONEEE");
 
 	while(1);
 }
