@@ -16,3 +16,4 @@ bootloader/header.bin
 bx_enh_dbg.ini
 bochs_config
 build
+apps

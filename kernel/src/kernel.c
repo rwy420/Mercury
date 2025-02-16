@@ -20,7 +20,6 @@
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
-extern TSS tss;
 
 uint32_t kernel_start_address;
 uint32_t kernel_end_address;
@@ -38,7 +37,8 @@ void kernel_main()
 
 	printf("<Mercury> Registering syscalls\n");
 	register_interrupt_handler(0x80, syscall);
-	register_syscall_handler(0x4, (syscall_t) syscall_printf);
+	register_syscall_handler(1, (syscall_t) syscall_printf);
+	register_syscall_handler(80, (syscall_t) kernel_switch_back);
 
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
@@ -77,7 +77,18 @@ void kernel_main()
 	printf("\n");
 
 	printf("<Mercury> Setting up paging\n");
-	//paging_enable();
+	//paging_enable();#include "syscall.h"
+
+void syscall(int syscall_number, void* arg) {
+    asm volatile (
+        "int $0x80"             // Trigger syscall interrupt
+        :                       // No outputs
+        : "a"(syscall_number),  // Syscall number in EAX
+          "b"(arg)              // Argument in EBX
+        : "memory"
+    );
+}
+
 
 	init_symtable();
 
@@ -107,7 +118,7 @@ void kernel_main()
 		printf("\n");
 	}
 
-	int fd = fat16_open("/BIN/SYSTEST.ELF", 'r');
+	int fd = fat16_open("/BIN/TEST.ELF", 'r');
 	uint8_t* buffer = malloc(13512);
 	fat16_read(fd, buffer, 13512);
 
@@ -115,35 +126,7 @@ void kernel_main()
 	entry = image_load(buffer, sizeof(buffer), true);
 	free(buffer);
 
-	memmove((void*) 0x500000, entry, 0x4000);
-	uint32_t* user_stack = (uint32_t*) 0x600000;
-	uint32_t* user_stack_ptr = (uint32_t*)(user_stack) + 4096;
-	memset(user_stack, 0, 4096);
-
-	print_hex32((uint32_t) user_stack);
-	printf(" ");
-	print_hex32((uint32_t) user_stack + 4096);
-
-	tss.cs = 0x18;
-	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x20;
-
-	asm volatile(
-		"cli;"
-		"mov $0x20, %%ax;"
-		"mov %%ax, %%ds;"
-		"mov %%ax, %%es;"
-		"mov %%ax, %%fs;"
-		"mov %%ax, %%gs;"
-		"mov %0, %%esp;"
-		"push $0x20;"
-		"push %0;"
-		"pushf;"
-		"push $0x18;"
-		"push %1;"
-		"iret;"
-		:
-		: "r" (((uint32_t) user_stack) + 4096), "r" ((void*) entry)
-	);
+	execute_user_mode(entry);
 
 	while(1);
 }
