@@ -1,5 +1,0 @@
-CompileFlags:
-  Add: -I/home/arjan/Development/Mercury/kernel/include
-    #"-I./include/"
-    #- "--include-directory include"
-    #- "-I ./include"
