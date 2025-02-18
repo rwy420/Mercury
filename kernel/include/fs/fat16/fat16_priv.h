@@ -52,7 +52,7 @@ typedef struct
 	uint32_t size;
 } __attribute__((packed)) DirEntry;
 
-enum FileAttribute
+enum FAT16_FILE_ATTRIBUTE
 {
 	READ_ONLY	= 0x01,
 	HIDDEN		= 0x02,

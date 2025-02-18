@@ -6,13 +6,13 @@
 #include <memory/gdt.h>
 #include <hardware/port.h>
 
-struct IDT
+typedef struct
 {
 	uint16_t size;
 	uint32_t address;
-} __attribute__((packed));
+} __attribute__((packed)) IDT;
 
-struct IDTDescriptor
+typedef struct
 {
 	uint16_t offset_low;
 	uint16_t segment_selector;
@@ -20,7 +20,7 @@ struct IDTDescriptor
 	uint8_t reserved;
 	uint8_t type_attribute;
 	uint16_t offset_high;
-} __attribute__((packed));
+} __attribute__((packed)) IDTDescriptor;
 
 void install_idt();
 

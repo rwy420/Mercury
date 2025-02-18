@@ -20,10 +20,12 @@
 
 extern uint8_t kernel_start;
 extern uint8_t kernel_end;
+extern Disk* g_default_disk;
 
 uint32_t kernel_start_address;
 uint32_t kernel_end_address;
 uint32_t kernel_size;
+
 
 uint32_t mem_manager_end;
 
@@ -45,14 +47,14 @@ void kernel_main()
 	if(identify_disk(&ata0m))
 	{
 		printf("<Mercury> Selected ata0m as default disk\n");
-		set_default_disk(&ata0m);
+		g_default_disk = &ata0m;
 	}
 
 	Disk ata0s = init_disk(0x1F0, false);
 	if(identify_disk(&ata0s))
 	{
 		printf("<Mercury> Selected ata0s as default disk\n");
-		set_default_disk(&ata0s);
+		g_default_disk = &ata0s;
 	}
 #endif
 

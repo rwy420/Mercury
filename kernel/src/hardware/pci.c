@@ -97,13 +97,6 @@ void pci_enumerate_devices(bool debug)
 	}
 }
 
-struct Driver* get_driver(uint16_t vendor, uint16_t device)
-{
-
-	
-	return 0;
-}
-
 uint16_t pci_get_vendor_id(uint16_t bus, uint16_t device, uint16_t function)
 {
 	uint32_t result = pci_read(bus, device, function, 0);

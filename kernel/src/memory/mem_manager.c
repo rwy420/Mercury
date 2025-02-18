@@ -115,31 +115,6 @@ void free_blocks(uint32_t* address, uint32_t num_blocks)
 	used_blocks -= num_blocks;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 typedef struct MemoryChunk
 {
 	struct MemoryChunk* next;

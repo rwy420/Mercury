@@ -1,14 +1,14 @@
 #include <driver/driver.h>
 #include <common/screen.h>
 
-static struct Driver* drivers[256];
+static Driver* drivers[256];
 uint8_t driver_index = 0;
 
 uint8_t create_driver(uint32_t interrupt, string name, enum DriverType type, isr_t interrupt_handler, 
 		enable_handler_t enable_handler, disbale_handler_t disbale_handler)
 {
 
-	struct Driver driver;
+	Driver driver;
 
 	driver.interrupt = interrupt;
 	driver.name = name;
@@ -27,7 +27,7 @@ uint8_t create_driver(uint32_t interrupt, string name, enum DriverType type, isr
 	return driver.id;
 }
 
-void add_driver(struct Driver* driver)
+void add_driver(Driver* driver)
 {
 	drivers[driver_index] = driver;
 	driver_index++;

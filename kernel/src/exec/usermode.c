@@ -4,7 +4,7 @@
 #include <memory/gdt.h>
 #include <common/screen.h>
 
-extern TSS tss;
+extern TSS g_tss;
 
 void execute_user_mode(void* entry)
 {
@@ -22,8 +22,8 @@ void execute_user_mode(void* entry)
 	uint32_t* user_stack_ptr = (uint32_t*)(user_stack) + 4096;
 	memset(user_stack, 0, 4096);
 
-	tss.cs = 0x18;
-	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x20;
+	g_tss.cs = 0x18;
+	g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
 
 	asm volatile(
 		"mov $0x20, %%ax;"

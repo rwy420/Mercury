@@ -5,19 +5,19 @@
 #include <memory/common.h>
 #include <memory/paging.h>
 
-HBA_MEM* global_abar;
+HbaMem* g_abar;
 
-HBA_PORT* probe_port(HBA_MEM* abar)
+HbaPort* probe_port(HbaMem* abar)
 {
-	global_abar = abar;
-	HBA_PORT* result;
+	g_abar = abar;
+	HbaPort* result;
 	int port_count = 0;
 
 	for(int i = 0; i < 32; i++)
 	{
 		if(abar->pi & (1 << i))
 		{
-			HBA_PORT* port = &abar->ports[i];
+			HbaPort* port = &abar->ports[i];
 			uint32_t type = get_type(port);
 
 			if(type == AHCI_DEV_SATA)
@@ -32,7 +32,7 @@ HBA_PORT* probe_port(HBA_MEM* abar)
 	return result;
 }
 
-void port_rebase(HBA_PORT* port, int port_idx)
+void port_rebase(HbaPort* port, int port_idx)
 {
 	stop_cmd(port);
 
@@ -46,7 +46,7 @@ void port_rebase(HBA_PORT* port, int port_idx)
 	port->fb = (uint32_t) fb;
 	port->fbu = (uint32_t) fb >> 32;
 
-	HBA_CMD_HEADER* cmd_header = (HBA_CMD_HEADER*) clb;
+	HbaCommandHeader* cmd_header = (HbaCommandHeader*) clb;
 	for(int i = 0; i < 32; i++)
 	{
 		cmd_header[i].prdtl = 8;
@@ -60,16 +60,16 @@ void port_rebase(HBA_PORT* port, int port_idx)
 	start_cmd(port);
 }
 
-uint32_t get_type(HBA_PORT* port)
+uint32_t get_type(HbaPort* port)
 {
 	uint32_t ssts = port->ssts;
 
 	uint8_t ipm = (ssts >> 8) & 0x0F;
 	uint8_t det = ssts & 0x0F;
 
-	if(det != HBA_PORT_DET_PRESENT) return AHCI_DEV_NULL;
+	if(det != HbaPort_DET_PRESENT) return AHCI_DEV_NULL;
 
-	if(ipm != HBA_PORT_IPM_ACTIVE) return AHCI_DEV_NULL;
+	if(ipm != HbaPort_IPM_ACTIVE) return AHCI_DEV_NULL;
 
 	switch(port->sig)
 	{
@@ -84,7 +84,7 @@ uint32_t get_type(HBA_PORT* port)
 	}
 }
 
-void start_cmd(HBA_PORT* port)
+void start_cmd(HbaPort* port)
 {
 	while(port->cmd & HBA_PxCMD_CR);
 
@@ -92,7 +92,7 @@ void start_cmd(HBA_PORT* port)
 	port->cmd |= HBA_PxCMD_ST;
 }
 
-void stop_cmd(HBA_PORT* port)
+void stop_cmd(HbaPort* port)
 {
 	port->cmd &= ~HBA_PxCMD_ST;
 	port->cmd &= ~HBA_PxCMD_FRE;
@@ -106,10 +106,10 @@ void stop_cmd(HBA_PORT* port)
 	}
 }
 
-int32_t find_cmd_slot(HBA_PORT* port)
+int32_t find_cmd_slot(HbaPort* port)
 {
 	uint32_t slots = (port->sact | port->ci);
-	uint32_t cmd_slots = (global_abar->cap & 0x0F00) >> 8;
+	uint32_t cmd_slots = (g_abar->cap & 0x0F00) >> 8;
 
 	for(int i = 0; i < cmd_slots; i++)
 	{
@@ -121,20 +121,20 @@ int32_t find_cmd_slot(HBA_PORT* port)
 	return -1;
 }
 
-bool sata_read(HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buf)
+bool sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buf)
 {
 	port->is = (uint32_t) -1;
 	int spin = 0;
 	int slot = find_cmd_slot(port);
 	if (slot == -1) return false;
 	
-	HBA_CMD_HEADER *cmd_header = (HBA_CMD_HEADER*) port->clb;
+	HbaCommandHeader *cmd_header = (HbaCommandHeader*) port->clb;
 	cmd_header += slot;
-	cmd_header->cfl = sizeof(FIS_REG_H2D)/sizeof(uint32_t);
+	cmd_header->cfl = sizeof(FisRegH2D)/sizeof(uint32_t);
 	cmd_header->w = 0;	
 	cmd_header->prdtl = (uint16_t)((count - 1) >> 4) + 1;
 	
-	HBA_CMD_TBL *cmd_tbl = (HBA_CMD_TBL*)(cmd_header->ctba);
+	HbaCommandTable *cmd_tbl = (HbaCommandTable*)(cmd_header->ctba);
 
 	int i = 0;
 	for (i = 0; i < cmd_header->prdtl - 1; i++)
@@ -151,7 +151,7 @@ bool sata_read(HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count,
 	cmd_tbl->prdt_entry[i].dbc = (count << 9) - 1;
 	cmd_tbl->prdt_entry[i].i = 1;
 
-	FIS_REG_H2D *cmd_fis = (FIS_REG_H2D*)(&cmd_tbl->cfis);
+	FisRegH2D *cmd_fis = (FisRegH2D*)(&cmd_tbl->cfis);
 
 	cmd_fis->fis_type = FIS_TYPE_REG_H2D;
 	cmd_fis->c = 1;

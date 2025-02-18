@@ -12,7 +12,7 @@
 #define COMMAND_PORT(base) base +  7
 #define CONTROL_PORT(base) base +  0x206
 
-Disk* default_disk;
+Disk* g_default_disk;
 uint16_t sector_bytes = 512;
 
 Disk init_disk(uint16_t port_base, bool master)
@@ -142,24 +142,14 @@ bool flush_disk(Disk* disk)
 
 bool read28(uint32_t sector, uint8_t* buffer, int length)
 {
-	return read28_disk(default_disk, sector, buffer, length);
+	return read28_disk(g_default_disk, sector, buffer, length);
 }
 bool write28(uint32_t sector, uint8_t* data, int length)
 {
-	return write28_disk(default_disk, sector, data, length);
+	return write28_disk(g_default_disk, sector, data, length);
 }
 
 bool flush()
 {
-	return flush_disk(default_disk);
-}
-
-void set_default_disk(Disk* disk)
-{
-	default_disk = disk;
-}
-
-Disk* get_default_disk()
-{
-	return default_disk;
+	return flush_disk(g_default_disk);
 }

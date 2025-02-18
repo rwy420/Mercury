@@ -3,7 +3,7 @@
 
 #include <common/types.h>
 
-enum FATError
+typedef enum
 {
 	INAVLID_JUMP_INSTRUCTION,
 	INVALID_BYTES_PER_SECTOR,
@@ -12,7 +12,7 @@ enum FATError
 	INVALID_ROOT_ENTRY_COUNT,
 	INVALID_SECTOR_COUNT,
 	INVALID_FAT_TYPE
-};
+} FAT_ERROR;
 
 typedef struct
 {

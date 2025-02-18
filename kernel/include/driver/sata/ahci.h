@@ -12,8 +12,8 @@
 #define AHCI_DEV_SATAPI 4
 #define AHCI_DEV_SEMB 2
 #define AHCI_DEV_PM 3
-#define HBA_PORT_DET_PRESENT 3
-#define HBA_PORT_IPM_ACTIVE 1
+#define HbaPort_DET_PRESENT 3
+#define HbaPort_IPM_ACTIVE 1
 #define HBA_PxIS_TFES   (1 << 30)
 #define ATA_CMD_READ_DMA_EX 0x25
 #define ATA_CMD_WRITE_DMA_EX    0x35
@@ -58,7 +58,7 @@ typedef struct
     uint32_t   fbs;        // 0x40, FIS-based switch control
     uint32_t   rsv1[11];   // 0x44 ~ 0x6F, Reserved
     uint32_t   vendor[4];  // 0x70 ~ 0x7F, vendor specific
-} HBA_PORT;
+} HbaPort;
 
 typedef struct
 {
@@ -77,8 +77,8 @@ typedef struct
 	uint8_t rsv[0xA0-0x2C];
 	uint8_t vendor[0x100 - 0xA0];
 
-	HBA_PORT ports[1];
-} __attribute__((packed)) HBA_MEM;
+	HbaPort ports[1];
+} __attribute__((packed)) HbaMem;
 
 typedef struct tagHBA_CMD_HEADER
 {
@@ -106,7 +106,7 @@ typedef struct tagHBA_CMD_HEADER
 
     // DW4 - 7
     uint32_t   rsv1[4];    // Reserved
-} __attribute__((packed)) HBA_CMD_HEADER;
+} __attribute__((packed)) HbaCommandHeader;
 
 typedef struct
 {
@@ -140,7 +140,7 @@ typedef struct
 
 	// DWORD 4
 	uint8_t  rsv1[4];	// Reserved
-} __attribute__((packed)) FIS_REG_H2D;
+} __attribute__((packed)) FisRegH2D;
 
 typedef struct
 {
@@ -152,7 +152,7 @@ typedef struct
 	uint32_t dbc:22;		// Byte count, 4M max
 	uint32_t rsv1:9;		// Reserved
 	uint32_t i:1;		// Interrupt on completion
-} __attribute__((packed)) HBA_PRDT_ENTRY;
+} __attribute__((packed)) HbaPrdtEntry;
 
 typedef struct
 {
@@ -166,25 +166,25 @@ typedef struct
 	uint8_t  rsv[48];	// Reserved
 
 	// 0x80
-	HBA_PRDT_ENTRY	prdt_entry[1];	// Physical region descriptor table entries, 0 ~ 65535
-} __attribute__((packed)) HBA_CMD_TBL;
+	HbaPrdtEntry	prdt_entry[1];	// Physical region descriptor table entries, 0 ~ 65535
+} __attribute__((packed)) HbaCommandTable;
 
 typedef struct
 {
 	void* clb;
 	void* fb;
 	void* ctba[32];
-	HBA_PORT* port;
+	HbaPort* port;
 } PortData;
 
-HBA_PORT* probe_port(HBA_MEM* abar);
-void port_rebase(HBA_PORT* port, int port_idx);
-uint32_t get_type(HBA_PORT* port);
+HbaPort* probe_port(HbaMem* abar);
+void port_rebase(HbaPort* port, int port_idx);
+uint32_t get_type(HbaPort* port);
 
-void start_cmd(HBA_PORT* port);
-void stop_cmd(HBA_PORT* port);
-int32_t find_cmd_slot(HBA_PORT* port);
+void start_cmd(HbaPort* port);
+void stop_cmd(HbaPort* port);
+int32_t find_cmd_slot(HbaPort* port);
 
-bool sata_read(HBA_PORT* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buffer);
+bool sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buffer);
 
 #endif 

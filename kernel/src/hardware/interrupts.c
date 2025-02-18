@@ -20,8 +20,8 @@ void register_interrupt_handler(uint8_t n, isr_t handler)
 	interrupt_handers[n] = handler;
 }
 
-struct IDTDescriptor idt_descriptors[256] = {0x00};
-struct IDT idt;
+IDTDescriptor idt_descriptors[256] = {0x00};
+IDT idt;
 
 void interrupts_init_descriptor(int32_t index, uint32_t address)
 {
@@ -59,7 +59,7 @@ void install_idt()
 	interrupts_init_descriptor(0x80, (uint32_t) handle_irq_128);
 
 	idt.address = (int32_t) &idt_descriptors;
-	idt.size = sizeof(struct IDTDescriptor) * 256;
+	idt.size = sizeof(IDTDescriptor) * 256;
 	asm volatile("lidt %0" : : "m" (idt));
 
 	pic_remap(0x20, 0x28);
