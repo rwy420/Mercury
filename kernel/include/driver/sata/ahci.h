@@ -12,8 +12,8 @@
 #define AHCI_DEV_SATAPI 4
 #define AHCI_DEV_SEMB 2
 #define AHCI_DEV_PM 3
-#define HbaPort_DET_PRESENT 3
-#define HbaPort_IPM_ACTIVE 1
+#define HBAPORT_DET_PRESENT 3
+#define HBAPORT_IPM_ACTIVE 1
 #define HBA_PxIS_TFES   (1 << 30)
 #define ATA_CMD_READ_DMA_EX 0x25
 #define ATA_CMD_WRITE_DMA_EX    0x35

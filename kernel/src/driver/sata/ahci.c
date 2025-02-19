@@ -67,9 +67,9 @@ uint32_t get_type(HbaPort* port)
 	uint8_t ipm = (ssts >> 8) & 0x0F;
 	uint8_t det = ssts & 0x0F;
 
-	if(det != HbaPort_DET_PRESENT) return AHCI_DEV_NULL;
+	if(det != HBAPORT_DET_PRESENT) return AHCI_DEV_NULL;
 
-	if(ipm != HbaPort_IPM_ACTIVE) return AHCI_DEV_NULL;
+	if(ipm != HBAPORT_IPM_ACTIVE) return AHCI_DEV_NULL;
 
 	switch(port->sig)
 	{
