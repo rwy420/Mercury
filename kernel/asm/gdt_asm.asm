@@ -1,12 +1,5 @@
-extern test_user_function
-
 global segments_load_gdt
 global segments_load_registers
-global flush_tss
-global jump_usermode
-
-global switch_context
-global new_task_setup
 
 segments_load_gdt:
 	lgdt [esp + 4]
@@ -22,9 +15,4 @@ segments_load_registers:
 	jmp 0x08:flush_cs
 
 flush_cs:
-	ret
-
-flush_tss:
-	mov ax, (5 * 8) | 0
-	ltr ax
 	ret

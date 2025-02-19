@@ -7,7 +7,7 @@ LDPARAMS = -melf_i386
 
 OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
-		  build/common.o build/mem_manager.o build/paging.o build/paging_asm.o build/syscalls.o build/ata.o \
+		  build/common.o build/mem_manager.o build/paging.o build/syscalls.o build/ata.o \
 		  build/elf_loader.o build/elf.o build/symtable.o build/sata.o build/ahci.o \
 		  build/fat16.o build/fat16_path.o build/fat16_priv.o build/fat16_rootdir.o build/fat16_subdir.o \
 		  build/usermode.o build/vga.o build/fd.o build/elf_so.o
@@ -55,13 +55,10 @@ build/%.o: src/exec/elf/%.c
 build/%.o: src/exec/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
-build/%.o: arch/x86/%.s
+build/%.o: asm/%.s
 	as $(ASPARAMS) -o $@ $<
 
-build/%.o: arch/grub_x86/%.s
-	as $(ASPARAMS) -o $@ $<
-
-build/%.o: arch/x86/%.asm
+build/%.o: asm/%.asm
 	nasm -felf32 -o $@ $<
 
 kernel.bin: linker.ld $(OBJECTS)
