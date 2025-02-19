@@ -85,5 +85,6 @@ typedef struct {
 } __attribute__((packed)) Elf32_Rel;
 
 bool is_elf_image(Elf32_Ehdr* hdr);
+const char* get_section_name(const uint8_t* elf, Elf32_Shdr* shdr, int index);
 
 #endif

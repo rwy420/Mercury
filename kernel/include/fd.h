@@ -19,7 +19,7 @@ typedef struct
 	int seek;
 	int (*read)(void* buffer, size_t length);
 	int (*write)(void* buffer, size_t length);
-	int *(close)();
+	int (*close)();
 } FileDescriptor;
 
 void fd_init();

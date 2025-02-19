@@ -7,3 +7,13 @@ bool is_elf_image(Elf32_Ehdr *hdr)
 
 	return false;
 }
+
+const char* get_section_name(const uint8_t* elf, Elf32_Shdr* shdr, int index)
+{
+	Elf32_Ehdr* ehdr = (Elf32_Ehdr*) elf;
+	Elf32_Shdr* shstrtab_shdr = &shdr[ehdr->e_shstrndx];
+
+	const char* shstrtab = (const char*)(elf + shstrtab_shdr->sh_offset);
+
+	return &shstrtab[shdr[index].sh_name];
+}

@@ -2,6 +2,7 @@
 #include <common/screen.h>
 #include <common/types.h>
 #include <exec/elf/elf_loader.h>
+#include <exec/elf/elf_so.h>
 #include <exec/elf/symtable.h>
 #include <exec/usermode.h>
 #include <memory/gdt.h>
@@ -116,8 +117,16 @@ void kernel_main()
 	void(*entry)();
 	entry = image_load(buffer, sizeof(buffer), true);
 	free(buffer);
-
+	
 	execute_user_mode(entry);
+	/*int dl_handle = dlopen("/LIB/LIBC.SO");
+	void* _printf = dlsym(dl_handle, "printf");
+
+	print_hex32((uint32_t) _printf);
+
+	void (*func)(char* str) = _printf;
+	func("Hello, World");
+	dlclose(dl_handle);*/
 
 	while(1);
 }

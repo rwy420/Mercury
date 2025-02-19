@@ -23,3 +23,6 @@ grub:
 	mv kernel/grub-kernel.bin iso/boot/kernel.bin
 	cp grub.cfg iso/boot/grub/grub.cfg
 	grub-mkrescue -o ./build/mercury.iso iso
+
+libc:
+	gcc -m32 -fPIE -shared -o libc.so lib/stdio.c
