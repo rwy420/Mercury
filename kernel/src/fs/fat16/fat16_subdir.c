@@ -91,6 +91,7 @@ static int open_entry_in_subdir(EntryHandle* handle, char* name, char mode, bool
 		handle->cluster = entry.starting_cluster;
 		handle->offset = 0;
 	}
+
 	if(mode == 'r') handle->remaining_bytes = entry.size;
 	else handle->remaining_bytes = 0;
 
@@ -105,6 +106,16 @@ int open_file_in_subdir(EntryHandle* handle, char* filename, char mode)
 int open_directory_in_subdir(EntryHandle* handle, char* dirname)
 {
 	return open_entry_in_subdir(handle, dirname, 'r', false);
+}
+
+uint32_t subdir_entry_size(EntryHandle* handle, char* filename)
+{
+	DirEntry entry;
+	uint32_t entry_pos;
+
+	if(find_entry_in_subdir(&entry, &entry_pos, handle, filename) < 0) return 0;
+
+	return entry.size;
 }
 
 int ls_in_subdir(uint32_t* index, char* name, EntryHandle* handle)

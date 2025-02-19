@@ -87,6 +87,20 @@ int open_directory_in_root(EntryHandle* handle, char* dirname)
 	return open_entry_in_root(handle, dirname, 'r', false);
 }
 
+uint32_t root_directory_entry_size(char* filename)
+{
+	uint16_t entry_index = 0;
+	DirEntry entry;
+	
+	if(find_root_directory_entry(&entry_index, filename) < 0)
+		return -1;
+
+	move_to_root_directory_region(entry_index);
+	dev->read(&entry, sizeof(DirEntry));
+
+	return entry.size;
+}
+
 int ls_in_root(uint32_t* index, char* filename)
 {
 	DirEntry entry;

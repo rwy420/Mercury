@@ -315,6 +315,34 @@ int fat16_open(const char* filepath, char mode)
 	return handle;
 }
 
+int fat16_size(const char* filepath)
+{
+	int i;
+	char filename[11];
+	uint8_t handle = find_available_handle();
+	uint32_t size = 0;
+
+	if(is_in_root(filepath))
+	{
+		if(to_short_filename(filename, filepath) < 0) return -1;
+
+		size = root_directory_entry_size(filename);
+	}
+	else
+	{
+		EntryHandle dir_handle;
+		if(navigate_to_subdir(&dir_handle, filename, filepath) < 0) return -1;
+
+		handles[handle] = dir_handle;
+
+		size = subdir_entry_size(&handles[handle], filename);
+	}
+
+	fat16_close(handle);
+
+	return size;
+}
+
 int fat16_close(uint8_t handle)
 {
 	if(check_handle(handle) == false)

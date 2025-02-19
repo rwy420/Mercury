@@ -111,8 +111,9 @@ void kernel_main()
 	}
 
 	int fd = fat16_open("/BIN/TEST.ELF", 'r');
-	uint8_t* buffer = malloc(13512);
-	fat16_read(fd, buffer, 13512);
+	int size = fat16_size("/BIN/TEST.ELF"); 
+	uint8_t* buffer = malloc(size);
+	fat16_read(fd, buffer, size);
 
 	void(*entry)();
 	entry = image_load(buffer, sizeof(buffer), true);

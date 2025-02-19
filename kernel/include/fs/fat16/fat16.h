@@ -25,6 +25,7 @@ typedef struct
 int fat16_read_bpb();
 int fat16_init(storage_dev_t* dev, uint32_t offset);
 int fat16_open(const char* filepath, char mode);
+int fat16_size(const char* filepath);
 int fat16_close(uint8_t handle);
 int fat16_read(uint8_t handle, void* buffer, uint32_t count);
 int fat16_ls(uint32_t* index, char* filename, const char* dir_path);
