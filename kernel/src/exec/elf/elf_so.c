@@ -72,9 +72,6 @@ void* dlsym(int dl, char* sym)
 	{
 		if(strcmp(sym, strtab + symbols[i].st_name) == 0)
 		{
-			printf("<ELF32> Resolved ");
-			printf(sym);
-			printf("\n");
 			return (void*) elf + symbols[i].st_value;
 		}
 	}
