@@ -70,3 +70,11 @@ void kernel_switch_back()
 		: "r" (0x90000), "r" ((void*) kernel_mode)
 	);
 }
+
+void syscall_exit(int status)
+{
+	printf("Process exited with code");
+	print_hex32(status);
+	printf("\n");
+	kernel_switch_back();
+}

@@ -7,9 +7,15 @@
 typedef enum
 {
 	FD_FILE,
-	FD_DL,
 	FD_DEVICE
 } FILE_DESCRIPTOR_TYPE;
+
+typedef enum
+{
+	SEEK_SET,
+	SEEK_CUR,
+	SEEK_END
+} SEEK_WHENCE;
 
 typedef struct
 {
@@ -17,17 +23,19 @@ typedef struct
 	FILE_DESCRIPTOR_TYPE type;
 	void* object;
 	int seek;
-	void (*read)(void* buffer, size_t length);
-	void (*write)(void* buffer, size_t length);
-	void (*close)();
+	int (*read)(void* buffer, size_t length);
+	int (*write)(void* buffer, size_t length);
+	int (*close)();
 } FileDescriptor;
 
 void fd_init();
 FileDescriptor* create_fd();
 void close_fd(int fd);
 
-void syscall_read(CPUState* cpu);
-void syscall_write(CPUState* cpu);
-void syscall_seek(CPUState* cpu);
+int syscall_read(CPUState* cpu);
+int syscall_write(CPUState* cpu);
+int syscall_open(CPUState* cpu);
+int syscall_close(CPUState* cpu);
+int syscall_lseek(CPUState* cpu);
 
 #endif

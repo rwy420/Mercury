@@ -62,6 +62,6 @@ typedef struct
 typedef void (*isr_t)(CPUState* cpu);
 
 void register_interrupt_handler(uint8_t n, isr_t handler);
-void interrupt_handler(CPUState cpu_state, uint32_t interrupt);
+int interrupt_handler(CPUState cpu_state, uint32_t interrupt);
 
 #endif 

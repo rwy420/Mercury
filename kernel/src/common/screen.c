@@ -5,9 +5,10 @@
 
 static uint8_t x = 0, y = 0;
 
-void syscall_printf(void* buffer, size_t length)
+int syscall_printf(void* buffer, size_t length)
 {
 	printf((string) buffer);
+	return 0;
 }
 
 void printf(string str)

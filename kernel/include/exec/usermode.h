@@ -5,5 +5,6 @@
 
 void execute_user_mode(void* entry);
 void kernel_switch_back();
+void syscall_exit(int status);
 
 #endif

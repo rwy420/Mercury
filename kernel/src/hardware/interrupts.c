@@ -65,8 +65,17 @@ void install_idt()
 	pic_remap(0x20, 0x28);
 }
 
-void interrupt_handler(CPUState cpu_state, uint32_t interrupt)
+int interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 {
+	// Only syscalls should return values
+	if(interrupt == 0x80)
+	{
+		int syscall_return = syscall(&cpu_state);
+		pic_confirm(interrupt);
+
+		return syscall_return;
+	}
+
 	if(interrupt_handers[interrupt] != NULL_PTR)
 	{
 		interrupt_handers[interrupt](&cpu_state);
@@ -80,4 +89,6 @@ void interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 		if(hardware_interrupt_offset + 8 <= interrupt)
 			outb_slow(SLAVE_COMMAND_PORT, 0x20);
 	}
+
+	return cpu_state.eax;
 }

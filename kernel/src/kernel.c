@@ -41,9 +41,13 @@ void kernel_main()
 
 	printf("<Mercury> Registering syscalls\n");
 	fd_init();
-	register_interrupt_handler(0x80, syscall);
-	register_syscall_handler(4, (syscall_t) syscall_write);
-	register_syscall_handler(80, (syscall_t) kernel_switch_back);
+
+	register_syscall_handler(0x01, (syscall_t) syscall_exit);
+	register_syscall_handler(0x03, (syscall_t) syscall_read);
+	register_syscall_handler(0x04, (syscall_t) syscall_write);
+	register_syscall_handler(0x05, (syscall_t) syscall_open);
+	register_syscall_handler(0x06, (syscall_t) syscall_close);
+	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
 
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
@@ -111,7 +115,7 @@ void kernel_main()
 		printf("\n");
 	}
 
-	int fd = fat16_open("/BIN/TEST.ELF", 'r');
+	/*int fd = fat16_open("/BIN/TEST.ELF", 'r');
 	int size = fat16_size("/BIN/TEST.ELF"); 
 	uint8_t* buffer = malloc(size);
 	fat16_read(fd, buffer, size);
@@ -120,7 +124,7 @@ void kernel_main()
 	entry = image_load(buffer, sizeof(buffer), true);
 	free(buffer);
 	
-	execute_user_mode(entry);
+	execute_user_mode(entry);*/
 
 	/*int dl_handle = dlopen("/LIB/LIBC.SO");
 	void* _printf = dlsym(dl_handle, "printf");

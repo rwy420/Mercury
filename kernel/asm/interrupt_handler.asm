@@ -23,7 +23,7 @@ common_interrupt_handler:
 
 	call interrupt_handler
 
-	pop eax
+	add esp, 4 ; Instead of pop'ing eax
 	pop ebx
 	pop ecx
 	pop edx

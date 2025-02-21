@@ -4,7 +4,7 @@
 #include <common/types.h>
 #include <hardware/interrupts.h>
 
-void syscall_printf(void* buffer, size_t length);
+int syscall_printf(void* buffer, size_t length);
 
 void printf(string str);
 void clear_screen();
