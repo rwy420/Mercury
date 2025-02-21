@@ -25,4 +25,4 @@ grub:
 	grub-mkrescue -o ./build/mercury.iso iso
 
 libc:
-	gcc -m32 -fPIE -shared -o libc.so lib/stdio.c
+	gcc -m32 -fPIE -shared -o libc.so lib/stdio.c lib/process.c
