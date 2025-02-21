@@ -1,4 +1,5 @@
 #include <syscalls.h>
+#include <fd.h>
 #include <common/screen.h>
 #include <common/types.h>
 #include <exec/elf/elf_loader.h>
@@ -39,8 +40,9 @@ void kernel_main()
 	install_idt();
 
 	printf("<Mercury> Registering syscalls\n");
+	fd_init();
 	register_interrupt_handler(0x80, syscall);
-	register_syscall_handler(1, (syscall_t) syscall_printf);
+	register_syscall_handler(4, (syscall_t) syscall_write);
 	register_syscall_handler(80, (syscall_t) kernel_switch_back);
 
 #ifdef ATA
@@ -119,6 +121,7 @@ void kernel_main()
 	free(buffer);
 	
 	execute_user_mode(entry);
+
 	/*int dl_handle = dlopen("/LIB/LIBC.SO");
 	void* _printf = dlsym(dl_handle, "printf");
 

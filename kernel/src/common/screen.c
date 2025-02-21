@@ -5,9 +5,9 @@
 
 static uint8_t x = 0, y = 0;
 
-void syscall_printf(CPUState* cpu)
+void syscall_printf(void* buffer, size_t length)
 {
-	printf((string) cpu->ebx);
+	printf((string) buffer);
 }
 
 void printf(string str)

@@ -61,7 +61,6 @@ void* dlsym(int dl, char* sym)
 
 	if(!dynsym || !dynstr)
 	{
-		printf("Error: Sections not found\n");
 		return NULL_PTR;
 	}
 

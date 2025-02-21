@@ -1,13 +1,13 @@
 #ifndef __MERCURY__FD_H
 #define __MERCURY__FD_H
 
-#define MAX
-
+#include <hardware/interrupts.h>
 #include <common/types.h>
 
 typedef enum
 {
 	FD_FILE,
+	FD_DL,
 	FD_DEVICE
 } FILE_DESCRIPTOR_TYPE;
 
@@ -17,14 +17,17 @@ typedef struct
 	FILE_DESCRIPTOR_TYPE type;
 	void* object;
 	int seek;
-	int (*read)(void* buffer, size_t length);
-	int (*write)(void* buffer, size_t length);
-	int (*close)();
+	void (*read)(void* buffer, size_t length);
+	void (*write)(void* buffer, size_t length);
+	void (*close)();
 } FileDescriptor;
 
 void fd_init();
 FileDescriptor* create_fd();
-FileDescriptor* get_fd(int fd);
 void close_fd(int fd);
+
+void syscall_read(CPUState* cpu);
+void syscall_write(CPUState* cpu);
+void syscall_seek(CPUState* cpu);
 
 #endif

@@ -3,13 +3,12 @@
 #include <memory/common.h>
 #include <memory/mem_manager.h>
 
-static Driver* drivers;
+Driver drivers[0x40];
 uint8_t driver_index;
 
 void init_drivers()
 {
 	driver_index = 0;
-	drivers = malloc(sizeof(Driver) * 0x40);
 }
 
 uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle)
