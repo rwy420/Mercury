@@ -4,29 +4,27 @@
 #include <common/types.h>
 #include <hardware/interrupts.h>
 
-typedef void (*enable_handler_t)();
-typedef void (*disbale_handler_t)();
-
-enum DriverType
+typedef enum
 {
-	KEYBOARD = 0,
-	ATA = 1,
-};
+	KEYBOARD,
+	ATA,
+	SATA
+} DRIVER_TYPE;
 
 typedef struct
 {
 	uint32_t interrupt;
 	string name;
-	enum DriverType type;
-	isr_t interrupt_handler;
-	enable_handler_t enable_handler;
-	disbale_handler_t disbale_handler;
+	DRIVER_TYPE type;
+	void (*init_handle)();
+	void (*enable_handler)();
+	void (*disbale_handler)();
 	bool enabled;
 	uint8_t id;
 } Driver;
 
-uint8_t create_driver(uint32_t interrupt, string name, enum DriverType type, isr_t interrupt_handler, 
-		enable_handler_t enable_handler, disbale_handler_t disbale_handler);
+void init_drivers();
+uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle);
 void add_driver(Driver* driver);
 void enable_driver(uint8_t id);
 void disable_driver(uint8_t id);

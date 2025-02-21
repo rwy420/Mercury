@@ -34,14 +34,14 @@ void pci_enumerate_devices(bool debug)
 			{
 				uint16_t vendor_id = pci_get_vendor_id(bus, device, function);
 				uint16_t device_id = pci_get_device_id(bus, device, function);
-				uint32_t port_base = 0x0;
+				uint32_t port_base[6] = {0};
 
 				if(vendor_id == 0x0000 || vendor_id == 0xFFFF) continue;
 
 				for(uint8_t bar_idx = 0; bar_idx < 6; bar_idx++)
 				{
 					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
-					if(bar->address && (bar->type == IO)) 
+					/*if(bar->address && (bar->type == IO)) 
 					{
 						port_base = bar->address;
 					}
@@ -52,7 +52,9 @@ void pci_enumerate_devices(bool debug)
 						{
 							port_base = bar->address;
 						}
-					}
+					}*/
+
+					port_base[bar_idx] = bar->address;
 
 					free(bar);
 				}
@@ -71,7 +73,7 @@ void pci_enumerate_devices(bool debug)
 					print_hex((device_id & 0xFF00) >> 8);
 					print_hex(device_id & 0xFF);
 					printf(" ");
-					if(port_base) print_hex32(port_base);
+					if(port_base) print_hex32(port_base[0]);
 					printf("\n");
 				}
 
@@ -87,7 +89,7 @@ void pci_enumerate_devices(bool debug)
 									map_page((void*)(port_base + (4096 * page)), (void*)(port_base + (4096 * page)),
 											PTE_RW);
 								}
-								init_sata(port_base);
+								init_sata(port_base[4]); // BAR5
 							break;
 						}
 					break;

@@ -67,10 +67,9 @@ void kernel_main()
 	kernel_size = kernel_end_address - kernel_start_address;
 	print_memory_info();
 	size_t mem_manager_size = 64 * 1024;
-	init_memory_manager(kernel_start_address - mem_manager_size, mem_manager_size);
-	init_memory_region(kernel_start_address - mem_manager_size, mem_manager_size);
+	size_t heap_size = 0x200000;
 
-	heap_init(0x200000, 0x200000);
+	heap_init(0x200000, heap_size);
 
 	printf("<Mercury> Block manager size: 0x");
 	print_hex((mem_manager_size >> 24) & 0xFF);
@@ -79,16 +78,16 @@ void kernel_main()
 	print_hex(mem_manager_size & 0xFF);
 	printf("\n");
 
+
+
 	printf("<Mercury> Setting up paging\n");
 	paging_enable();
 
 	init_symtable();
 
-	uint8_t keyboard_driver = create_driver(0x21, "PS2-Keyboard", 0, 
-			ps2_kb_handle_interrupt, ps2_kb_enable, 
-			ps2_kb_disable);
-
-	enable_driver(keyboard_driver);
+	init_drivers();
+	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable);
+	enable_driver(ps2_keyboard);
 
 	printf("<Mercury> Searching PCI deivce drivers\n");
 	pci_enumerate_devices(false);

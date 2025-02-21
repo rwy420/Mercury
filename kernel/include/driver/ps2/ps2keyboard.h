@@ -1,14 +1,10 @@
 #ifndef __MERCURY__DRIVER__PS2__PS2KEYBOARD_H
 #define __MERCURY__DRIVER__PS2__PS2KEYBOARD_H
 
-#include <hardware/port.h>
-#include <common/types.h>
-#include <common/screen.h>
-#include <hardware/interrupts.h>
-#include <driver/driver.h>
+#define DATA_PORT 0x60
+#define COMMAND_PORT 0x64
 
 void ps2_kb_enable();
 void ps2_kb_disable();
-void ps2_kb_handle_interrupt();
 
 #endif 
