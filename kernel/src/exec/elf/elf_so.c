@@ -16,9 +16,9 @@ void dl_init()
 int dlopen(char* path)
 {
 	int fd = fat16_open(path, 'r');
-	uint8_t* buffer = malloc(14112);
-	memset(buffer, 0, 14112);
-	fat16_read(fd, buffer, 14112);
+	uint32_t size = fat16_size("/LIB/LIBC.SO");
+	uint8_t* buffer = malloc(size);
+	fat16_read(fd, buffer, size);
 
 	Elf32_Ehdr* hdr = (Elf32_Ehdr*) buffer;
 	Elf32_Shdr* shdr = (Elf32_Shdr*)(buffer + hdr->e_shoff);
@@ -28,7 +28,7 @@ int dlopen(char* path)
 	dynamic_libraries[dl].buffer = buffer;
 	dynamic_libraries[dl].fd = fd;
 	dynamic_libraries[dl].shdr = shdr;
-	dynamic_libraries[dl].shnum = 10;
+	dynamic_libraries[dl].shnum = 20;
 
 	return dl;
 }
@@ -72,6 +72,9 @@ void* dlsym(int dl, char* sym)
 	{
 		if(strcmp(sym, strtab + symbols[i].st_name) == 0)
 		{
+			printf("<ELF32> Resolved ");
+			printf(sym);
+			printf("\n");
 			return (void*) elf + symbols[i].st_value;
 		}
 	}

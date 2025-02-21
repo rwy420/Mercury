@@ -11,8 +11,6 @@ FileDescriptor* stdout;
 
 void fd_init()
 {
-	fd_count = 0;
-
 	stdin = &g_file_descriptors[0];
 	stdout = &g_file_descriptors[1];
 
@@ -20,6 +18,8 @@ void fd_init()
 	stdout->index = 1;
 
 	stdout->write = syscall_printf;
+
+	fd_count = 2;
 }
 
 FileDescriptor* create_fd()

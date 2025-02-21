@@ -19,3 +19,8 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 
 **Future ideas**
 - Multitasking
+
+**Screenshots**
+Dynamic library loading working:
+![VirtualBox Output](./docs/example-result00.png "Out")
+![Code](./docs/example-code00.png "Code")

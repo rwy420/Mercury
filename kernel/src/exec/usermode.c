@@ -1,3 +1,4 @@
+#include "hardware/interrupts.h"
 #include <memory/paging.h>
 #include <exec/usermode.h>
 #include <memory/common.h>
@@ -71,10 +72,10 @@ void kernel_switch_back()
 	);
 }
 
-void syscall_exit(int status)
+void syscall_exit(CPUState* cpu)
 {
-	printf("Process exited with code");
-	print_hex32(status);
+	printf("Process exited with code ");
+	print_uint32_t(cpu->ebx);
 	printf("\n");
 	kernel_switch_back();
 }

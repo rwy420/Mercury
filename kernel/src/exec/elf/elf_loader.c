@@ -1,10 +1,11 @@
 #include <exec/elf/elf.h>
+#include <exec/elf/elf_so.h>
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/mem_manager.h>
 #include <exec/elf/symtable.h>
 
-void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst)
+void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst, int dl)
 {
     Elf32_Rel* rel = (Elf32_Rel*)(src + shdr->sh_offset);
 
@@ -17,6 +18,7 @@ void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, cons
             case R_386_JMP_SLOT:
 				*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
             case R_386_GLOB_DAT:
+				*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) dlsym(dl, sym);
                 break;
         }
     }
@@ -76,6 +78,7 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
     void* entry;
     int i = 0;
     uint8_t* exec;
+	int dl = dlopen("/LIB/LIBC.SO");
 
     hdr = (Elf32_Ehdr*) elf_start;
 
@@ -124,7 +127,7 @@ void* image_load(char* elf_start, unsigned int size, bool debug)
     {
         if (shdr[i].sh_type == SHT_REL)
         {
-            relocate(shdr + i, global_syms, global_strings, elf_start, exec);
+            relocate(shdr + i, global_syms, global_strings, elf_start, exec, dl);
         }
     }
 

@@ -106,7 +106,6 @@ void kernel_main()
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
 
-
 	char fname[11];
 	uint32_t i = 0;
 	while(fat16_ls(&i, fname, "/") == 1)
@@ -115,16 +114,18 @@ void kernel_main()
 		printf("\n");
 	}
 
-	/*int fd = fat16_open("/BIN/TEST.ELF", 'r');
-	int size = fat16_size("/BIN/TEST.ELF"); 
+	int fd = fat16_open("/BIN/APP.ELF", 'r');
+	int size = fat16_size("/BIN/APP.ELF"); 
 	uint8_t* buffer = malloc(size);
 	fat16_read(fd, buffer, size);
+
+	clear_screen();
 
 	void(*entry)();
 	entry = image_load(buffer, sizeof(buffer), true);
 	free(buffer);
 	
-	execute_user_mode(entry);*/
+	execute_user_mode(entry);
 
 	/*int dl_handle = dlopen("/LIB/LIBC.SO");
 	void* _printf = dlsym(dl_handle, "printf");

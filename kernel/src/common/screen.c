@@ -87,7 +87,14 @@ void print_uint8_t(uint8_t value)
 	printf(buffer);
 }
 
-void uint8_t_to_string(uint8_t value, uint8_t* buffer)
+void print_uint32_t(uint32_t value)
+{
+	uint8_t buffer[11];
+	uint32_t_to_string(value, buffer);
+	printf(buffer);
+}
+
+void uint8_t_to_string(uint8_t value, char* buffer)
 {
 	int i = 0;
 	do
@@ -103,4 +110,28 @@ void uint8_t_to_string(uint8_t value, uint8_t* buffer)
 		buffer[j] = buffer[k];
 		buffer[k] = temp;
 	}
+}
+
+void uint32_t_to_string(uint32_t value, char *buffer)
+{
+    char temp[11];
+    int i = 0;
+
+    if (value == 0) {
+        buffer[0] = '0';
+        buffer[1] = '\0';
+        return;
+    }
+
+    while (value > 0) {
+        temp[i++] = '0' + (value % 10);
+        value /= 10;
+    }
+
+    int j = 0;
+    while (i > 0) {
+        buffer[j++] = temp[--i];
+    }
+
+    buffer[j] = '\0';
 }
