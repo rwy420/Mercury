@@ -1,4 +1,4 @@
-#include "hardware/interrupts.h"
+#include <shell.h>
 #include <memory/paging.h>
 #include <exec/usermode.h>
 #include <memory/common.h>
@@ -27,6 +27,7 @@ void execute_user_mode(void* entry)
 	g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
 
 	asm volatile(
+		"cli;"
 		"mov $0x20, %%ax;"
 		"mov %%ax, %%ds;"
 		"mov %%ax, %%es;"
@@ -34,8 +35,8 @@ void execute_user_mode(void* entry)
 		"mov %%ax, %%gs;"
 		"mov %0, %%esp;"
 		"push $0x20;"
-		"push %0;"
-		"pushf;"
+		"push %%esp;"
+		"push $0x200202;"
 		"push $0x18;"
 		"push %1;"
 		"iret;"
@@ -46,7 +47,11 @@ void execute_user_mode(void* entry)
 
 static void kernel_mode()
 {
-	printf("\nBACK TO KERNEL MODE!!\n");
+	// Fix interrupts
+	outb(0x20, 0x20);
+	outb(0xA0, 0x20);
+
+	shell_init();
 
 	while(1);
 }
@@ -62,8 +67,8 @@ void kernel_switch_back()
 		"mov %%ax, %%gs;"
 		"mov %0, %%esp;"
 		"push $0x10;"
-		"push %0;"
-		"pushf;"
+		"push %%esp;"
+		"push $0x200202;"
 		"push $0x08;"
 		"push %1;"
 		"iret;"

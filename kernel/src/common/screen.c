@@ -47,6 +47,13 @@ void printf(string str)
 	}
 }
 
+void terminal_move_left()
+{
+	x -= 1;
+	printf(" ");
+	x -= 1;
+}
+
 void clear_screen()
 {
 	uint16_t* video_memory = (uint16_t*) 0xb8000;

@@ -14,6 +14,11 @@ void handle_interrupt()
 	if(key == 0x2A || key == 0x36) shift = true;
 	if(key == 0xAA || key == 0xB6) shift = false;
 
+	if(key == 0x0E)
+	{
+		shell_putc('\b');
+		return;
+	}
 
 
     if(key < 0x80)

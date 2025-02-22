@@ -1,7 +1,10 @@
 #include <shell.h>
 #include <common/screen.h>
 #include <memory/common.h>
+#include <memory/mem_manager.h>
 #include <fs/fat16/fat16.h>
+#include <exec/usermode.h>
+#include <exec/elf/elf_loader.h>
 
 char input_buffer[0xFF];
 uint32_t input_buffer_pointer;
@@ -17,7 +20,14 @@ void shell_init()
 }
 
 void shell_putc(uint8_t key)
-{	
+{
+	if(key == '\b')
+	{
+		input_buffer_pointer--;
+		terminal_move_left();
+		return;
+	}
+
 	char* txt = " ";
 	txt[0] = key;
 	input_buffer[input_buffer_pointer++] = key;
@@ -60,6 +70,27 @@ static void parse_command(char* command)
 		clear_screen();
 		return;
 	}
+	else if(strcmp(command, "elfexec") == 0)
+	{
+		char* arg1 = get_argument(input_buffer, 1);
+		uint32_t file_size = fat16_size(arg1);
+		int fd = fat16_open(arg1, 'r');
+
+		if(fd == -1)
+		{
+			printf("File not found\n");
+			return;
+		}
+
+		char* buffer = malloc(file_size);
+		fat16_read(fd, buffer, file_size);
+		void(*entry)();
+		entry = image_load(buffer, file_size, false);
+		free(buffer);
+
+		execute_user_mode(entry);
+	}
+
 
 	printf("Command not found\n");
 }

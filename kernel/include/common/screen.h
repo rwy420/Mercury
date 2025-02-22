@@ -7,6 +7,7 @@
 int syscall_printf(void* buffer, size_t length);
 
 void printf(string str);
+void terminal_move_left();
 void clear_screen();
 void print_hex(uint8_t h);
 void print_hex32(uint32_t h);
