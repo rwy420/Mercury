@@ -1,5 +1,6 @@
 #include <syscalls.h>
 #include <fd.h>
+#include <shell.h>
 #include <common/screen.h>
 #include <common/types.h>
 #include <exec/elf/elf_loader.h>
@@ -106,35 +107,7 @@ void kernel_main()
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
 
-	char fname[11];
-	uint32_t i = 0;
-	while(fat16_ls(&i, fname, "/") == 1)
-	{
-		printf(fname);
-		printf("\n");
-	}
-
-	int fd = fat16_open("/BIN/APP.ELF", 'r');
-	int size = fat16_size("/BIN/APP.ELF"); 
-	uint8_t* buffer = malloc(size);
-	fat16_read(fd, buffer, size);
-
-	clear_screen();
-
-	void(*entry)();
-	entry = image_load(buffer, sizeof(buffer), true);
-	free(buffer);
-	
-	execute_user_mode(entry);
-
-	/*int dl_handle = dlopen("/LIB/LIBC.SO");
-	void* _printf = dlsym(dl_handle, "printf");
-
-	print_hex32((uint32_t) _printf);
-
-	void (*func)(char* str) = _printf;
-	func("Hello, World");
-	dlclose(dl_handle);*/
+	shell_init();
 
 	while(1);
 }
