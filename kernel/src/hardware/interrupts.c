@@ -6,14 +6,9 @@
 #include <common/screen.h>
 #include <syscalls.h>
 
-#define MASTER_COMMAND_PORT 0x20
-#define SLAVE_COMMAND_PORT 0xA0
-#define MASTER_DATA_PORT 0x21
-#define SLAVE_DATA_PORT 0xA1
-
 isr_t interrupt_handers[256];
 
-uint16_t hardware_interrupt_offset;
+uint16_t hardware_interrupt_offset = 0x20;
 
 void register_interrupt_handler(uint8_t n, isr_t handler)
 {
@@ -31,7 +26,7 @@ void interrupts_init_descriptor(int32_t index, uint32_t address)
 	idt_descriptors[index].segment_selector = 0x08;
 	idt_descriptors[index].reserved = 0x00;
 
-	idt_descriptors[index].type_attribute = (0x01 << 7) | (0x00 << 6) | (0x00 << 5) | 0xE;
+	idt_descriptors[index].type_attribute = 0x8E;
 }
 
 void install_idt()
@@ -54,15 +49,16 @@ void install_idt()
 	interrupts_init_descriptor(0x0D, (uint32_t) handle_irq_13);
 	interrupts_init_descriptor(0x0E, (uint32_t) handle_irq_14);
 	interrupts_init_descriptor(0x0F, (uint32_t) handle_irq_15);
+	interrupts_init_descriptor(0x20, (uint32_t) handle_irq_32);
 	interrupts_init_descriptor(0x21, (uint32_t) handle_irq_33);
 	interrupts_init_descriptor(0x31, (uint32_t) handle_irq_49);
 	interrupts_init_descriptor(0x80, (uint32_t) handle_irq_128);
 
+	pic_remap(0x20, 0x28);
+
 	idt.address = (int32_t) &idt_descriptors;
 	idt.size = sizeof(IDTDescriptor) * 256;
-	asm volatile("lidt %0" : : "m" (idt));
-
-	pic_remap(0x20, 0x28);
+	asm volatile("lidt %0; sti;" : : "m" (idt));	
 }
 
 int interrupt_handler(CPUState cpu_state, uint32_t interrupt)
@@ -71,23 +67,18 @@ int interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 	if(interrupt == 0x80)
 	{
 		int syscall_return = syscall(&cpu_state);
-		pic_confirm(interrupt);
-
+		
 		return syscall_return;
 	}
 
-	if(interrupt_handers[interrupt] != NULL_PTR)
+	if(interrupt_handers[interrupt] != 0x00)
 	{
 		interrupt_handers[interrupt](&cpu_state);
-		pic_confirm(interrupt);
 	}
 
 	if(hardware_interrupt_offset <= interrupt && interrupt < hardware_interrupt_offset + 16)
 	{
-		outb_slow(MASTER_COMMAND_PORT, 0x20);
-
-		if(hardware_interrupt_offset + 8 <= interrupt)
-			outb_slow(SLAVE_COMMAND_PORT, 0x20);
+		pic_confirm(interrupt);
 	}
 
 	return cpu_state.eax;
