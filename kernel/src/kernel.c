@@ -14,6 +14,7 @@
 #include <driver/ata/ata.h>
 #include <hardware/interrupts.h>
 #include <hardware/pci.h>
+#include <hardware/pit.h>
 #include <memory/mem_manager.h>
 #include <memory/common.h>
 #include <memory/paging.h>
@@ -39,6 +40,7 @@ void kernel_main()
 
 	segments_install_gdt();
 	install_idt();
+	pit_init(100);
 
 	printf("<Mercury> Registering syscalls\n");
 	fd_init();
