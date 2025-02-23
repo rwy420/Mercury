@@ -1,4 +1,4 @@
-#include <exec/elf/elf_so.h>
+#include <exec/elf/elf_dl.h>
 #include <exec/elf/elf.h>
 #include <fs/fat16/fat16.h>
 #include <common/screen.h>

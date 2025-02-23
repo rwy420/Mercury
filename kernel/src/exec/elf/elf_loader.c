@@ -1,5 +1,5 @@
 #include <exec/elf/elf.h>
-#include <exec/elf/elf_so.h>
+#include <exec/elf/elf_dl.h>
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/mem_manager.h>
