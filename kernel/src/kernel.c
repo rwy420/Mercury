@@ -1,6 +1,7 @@
 #include <syscalls.h>
 #include <fd.h>
 #include <shell.h>
+#include <multitasking.h>
 #include <common/screen.h>
 #include <common/types.h>
 #include <exec/elf/elf_loader.h>
@@ -39,6 +40,7 @@ void kernel_main()
 
 	segments_install_gdt();
 	install_idt();
+	init_tasks();
 	pit_init(100);
 
 	printf("<Mercury> Registering syscalls\n");
