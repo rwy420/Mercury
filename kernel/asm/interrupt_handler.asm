@@ -12,8 +12,10 @@ handle_irq_%1:
 common_interrupt_handler:
 	push dword 0
 
+	mov [0x20000], eax
 	mov eax, [esp + 8]
 	push eax
+	mov eax, [0x20000]
 
 	push esp 
 	push ebp
