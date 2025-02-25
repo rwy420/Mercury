@@ -56,6 +56,7 @@ typedef struct
 	uint32_t edi;
 	uint32_t ebp;
 	uint32_t esp;
+	uint32_t eip;
 	uint32_t error;
 } __attribute__((packed)) CPUState;
 

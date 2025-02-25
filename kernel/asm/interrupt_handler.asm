@@ -12,6 +12,9 @@ handle_irq_%1:
 common_interrupt_handler:
 	push dword 0
 
+	mov eax, [esp + 8]
+	push eax
+
 	push esp 
 	push ebp
 	push edi
@@ -32,7 +35,7 @@ common_interrupt_handler:
 	pop ebp
 	pop esp
 
-	add esp, 8
+	add esp, 12
 
 	iret
 
