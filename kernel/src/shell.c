@@ -1,3 +1,4 @@
+#include "multitasking.h"
 #include <shell.h>
 #include <common/screen.h>
 #include <memory/common.h>
@@ -88,7 +89,7 @@ static void parse_command(char* command)
 		entry = image_load(buffer, file_size, false);
 		free(buffer);
 
-		execute_user_mode(entry);
+		entry();
 	}
 
 

@@ -14,10 +14,10 @@ common_interrupt_handler:
 
 	mov [0x20000], eax
 	mov eax, [esp + 8]
-	push eax
+	push eax	
 	mov eax, [0x20000]
 
-	push esp 
+	push esp
 	push ebp
 	push edi
 	push esi

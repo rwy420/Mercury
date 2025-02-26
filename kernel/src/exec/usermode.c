@@ -1,3 +1,4 @@
+#include <multitasking.h>
 #include <shell.h>
 #include <memory/paging.h>
 #include <exec/usermode.h>
@@ -6,6 +7,7 @@
 #include <common/screen.h>
 
 extern TSS g_tss;
+extern Task* g_current_task;
 
 void execute_user_mode(void* entry)
 {
@@ -82,5 +84,7 @@ void syscall_exit(CPUState* cpu)
 	printf("Process exited with code ");
 	print_uint32_t(cpu->ebx);
 	printf("\n");
-	kernel_switch_back();
+	//kernel_switch_back();
+	kill_task(g_current_task->id);
+	asm("int $32");
 }

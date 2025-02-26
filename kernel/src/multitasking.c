@@ -8,13 +8,13 @@
 #include <memory/gdt.h>
 #include <common/screen.h>
 
-// fuck all of this
-
 Task tasks[MAX_TASKS];
 Task* g_current_task;
 Task* current_last;
 
 extern TSS g_tss;
+char* msg = "Task: ";
+char* msg1 = "\n";
 
 void kernel_schedule();
 
@@ -25,10 +25,15 @@ void dummy_task()
 
 void idle_task()
 {
-	printf("PART 1\n");
-	asm("int $32");
-	printf("PART 2\n");
-	while(1);
+	static uint32_t counter = 0;
+	while(1)
+	{
+		asm("xchg %bx, %bx");
+		printf("Task: ");
+		print_hex32(counter++);
+		printf(msg1);
+		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
+	}
 }
 
 void init_tasks()
@@ -44,17 +49,20 @@ void init_tasks()
 	dummy->eip = (uint32_t) dummy_task;
 
 	Task* idle = &tasks[1];
-	idle->eip = (uint32_t) idle_task;
-	idle->esp = 0x800000;
-	idle->next = idle;
+	idle->eip = (uint32_t) shell_init;
+	idle->esp = 0x800000;	
 
+	Task* test = &tasks[2];
+	test->eip = (uint32_t) idle_task;
+	test->esp = 0x700000;
+	idle->next = test;
 	dummy->next = idle;
 
 	g_current_task = dummy;
-	current_last = idle;
+	current_last = test;
 }
 
-Task* create_task(void(*entry)())
+Task* create_task(void(*entry)(), uint32_t esp)
 {
 	for(int i = 0; i < MAX_TASKS; i++)
 	{
@@ -72,19 +80,38 @@ Task* create_task(void(*entry)())
 	return NULL_PTR;
 }
 
+void kill_task(uint8_t id)
+{
+	Task* task = &tasks[id];
+	if(task->next->id == current_last->id)
+	{
+		task->prev->next->eip = 0x00;
+	}
+	else
+	{	
+		task->prev->next = task->next;
+	}
+
+	task->eip = 0;
+	task->esp = 0;
+
+	g_current_task = &tasks[1];
+}
+
 void schedule(CPUState* cpu) 
 {
-	printf("Saving ");
-	print_hex(g_current_task->id);
-	printf("\n");
-
 	g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
 	g_current_task->ebp = cpu->ebp;
 
 	g_current_task->eax = cpu->eax;
+	g_current_task->ebx = cpu->ebx;
+	g_current_task->ecx = cpu->ecx;
+	g_current_task->edx = cpu->edx;
+	g_current_task->esi = cpu->esi;
+	g_current_task->edi = cpu->edi;
 
-	if(g_current_task->next->eip == 0x00)
+	if(g_current_task->id == current_last->id)
 	{
 		g_current_task = &tasks[1];
 	}
@@ -92,35 +119,10 @@ void schedule(CPUState* cpu)
 	{
 		g_current_task = g_current_task->next;
 	}
-
-	printf("Executing ");
-	print_hex(g_current_task->id);
-	printf(" @ ");
-	print_hex32(g_current_task->eip);
-	printf(" ESP: ");
-	print_hex32(g_current_task->esp);
-	printf(" EAX: ");
-	print_hex32(g_current_task->eax);
-	printf("\n");
-
 	g_tss.cs = 0x18;
 	g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
 
-	asm volatile(
-		"cli;"
-		"mov $0x20, %%ax;"
-		"mov %%ax, %%ds;"
-		"mov %%ax, %%es;"
-		"mov %%ax, %%fs;"
-		"mov %%ax, %%gs;"
-		"mov %0, %%esp;"
-		"push $0x20;"
-		"push %%esp;"
-		"push $0x202;"
-		"push $0x18;"
-		"push %1;"
-		"iret;"
-		:
-		: "r" (g_current_task->esp + 1), "r" (g_current_task->eip)
-	);
+	pic_confirm(0x20);
+
+	restore_and_switch();
 }
