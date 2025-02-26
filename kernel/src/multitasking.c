@@ -1,4 +1,6 @@
+#include "exec/elf/elf_loader.h"
 #include "exec/usermode.h"
+#include "fs/fat16/fat16.h"
 #include <multitasking.h>
 #include <shell.h>
 #include <hardware/interrupts.h>
@@ -13,8 +15,8 @@ Task* g_current_task;
 Task* current_last;
 
 extern TSS g_tss;
-char* msg = "Task: ";
-char* msg1 = "\n";
+char* msg1 = "Task: ";
+char* msg2 = "\n";
 
 void kernel_schedule();
 
@@ -28,10 +30,9 @@ void idle_task()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		asm("xchg %bx, %bx");
-		printf("Task: ");
-		print_hex32(counter++);
 		printf(msg1);
+		print_hex32(counter++);
+		printf(msg2);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -46,14 +47,24 @@ void init_tasks()
 	}
 
 	Task* dummy = &tasks[0];
+	dummy->flags = TASK_OK;
 	dummy->eip = (uint32_t) dummy_task;
 
 	Task* idle = &tasks[1];
-	idle->eip = (uint32_t) shell_init;
+	idle->flags = TASK_OK;
+	idle->eip = (uint32_t) idle_task;
 	idle->esp = 0x800000;	
 
+	int fd = fat16_open("/BIN/APP.ELF", 'r');
+	int size = fat16_size("/BIN/APP.ELF");
+	char* buffer = malloc(size);
+	fat16_read(fd, buffer, size);
+	void(*entry)();
+	entry = image_load(buffer, size, 0);
+
 	Task* test = &tasks[2];
-	test->eip = (uint32_t) idle_task;
+	test->flags = TASK_OK;
+	test->eip = (uint32_t) entry;
 	test->esp = 0x700000;
 	idle->next = test;
 	dummy->next = idle;
@@ -83,23 +94,13 @@ Task* create_task(void(*entry)(), uint32_t esp)
 void kill_task(uint8_t id)
 {
 	Task* task = &tasks[id];
-	if(task->next->id == current_last->id)
-	{
-		task->prev->next->eip = 0x00;
-	}
-	else
-	{	
-		task->prev->next = task->next;
-	}
-
-	task->eip = 0;
-	task->esp = 0;
-
-	g_current_task = &tasks[1];
+	task->flags = TASK_TERMINATED;
 }
 
 void schedule(CPUState* cpu) 
 {
+	pic_confirm(0x20);
+
 	g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
 	g_current_task->ebp = cpu->ebp;
@@ -119,10 +120,9 @@ void schedule(CPUState* cpu)
 	{
 		g_current_task = g_current_task->next;
 	}
+
 	g_tss.cs = 0x18;
 	g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
-
-	pic_confirm(0x20);
 
 	restore_and_switch();
 }

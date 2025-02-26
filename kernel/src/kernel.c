@@ -40,7 +40,6 @@ void kernel_main()
 
 	segments_install_gdt();
 	install_idt();
-	init_tasks();
 	pit_init(10);
 
 	printf("<Mercury> Registering syscalls\n");
@@ -108,6 +107,7 @@ void kernel_main()
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
 
+	init_tasks();
 	register_interrupt_handler(0x20, schedule);
 
 	while(1);
