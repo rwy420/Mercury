@@ -1,5 +1,3 @@
-section .text
-
 extern interrupt_handler
 
 %macro interrupt 1
