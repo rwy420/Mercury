@@ -17,6 +17,13 @@ vdi: image
 	mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
 	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352	
 
+full-image: image
+	mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
+	dd if=./fs.bin of=build/mercury_image.img conv=notrunc oflag=seek_bytes seek=51200
+
+qemu-run:
+	qemu-system-x86_64 -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw
+
 grub:
 	cd kernel && make grub
 	mkdir -p iso/boot/grub

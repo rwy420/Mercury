@@ -6,7 +6,7 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 **Features**
 - FAT16 driver
 - ELF32 App / SO loader
-- Usermode apps
+- Multitasking
 
 **Work in progress**
 - Linux like syscalls
@@ -18,7 +18,6 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 - Porting some apps made for Linux (Lua, Python...)
 
 **Future ideas**
-- Multitasking
 
 **Screenshots** \
 Dynamic library loading working: \

@@ -24,6 +24,12 @@ void stage2_main()
 		default_disk = &ata0s;
 	}
 
+	if(!default_disk)
+	{
+		printf("NO SUPPORTED DISK FOUND\n");
+		while(1);
+	}
+
 	void* kernel_buffer = (void*) 0x100000 - 0x1000;
 
 	fat16_init(0);
