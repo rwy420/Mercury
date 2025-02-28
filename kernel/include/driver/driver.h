@@ -3,6 +3,7 @@
 
 #include <common/types.h>
 #include <hardware/interrupts.h>
+#include <hardware/pci.h>
 
 typedef enum
 {
@@ -20,20 +21,21 @@ typedef struct
 	uint32_t(*get_ip_address)();
 } EthernetInterface;
 
-typedef struct
+typedef struct Driver
 {
 	uint8_t id;
 	string name;
 	bool enabled;
 	DRIVER_TYPE type;
-	void (*init_handle)(uint8_t id);
+	DeviceDescriptor* device_descriptor;
+	void (*init_handle)(struct Driver* self);
 	void (*enable_handler)();
 	void (*disbale_handler)();
 	void* driver_interface;
 } Driver;
 
 void init_drivers();
-uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle);
+uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor);
 void set_interface(uint8_t driver, void* interface);
 void* get_interface(uint8_t driver);
 void enable_all_drivers();

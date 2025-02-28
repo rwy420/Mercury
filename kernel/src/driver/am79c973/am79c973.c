@@ -1,19 +1,20 @@
 #include <driver/am79c973/am79c973.h>
 #include <driver/driver.h>
+#include <hardware/interrupts.h>
 #include <common/screen.h>
 
 uint8_t am79c973_id;
 EthernetInterface* interface;
 
-void am79c973_handle_interrupt(void)
+void am79c973_handle_interrupt(CPUState* cpu)
 {
 
 }
 
-void am79c973_init(uint8_t id)
+void am79c973_init(Driver* self)
 {
-	am79c973_id = id;
-	interface = get_interface(am79c973_id);
+	am79c973_id = self->id;
+	interface = (EthernetInterface*) self->driver_interface;
 
 	interface->send = am79c973_send;
 	interface->receive = am79c973_receive;

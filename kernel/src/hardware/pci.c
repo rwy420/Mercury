@@ -2,12 +2,15 @@
 #include <memory/mem_manager.h>
 #include <memory/paging.h>
 #include <driver/sata/sata.h>
-#include <common/screen.h>
 #include <driver/driver.h>
+#include <common/screen.h>
 #include <driver/am79c973/am79c973.h>
 
 #define DATA_PORT 0xCFC
 #define COMMAND_PORT 0xCF8
+
+DeviceDescriptor devices[MAX_DEVICES];
+uint8_t num_devices;
 
 uint32_t pci_read(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset)
 {
@@ -26,6 +29,8 @@ void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset
 
 void pci_enumerate_devices(bool debug)
 {
+	num_devices = 0;
+
 	for(int bus = 0; bus < 8; bus++)
 	{
 		for(int device = 0; device < 32; device++)
@@ -33,11 +38,15 @@ void pci_enumerate_devices(bool debug)
 			int function_count = has_functions(bus, device) ? 8 : 1; 
 			for(int function = 0; function < function_count; function++)
 			{
-				uint16_t vendor_id = pci_get_vendor_id(bus, device, function);
-				uint16_t device_id = pci_get_device_id(bus, device, function);
-				uint32_t port_base[6] = {0};
+				DeviceDescriptor* device_descriptor = &devices[num_devices];
+				num_devices++;
+				
 
-				if(vendor_id == 0x0000 || vendor_id == 0xFFFF) continue;
+				device_descriptor->vendor_id = pci_get_vendor_id(bus, device, function);
+				device_descriptor->device_id = pci_get_device_id(bus, device, function);
+				device_descriptor->interrupt = pci_get_interrupt(bus, device, function);
+
+				if(device_descriptor->vendor_id == 0x0000 || device_descriptor->vendor_id == 0xFFFF) continue;
 
 				for(uint8_t bar_idx = 0; bar_idx < 6; bar_idx++)
 				{
@@ -55,7 +64,7 @@ void pci_enumerate_devices(bool debug)
 						}
 					}*/
 
-					port_base[bar_idx] = bar->address;
+					device_descriptor->port_base[bar_idx] = bar->address;
 
 					free(bar);
 				}
@@ -68,45 +77,48 @@ void pci_enumerate_devices(bool debug)
 					printf(" ");
 					print_hex(function & 0xFF);
 					printf(" ");
-					print_hex((vendor_id & 0xFF00) >> 8);
-					print_hex(vendor_id & 0xFF);
+					print_hex((device_descriptor->vendor_id & 0xFF00) >> 8);
+					print_hex(device_descriptor->vendor_id & 0xFF);
 					printf(" ");
-					print_hex((device_id & 0xFF00) >> 8);
-					print_hex(device_id & 0xFF);
+					print_hex((device_descriptor->device_id & 0xFF00) >> 8);
+					print_hex(device_descriptor->device_id & 0xFF);
 					printf(" ");
-					if(port_base) print_hex32(port_base[0]);
+					print_hex32(device_descriptor->port_base[0]);
 					printf("\n");
 				}
 
-				get_driver(vendor_id, device_id, port_base);
+				get_driver(device_descriptor);
 			}
 		}
 	}
 }
 
-void get_driver(uint16_t vendor_id, uint16_t device_id, uint32_t port_base[6])
+void get_driver(DeviceDescriptor* device_descriptor)
 {
-	switch(vendor_id)
+	switch(device_descriptor->vendor_id)
 	{
 		case 0x8086:
-			switch (device_id)
+			switch (device_descriptor->vendor_id)
 			{
 				case 0x2829:
 					for(int page = 0; page < 6; page++)
 					{
 						//TODO TEST THIS
-						map_page((void*)(port_base[4] + (4096 * page)), (void*)(port_base[4] + (4096 * page)), PTE_RW);
+						map_page((void*)(device_descriptor->port_base[4] + (4096 * page)), (void*)(device_descriptor->port_base[4] + (4096 * page)), 
+								PTE_RW);
 					}
-					init_sata(port_base[4]); // BAR5
+					init_sata(device_descriptor->port_base[4]); // BAR5
 					break;
 			}
 			break;
 		case 0x1022:
-			switch(device_id)
+			switch(device_descriptor->device_id)
 			{
 				case 0x2000:
-					create_driver("AMD-AM79C973", ETHERNET, am79c973_init, am79c973_enable, am79c973_disable);
+				{
+					create_driver("AMD-AM79C973", ETHERNET, am79c973_init, am79c973_enable, am79c973_disable, device_descriptor);
 					break;
+				}
 			}
 		break;
 	}
@@ -114,13 +126,13 @@ void get_driver(uint16_t vendor_id, uint16_t device_id, uint32_t port_base[6])
 
 uint16_t pci_get_vendor_id(uint16_t bus, uint16_t device, uint16_t function)
 {
-	uint32_t result = pci_read(bus, device, function, 0);
+	uint32_t result = pci_read(bus, device, function, 0x00);
 	return result;
 }
 
 uint16_t pci_get_device_id(uint16_t bus, uint16_t device, uint16_t function)
 {	
-	uint32_t result = pci_read(bus, device, function, 2);
+	uint32_t result = pci_read(bus, device, function, 0x02);
 	return result;
 }
 
@@ -133,6 +145,12 @@ uint16_t pci_get_class_id(uint16_t bus, uint16_t device, uint16_t function)
 uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function)
 {
 	uint32_t result = pci_read(bus, device, function, 0xA);
+	return (result & ~0xFF00);
+}
+
+uint16_t pci_get_interrupt(uint16_t bus, uint16_t device, uint16_t function)
+{
+	uint32_t result = pci_read(bus, device, function, 0x3C);
 	return (result & ~0xFF00);
 }
 

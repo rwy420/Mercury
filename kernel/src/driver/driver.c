@@ -13,25 +13,23 @@ void init_drivers()
 	driver_index = 0;
 }
 
-uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle)
+uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor)
 {
-	Driver driver;
-
-	driver.name = name;
-	driver.type = type;
-	driver.init_handle = init_handle;
-	driver.enable_handler = enable_handle;
-	driver.disbale_handler = disbale_handle;
-	driver.enabled = false;
-	driver.id = driver_index;
-
-	drivers[driver_index] = driver;
-
-	if(init_handle != NULL_PTR) drivers[driver_index].init_handle(driver_index);
-
+	Driver* driver = &drivers[driver_index];
 	driver_index++;
 
-	return driver.id;
+	driver->name = name;
+	driver->type = type;
+	driver->id = driver_index - 1;
+	driver->device_descriptor = device_descriptor;
+	driver->init_handle = init_handle;
+	driver->enable_handler = enable_handle;
+	driver->disbale_handler = disbale_handle;
+	driver->enabled = false;	
+
+	if(init_handle != NULL_PTR) driver->init_handle(driver);
+
+	return driver->id;
 }
 
 void set_interface(uint8_t driver, void* interface)

@@ -2,8 +2,9 @@
 #define __MERCURY__DRIVER__AM79C973__AM79C973_H
 
 #include <common/types.h>
+#include <driver/driver.h>
 
-void am79c973_init(uint8_t id);
+void am79c973_init(Driver* self);
 void am79c973_enable();
 void am79c973_disable();
 void am79c973_send(char* buffer, size_t size);

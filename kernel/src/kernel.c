@@ -93,7 +93,7 @@ void kernel_main()
 	init_symtable();
 
 	init_drivers();
-	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable);
+	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 
 	printf("<Mercury> Searching PCI deivce drivers\n");
 	pci_enumerate_devices(false);
