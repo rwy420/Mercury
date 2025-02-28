@@ -14,4 +14,6 @@ void outw(uint16_t port, uint16_t data);
 uint32_t inl(uint16_t port);
 void outl(uint16_t port, uint32_t data);
 
+void io_wait();
+
 #endif 

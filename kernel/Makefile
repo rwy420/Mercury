@@ -70,7 +70,7 @@ build/%.o: asm/%.asm
 kernel.bin: linker.ld $(OBJECTS)
 	@echo "Mercury Size: $(MSIZE)"
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
-	#strip --strip-all kernel.bin
+	strip --strip-all kernel.bin
 
 grub: grub_linker.ld $(GRUB_OBJECTS)
 	ld $(LDPARAMS) -T $< -o grub-kernel.bin $(GRUB_OBJECTS)

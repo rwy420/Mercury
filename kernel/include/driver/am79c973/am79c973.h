@@ -16,7 +16,7 @@ typedef struct
 	uint64_t logical_address;
 	uint32_t receive_buffer_descriptor_address;
 	uint32_t send_buffer_descriptor_address;
-} __attribute__((packed)) InitBlock;
+} __attribute__((packed)) __attribute__((aligned(16))) InitBlock;
 
 typedef struct
 {

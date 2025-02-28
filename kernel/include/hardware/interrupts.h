@@ -44,6 +44,7 @@ void handle_irq_15();
 void handle_irq_32();
 void handle_irq_33();
 void handle_irq_41();
+void handle_irq_43();
 void handle_irq_49();
 void handle_irq_128();
 

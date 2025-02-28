@@ -60,5 +60,6 @@ interrupt 15
 interrupt 32
 interrupt 33
 interrupt 41
+interrupt 43
 interrupt 49
 interrupt 128

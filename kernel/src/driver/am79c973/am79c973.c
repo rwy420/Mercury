@@ -13,20 +13,13 @@
 #include <common/screen.h>
 #include <memory/common.h>
 
+// :(
+
 EthernetInterface* interface;
 
 uint32_t port_base;
 
 InitBlock init_block;
-BufferDescriptor* send_buffer_descriptor;
-BufferDescriptor* receive_buffer_descriptor;
-char send_buffer_descriptor_memory[2 * 1024 + 15];
-char send_buffers[2 * 1024 + 15][8];
-uint8_t current_send_buffer;
-
-char receive_buffer_descriptor_memory[2 * 1024 + 15];
-char receive_buffers[2 * 1024 + 15][8];
-uint8_t current_receive_buffer;
 
 void am79c973_handle_interrupt(CPUState* cpu)
 {
@@ -49,8 +42,9 @@ void am79c973_handle_interrupt(CPUState* cpu)
 
 void am79c973_init(Driver* self)
 {
-	print_uint8_t(self->device_descriptor->interrupt + 0x20);
-	register_interrupt_handler(self->device_descriptor->interrupt + 0x20, am79c973_handle_interrupt);
+	print_uint8_t(0x20 + self->device_descriptor->interrupt);
+	printf("\n");
+	register_interrupt_handler(0x20 + self->device_descriptor->interrupt, am79c973_handle_interrupt);
 
 	interface = (EthernetInterface*) self->driver_interface;
 	port_base = self->device_descriptor->port_base[0];
@@ -60,52 +54,38 @@ void am79c973_init(Driver* self)
 	interface->get_mac_address = am79c973_get_mac_address;
 	interface->get_ip_address = am79c973_get_ip_address;
 
-
-	current_send_buffer = 0;
-	current_receive_buffer = 0;
-
-	uint64_t MAC0 = inw(port_base + MAC_ADDRESS_0_PORT_OFFSET) % 256;
-	uint64_t MAC1 = inw(port_base + MAC_ADDRESS_0_PORT_OFFSET) / 256;
-	uint64_t MAC2 = inw(port_base + MAC_ADDRESS_2_PORT_OFFSET) % 256;
-	uint64_t MAC3 = inw(port_base + MAC_ADDRESS_2_PORT_OFFSET) / 256;
-	uint64_t MAC4 = inw(port_base + MAC_ADDRESS_4_PORT_OFFSET) % 256;
-	uint64_t MAC5 = inw(port_base + MAC_ADDRESS_4_PORT_OFFSET) / 256;
+	uint64_t MAC0 = inw(port_base + MAC_ADDRESS_0_PORT_OFFSET) & 0xFF;
+	uint64_t MAC1 = (inw(port_base + MAC_ADDRESS_0_PORT_OFFSET) >> 8) & 0xFF;
+	uint64_t MAC2 = inw(port_base + MAC_ADDRESS_2_PORT_OFFSET) & 0xFF;
+	uint64_t MAC3 = (inw(port_base + MAC_ADDRESS_2_PORT_OFFSET) >> 8) & 0xFF;
+	uint64_t MAC4 = inw(port_base + MAC_ADDRESS_4_PORT_OFFSET) & 0xFF;
+	uint64_t MAC5 = (inw(port_base + MAC_ADDRESS_4_PORT_OFFSET) >> 8) & 0xFF;
 
 	uint64_t MAC = MAC5 << 40 | MAC4 << 32 | MAC3 << 24 | MAC2 << 16 | MAC1 << 8 | MAC0;
 
+	print_hex((MAC >> 40) & 0xFF);
+	print_hex((MAC >> 32) & 0xFF);
+	print_hex((MAC >> 24) & 0xFF);
+	print_hex((MAC >> 16) & 0xFF);
+	print_hex((MAC >> 8) & 0xFF);
+	print_hex(MAC & 0xFF);
+	printf("\n");
+
 	outw(port_base + REGISTER_ADDRESS_PORT_OFFSET, 0x14);
 	outw(port_base + BUS_CONTROL_REGISTER_PORT_OFFSET, 0x102);
+	(void) inw(port_base + REGISTER_DATA_PORT_OFFSET);
 
 	outw(port_base + REGISTER_ADDRESS_PORT_OFFSET, 0x00);
 	outw(port_base + REGISTER_DATA_PORT_OFFSET, 0x04);
 
 	init_block.mode = 0x00;
 	init_block.reserved1 = 0x00;
-	init_block.num_send_buffers = 0x03;
+	init_block.num_send_buffers = 0x3;
 	init_block.reserved2 = 0x00;
-	init_block.num_receive_buffers = 0x03;
+	init_block.num_receive_buffers = 0x3;
 	init_block.physical_address = MAC;
 	init_block.reserved3 = 0x00;
 	init_block.logical_address = 0x00;
-
-	send_buffer_descriptor = (BufferDescriptor*)((((uint32_t) &send_buffer_descriptor_memory[0]) + 0xF) & ~((uint32_t) 0xF));
-	init_block.send_buffer_descriptor_address = (uint32_t) send_buffer_descriptor;
-
-	receive_buffer_descriptor = (BufferDescriptor*)((((uint32_t) &receive_buffer_descriptor_memory[0]) + 0xF) & ~((uint32_t) 0xF));
-	init_block.receive_buffer_descriptor_address = (uint32_t) receive_buffer_descriptor;
-
-	for(int i = 0; i < 8; i++)
-	{
-		send_buffer_descriptor[i].address = (((uint32_t) &send_buffers[i]) + 0xF) & ~(uint32_t) 0x0F;
-		send_buffer_descriptor[i].flags = 0x7FF | 0xF000;
-		send_buffer_descriptor[i].flags2 = 0x00;
-		send_buffer_descriptor[i].available = 0x00;
-
-		receive_buffer_descriptor[i].address = (((uint32_t) &receive_buffers[i]) + 0xF) & ~(uint32_t) 0x0F;
-		receive_buffer_descriptor[i].flags = 0xF7FF | 0x80000000;
-		receive_buffer_descriptor[i].flags2 = 0x00;
-		receive_buffer_descriptor[i].available = 0x00;
-	}
 
 	outw(port_base + REGISTER_ADDRESS_PORT_OFFSET, 0x01);
 	outw(port_base + REGISTER_DATA_PORT_OFFSET, (uint32_t)(&init_block) & 0xFFFF);

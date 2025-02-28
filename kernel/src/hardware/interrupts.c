@@ -52,6 +52,7 @@ void install_idt()
 	interrupts_init_descriptor(0x20, (uint32_t) handle_irq_32);
 	interrupts_init_descriptor(0x21, (uint32_t) handle_irq_33);
 	interrupts_init_descriptor(0x29, (uint32_t) handle_irq_41);
+	interrupts_init_descriptor(0x2b, (uint32_t) handle_irq_43);
 	interrupts_init_descriptor(0x31, (uint32_t) handle_irq_49);
 	interrupts_init_descriptor(0x80, (uint32_t) handle_irq_128);
 
@@ -64,8 +65,6 @@ void install_idt()
 
 int interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 {
-	if(interrupt == 0x29) printf("SDSDSDASDAS");
-
 	// Only syscalls should return values
 	if(interrupt == 0x80)
 	{

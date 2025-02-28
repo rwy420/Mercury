@@ -22,7 +22,7 @@ full-image: image
 	dd if=./fs.bin of=build/mercury_image.img conv=notrunc oflag=seek_bytes seek=51200
 
 qemu-run:
-	qemu-system-x86_64 -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw
+	qemu-system-x86_64 -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw -device pcnet
 
 grub:
 	cd kernel && make grub
