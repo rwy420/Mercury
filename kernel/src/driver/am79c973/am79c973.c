@@ -1,3 +1,11 @@
+#define MAC_ADDRESS_0_PORT_OFFSET
+#define MAC_ADDRESS_2_PORT_OFFSET
+#define MAC_ADDRESS_4_PORT_OFFSET
+#define REGISTER_DATA_PORT_OFFSET
+#define REGISTER_ADDRESS_PORT_OFFSET
+#define RESET_PORT_OFFSET
+#define BUS_CONTROL_REGISTER_PORT_OFFSET
+
 #include <driver/am79c973/am79c973.h>
 #include <driver/driver.h>
 #include <hardware/interrupts.h>

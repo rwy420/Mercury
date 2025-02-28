@@ -3,28 +3,6 @@
 
 #include <common/types.h>
 
-#define SATA_SIG_ATA    0x00000101  // SATA drive
-#define SATA_SIG_ATAPI  0xEB140101  // SATAPI drive
-#define SATA_SIG_SEMB   0xC33C0101  // Enclosure management bridge
-#define SATA_SIG_PM 0x96690101  // Port multiplier
-#define AHCI_DEV_NULL 0
-#define AHCI_DEV_SATA 1
-#define AHCI_DEV_SATAPI 4
-#define AHCI_DEV_SEMB 2
-#define AHCI_DEV_PM 3
-#define HBAPORT_DET_PRESENT 3
-#define HBAPORT_IPM_ACTIVE 1
-#define HBA_PxIS_TFES   (1 << 30)
-#define ATA_CMD_READ_DMA_EX 0x25
-#define ATA_CMD_WRITE_DMA_EX    0x35
-#define HBA_PxCMD_CR    (1 << 15)
-#define HBA_PxCMD_FR    (1 << 14)
-#define HBA_PxCMD_FRE   (1 << 4)
-#define HBA_PxCMD_SUD   (1 << 1)
-#define HBA_PxCMD_ST    (1 << 0)
-#define ATA_DEV_BUSY 0x80
-#define ATA_DEV_DRQ 0x08
-
 typedef enum
 {
 	FIS_TYPE_REG_H2D	= 0x27,	// Register FIS - host to device

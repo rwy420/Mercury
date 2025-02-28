@@ -60,7 +60,7 @@ void enable_driver(uint8_t id)
 	printf(driver->name);
 	printf("' enabled \n");
 
-	if(driver->type == ETHERNET && driver->driver_interface)
+	if(driver->type == ETHERNET && ((EthernetInterface*)(driver->driver_interface))->send)
 	{
 		default_net_interface = driver->driver_interface;
 		printf("<Mercury> Selected '");

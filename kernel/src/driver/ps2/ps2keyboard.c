@@ -1,3 +1,6 @@
+#define DATA_PORT 0x60
+#define COMMAND_PORT 0x64
+
 #include <driver/ps2/ps2keyboard.h>
 #include <memory/mem_manager.h>
 #include <hardware/interrupts.h>
