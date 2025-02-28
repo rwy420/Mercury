@@ -23,7 +23,7 @@ uint32_t pci_read(uint16_t bus, uint16_t device, uint16_t function, uint32_t off
 void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset, uint32_t value);
 
 void pci_enumerate_devices(bool debug);
-Driver* get_driver(uint16_t vendor, uint16_t device);
+void get_driver(uint16_t vendor, uint16_t device, uint32_t port_base[6]);
 
 uint16_t pci_get_vendor_id(uint16_t bus, uint16_t device, uint16_t function);
 uint16_t pci_get_device_id(uint16_t bus, uint16_t device, uint16_t function);

@@ -4,6 +4,7 @@
 #include <driver/sata/sata.h>
 #include <common/screen.h>
 #include <driver/driver.h>
+#include <driver/am79c973/am79c973.h>
 
 #define DATA_PORT 0xCFC
 #define COMMAND_PORT 0xCF8
@@ -77,25 +78,37 @@ void pci_enumerate_devices(bool debug)
 					printf("\n");
 				}
 
-				switch(vendor_id)
-				{
-					case 0x8086:
-						switch (device_id)
-						{
-							case 0x2829:
-								for(int page = 0; page < 6; page++)
-								{
-									//TODO TEST THIS
-									map_page((void*)(port_base + (4096 * page)), (void*)(port_base + (4096 * page)),
-											PTE_RW);
-								}
-								init_sata(port_base[4]); // BAR5
-							break;
-						}
-					break;
-				}
+				get_driver(vendor_id, device_id, port_base);
 			}
 		}
+	}
+}
+
+void get_driver(uint16_t vendor_id, uint16_t device_id, uint32_t port_base[6])
+{
+	switch(vendor_id)
+	{
+		case 0x8086:
+			switch (device_id)
+			{
+				case 0x2829:
+					for(int page = 0; page < 6; page++)
+					{
+						//TODO TEST THIS
+						map_page((void*)(port_base[4] + (4096 * page)), (void*)(port_base[4] + (4096 * page)), PTE_RW);
+					}
+					init_sata(port_base[4]); // BAR5
+					break;
+			}
+			break;
+		case 0x1022:
+			switch(device_id)
+			{
+				case 0x2000:
+					create_driver("AMD-AM79C973", ETHERNET, am79c973_init, am79c973_enable, am79c973_disable);
+					break;
+			}
+		break;
 	}
 }
 

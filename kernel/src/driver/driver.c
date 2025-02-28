@@ -6,6 +6,8 @@
 Driver drivers[0x40];
 uint8_t driver_index;
 
+void* default_net_interface;
+
 void init_drivers()
 {
 	driver_index = 0;
@@ -25,36 +27,66 @@ uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* en
 
 	drivers[driver_index] = driver;
 
-	if(init_handle != NULL_PTR) drivers[driver_index].init_handle();
+	if(init_handle != NULL_PTR) drivers[driver_index].init_handle(driver_index);
 
 	driver_index++;
 
 	return driver.id;
 }
 
-void add_driver(Driver* driver)
+void set_interface(uint8_t driver, void* interface)
 {
-	drivers[driver_index] = *driver;
-	driver_index++;
+	drivers[driver].driver_interface = interface;
+}
+void* get_interface(uint8_t driver)
+{
+	return drivers[driver].driver_interface;
 }
 
+void enable_all_drivers()
+{
+	for(int i = 0; i < driver_index; i++)
+	{
+		enable_driver(i);
+	}
+}
 
 void enable_driver(uint8_t id)
 {
-	drivers[id].enabled = true;
-	drivers[id].enable_handler();
+	Driver* driver = &drivers[id];
+
+	driver->enabled = true;
+	driver->enable_handler();
 
 	printf("<Mercury> Driver '");
-	printf(drivers[id].name);
+	printf(driver->name);
 	printf("' enabled \n");
+
+	if(driver->type == ETHERNET && driver->driver_interface)
+	{
+		default_net_interface = driver->driver_interface;
+		printf("<Mercury> Selected '");
+		printf(driver->name);
+		printf("' as default ethernet driver\n");
+	}
 }
 
 void disbale_driver(uint8_t id)
 {
-	drivers[id].enabled = false;
-	drivers[id].disbale_handler();
+	Driver* driver = &drivers[id];
+	driver->enabled = false;
+	driver->disbale_handler();
 
 	printf("<Mercury> Driver '");
-	printf(drivers[id].name);
+	printf(driver->name);
 	printf("' disabled \n");
+}
+
+void net_send(char* buffer, size_t size)
+{
+	if(default_net_interface)
+	{
+		EthernetInterface* interface = (EthernetInterface*) default_net_interface;
+		interface->send(buffer, size);
+	}
 }

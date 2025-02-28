@@ -11,7 +11,7 @@ OBJECTS = build/entry.o build/kernel.o build/screen.o build/gdt.o build/port.o b
 		  build/elf_loader.o build/elf.o build/symtable.o build/sata.o build/ahci.o \
 		  build/fat16.o build/fat16_path.o build/fat16_priv.o build/fat16_rootdir.o build/fat16_subdir.o \
 		  build/usermode.o build/vga.o build/fd.o build/elf_dl.o build/shell.o build/pit.o build/multitasking.o \
-		  build/multitasking_asm.o
+		  build/multitasking_asm.o build/am79c973.o
 
 GRUB_OBJECTS = build/grub_entry.o build/kernel.o build/screen.o build/gdt.o build/port.o build/interrupts.o \
 		  build/interrupt_handler.o build/gdt_asm.o build/pci.o build/ps2keyboard.o build/driver.o build/pic.o \
@@ -36,6 +36,9 @@ build/%.o: src/driver/ps2/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/vga/%.c
+	gcc $(GCCPARAMS) -o $@ -c $<
+
+build/%.o: src/driver/am79c973/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
 build/%.o: src/driver/sata/%.c

@@ -94,11 +94,12 @@ void kernel_main()
 
 	init_drivers();
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable);
-	enable_driver(ps2_keyboard);
 
 	printf("<Mercury> Searching PCI deivce drivers\n");
 	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
+
+	enable_all_drivers();
 
 	storage_dev_t* fat_dev = malloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
