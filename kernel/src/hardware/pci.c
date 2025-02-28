@@ -51,19 +51,6 @@ void pci_enumerate_devices(bool debug)
 				for(uint8_t bar_idx = 0; bar_idx < 6; bar_idx++)
 				{
 					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
-					/*if(bar->address && (bar->type == IO)) 
-					{
-						port_base = bar->address;
-					}
-					
-					if(bar->type == MM)
-					{
-						if(bar->address && bar_idx == 5)
-						{
-							port_base = bar->address;
-						}
-					}*/
-
 					device_descriptor->port_base[bar_idx] = bar->address;
 
 					free(bar);
@@ -151,7 +138,7 @@ uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function)
 uint16_t pci_get_interrupt(uint16_t bus, uint16_t device, uint16_t function)
 {
 	uint32_t result = pci_read(bus, device, function, 0x3C);
-	return (result & ~0xFF00);
+	return result;
 }
 
 BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)

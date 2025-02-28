@@ -59,5 +59,6 @@ interrupt 15
 ; Non-exception interrups
 interrupt 32
 interrupt 33
+interrupt 41
 interrupt 49
 interrupt 128
