@@ -11,6 +11,7 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 **Work in progress**
 - Linux like syscalls
 - AHCI driver
+- Networking (Drivers and lwip)
 
  **Coming Features**
 - Proper terminal
@@ -18,6 +19,7 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 - Porting some apps made for Linux (Lua, Python...)
 
 **Future ideas**
+- Module system for drivers / services
 
 **Screenshots** \
 Dynamic library loading working: \
