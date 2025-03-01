@@ -1,6 +1,6 @@
 extern kernel_main
-global entry
+global k_entry
 
-entry:
+k_entry:
 	mov esp, 0x90000
 	call kernel_main
