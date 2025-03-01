@@ -5,6 +5,7 @@
 #include <driver/driver.h>
 #include <common/screen.h>
 #include <driver/am79c973/am79c973.h>
+#include <driver/rtl8139/rtl8139.h>
 
 #define DATA_PORT 0xCFC
 #define COMMAND_PORT 0xCF8
@@ -102,12 +103,17 @@ void get_driver(DeviceDescriptor* device_descriptor)
 			switch(device_descriptor->device_id)
 			{
 				case 0x2000:
-				{
 					create_driver("AMD-AM79C973", ETHERNET, am79c973_init, am79c973_enable, am79c973_disable, device_descriptor);
-					break;
-				}
+					break;			
 			}
-		break;
+			break;
+		case 0x10EC:
+			switch(device_descriptor->device_id)
+			{
+				case 0x8139:
+					create_driver("RTL-8139", ETHERNET, rtl8139_init, rtl8139_enable, rtl8139_disable, device_descriptor);
+					break;
+			} 
 	}
 }
 

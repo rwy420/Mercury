@@ -15,11 +15,10 @@
 
 // :(
 
-EthernetInterface* interface;
+static EthernetInterface* interface;
+static uint32_t port_base;
 
-uint32_t port_base;
-
-InitBlock init_block;
+static InitBlock init_block;
 
 void am79c973_handle_interrupt(CPUState* cpu)
 {
