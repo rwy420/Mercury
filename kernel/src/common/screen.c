@@ -25,7 +25,7 @@ void printf(string str)
 				break;
 
 			default:
-				vesa_putc(str[i], x, y, 0xFFFF, 0x0);
+				vesa_putc(str[i], x, y, RGB565_WHITE, RGB565_BLACK);
 				x += 0x8;
 		}
 
