@@ -44,8 +44,8 @@ void stage2_main()
 	vesa_info_block.fb_width = 1024;
 	vesa_info_block.fb_height = 768;
 
-	void(*entry)() = (void*) 0x100000;
-	entry();
+	void(*entry)(VesaInfoBlock) = (void*) 0x100000;
+	entry(vesa_info_block);
 	
 	
 	printf("SOMETHING BAD HAS HAPPENED AND YOU HAVE REACHED THE BOOTLOADER FALLBACK LOOP\n");

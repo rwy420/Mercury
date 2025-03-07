@@ -34,12 +34,11 @@ uint32_t mem_manager_end;
 
 VesaInfoBlock g_vesa_info_block;
 
-void kernel_main()
+void kernel_main(VesaInfoBlock vesa_info_block)
 {
-	g_vesa_info_block.fb = 0xFD000000;
-	g_vesa_info_block.fb_width = 1024;
-	g_vesa_info_block.fb_height = 768;
-
+	g_vesa_info_block.fb = vesa_info_block.fb;
+	g_vesa_info_block.fb_width = vesa_info_block.fb_width;
+	g_vesa_info_block.fb_height = vesa_info_block.fb_height;
 	vesa_init();
 
 	clear_screen();
