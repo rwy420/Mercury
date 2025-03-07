@@ -1,12 +1,15 @@
 #include "./screen.h"
 #include "./ata.h"
 #include "./fat16.h"
+#include "vesa.h"
 
 Disk* default_disk;
 extern char ksize;
 
 void stage2_main()
 {
+	vesa_init();
+
 	clear_screen();
 	printf("BOOT DISK INIT...\n");
 
@@ -33,7 +36,7 @@ void stage2_main()
 	void* kernel_buffer = (void*) 0x100000 - 0x1000;
 
 	fat16_init(0);
-	fat16_read("/BOOT/KERNEL0.ELF", 'r', kernel_buffer, (unsigned long) &ksize);
+	fat16_read("/BOOT/KERNEL0.ELF", 'r', kernel_buffer, (uint32_t) &ksize);
 
 	void(*entry)() = (void*) 0x100000;
 	entry();

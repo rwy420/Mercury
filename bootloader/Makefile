@@ -30,9 +30,11 @@ build/stage2.bin:
 		-c src/stage2/common.c -o build/stage2common_c.o
 	gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-pic -fno-pie -fno-stack-protector \
 		-c src/stage2/fat16.c -o build/stage2fat16_c.o
+	gcc -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-pic -fno-pie -fno-stack-protector \
+		-c src/stage2/vesa.c -o build/vesa_c.o
 	@echo "Dynamically adjusted kernel size to $(KSIZE)"
 	ld -m elf_i386 -T linker.ld --defsym ksize=$(KSIZE) -o build/stage2.bin build/stage2main_asm.o build/stage2main_c.o \
-		build/stage2screen_c.o build/stage2ata_c.o build/stage2common_c.o build/stage2fat16_c.o
+		build/stage2screen_c.o build/stage2ata_c.o build/stage2common_c.o build/stage2fat16_c.o build/vesa_c.o
 
 clean:
 	rm -rf build/*

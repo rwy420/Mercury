@@ -32,7 +32,7 @@ main:
 
 	mov ax, 1
 	mov dl, [drive_number]
-	mov cl, 20
+	mov cl, 50
 	mov bx, 0x500
 
 	call disk_read

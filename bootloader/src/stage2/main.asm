@@ -1,8 +1,18 @@
-bits 16
+bits 16 
+
+section .bss
+vbe_mode_info: resb 256
+vbe_controller_info: resb 512
+
+vesa_data: resd 4
+
 
 global entry
-extern stage2_main 
-	
+global vesa_data
+extern stage2_main
+
+section .text
+
 entry:
 	; Set up segments and stack
 	mov ax, 0
@@ -12,10 +22,17 @@ entry:
 
 	mov sp, 0x8E00
 
-	;mov	ax,1112h
-	;xor	bl,bl
-	;int	10h
+	mov ax, 0x4F02
+	mov bx, 0x117
+	int 0x10
 
+	mov ax, 0x4F01
+	mov cx, 0x117
+	mov di, vbe_mode_info
+	int 0x10
+
+	mov eax, [vbe_mode_info + 0x28]
+	mov dword [vesa_data], eax
 	mov si, stage2_message
 	call puts
 
@@ -128,6 +145,7 @@ kbd_controller_write_control_output:	equ 0xD1
 
 stage2_message:							db "Boot stage 2", 0x0A, 0x0D, 0
 relocate_done_message:					db "Kernel relocated", 0x0A, 0x0D, 0
+vesa_fail_message:						db "VESA not supported", 0x0A, 0x0D, 0
 
 g_gdt_start:
 	.null_descriptor:
