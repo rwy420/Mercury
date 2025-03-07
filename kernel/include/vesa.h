@@ -1,7 +1,7 @@
-#ifndef BOOT__VESA_H
-#define BOOT__VESA_H
+#ifndef __MERCURY__VESA_H
+#define __MERCURY__VESA_H
 
-#include "./types.h"
+#include <common/types.h>
 
 typedef struct
 {

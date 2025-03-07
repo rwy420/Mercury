@@ -1,9 +1,7 @@
 #include <common/screen.h>
+#include <vesa.h>
 
-#define MAX_X 80
-#define MAX_Y 25
-
-static uint8_t x = 0, y = 0;
+static uint16_t x = 0, y = 0;
 
 int syscall_printf(void* buffer, size_t length)
 {
@@ -13,34 +11,31 @@ int syscall_printf(void* buffer, size_t length)
 
 void printf(string str)
 {
-	uint16_t* video_memory = (uint16_t*) 0xb8000;
 	for(int i = 0; str[i] != '\0'; i++)
 	{
-
 		switch(str[i])
 		{
 			case '\n':
-			{
-				y++;
+				y += 0xE;
 				x = 0;
 				break;
-			}
+
+			case ' ':
+				x += 0x8;
+				break;
 
 			default:
-			{
-				video_memory[MAX_X * y + x] = (video_memory[MAX_X * y + x] & 0xFF00) | str[i];
-				x++;
-				break;
-			}
+				vesa_putc(str[i], x, y, 0xFFFF, 0x0);
+				x += 0x8;
 		}
 
-		if(x >= MAX_X)
+		if(x >= 1024)
 		{
-			y++;
+			y += 0xE;
 			x = 0;
 		}
 
-		if(y >= 25)
+		if(y >= 768)
 		{
 			clear_screen();
 		}
@@ -49,22 +44,14 @@ void printf(string str)
 
 void terminal_move_left()
 {
-	x -= 1;
+	x -= 8;
 	printf(" ");
-	x -= 1;
+	x -= 8;
 }
 
 void clear_screen()
 {
-	uint16_t* video_memory = (uint16_t*) 0xb8000;
-
-	for(y = 0; y < MAX_Y; y++)
-	{
-		for(x = 0; x < MAX_X; x++)
-		{ 
-			video_memory[MAX_X * y + x] = (video_memory[MAX_X * y + x] & 0xFF00) | ' ';
-		}
-	}
+	vesa_clear();
 
 	x = 0;
 	y = 0;

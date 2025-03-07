@@ -5,6 +5,7 @@
 
 Disk* default_disk;
 extern char ksize;
+extern uint32_t framebuffer;
 
 void stage2_main()
 {
@@ -37,6 +38,11 @@ void stage2_main()
 
 	fat16_init(0);
 	fat16_read("/BOOT/KERNEL0.ELF", 'r', kernel_buffer, (uint32_t) &ksize);
+
+	VesaInfoBlock vesa_info_block;
+	vesa_info_block.fb = framebuffer;
+	vesa_info_block.fb_width = 1024;
+	vesa_info_block.fb_height = 768;
 
 	void(*entry)() = (void*) 0x100000;
 	entry();

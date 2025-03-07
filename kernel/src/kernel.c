@@ -1,5 +1,6 @@
 #include <syscalls.h>
 #include <fd.h>
+#include <vesa.h>
 #include <shell.h>
 #include <multitasking.h>
 #include <common/screen.h>
@@ -29,12 +30,18 @@ extern Disk* g_default_disk;
 uint32_t kernel_start_address;
 uint32_t kernel_end_address;
 uint32_t kernel_size;
-
-
 uint32_t mem_manager_end;
+
+VesaInfoBlock g_vesa_info_block;
 
 void kernel_main()
 {
+	g_vesa_info_block.fb = 0xFD000000;
+	g_vesa_info_block.fb_width = 1024;
+	g_vesa_info_block.fb_height = 768;
+
+	vesa_init();
+
 	clear_screen();
 	printf("<Mercury> Loading Mercury kernel... \n");
 
