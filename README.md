@@ -22,7 +22,7 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 - Module system for drivers / services
 
 **Screenshots** \
-Dynamic library loading working: \
-The APP.ELF file is using the LIBC.SO file 'make libc' and executed using the elfexec command
-![VirtualBox Output](./docs/example-result00.png "Out")
+Multitasking and SO loading working: \
+You can see two idle tasks counting up and a program using functions from LIBC.SO running
+![Qemu Output](./docs/example-result01.png "Qemu Output")
 ![Code](./docs/example-code00.png "Code")

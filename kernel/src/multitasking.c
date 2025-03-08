@@ -16,6 +16,7 @@ Task* current_last;
 
 extern TSS g_tss;
 char* msg1 = "Task: ";
+char* msg3 = "Task2: ";
 char* msg2 = "\n";
 
 void kernel_schedule();
@@ -37,6 +38,21 @@ void idle_task()
 	}
 }
 
+void idle_task2()
+{
+	static uint32_t counter = 0;
+	while(1)
+	{
+		printf(msg3);
+		print_hex32(counter++);
+		printf(msg2);
+		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
+	}
+}
+
+
+
+
 void init_tasks()
 {
 	memset(tasks, 0, sizeof(Task) * MAX_TASKS);
@@ -55,6 +71,14 @@ void init_tasks()
 	idle->eip = (uint32_t) idle_task;
 	idle->esp = 0x800000;	
 
+	Task* idle2 = &tasks[2];
+	idle2->flags = TASK_OK;
+	idle2->eip = (uint32_t) idle_task2;
+	idle2->esp = 0x900000;
+
+	idle->next = idle2;
+	idle2->prev = idle;
+
 	int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
 	char* buffer = malloc(size);
@@ -62,11 +86,11 @@ void init_tasks()
 	void(*entry)();
 	entry = image_load(buffer, size, 0);
 
-	Task* test = &tasks[2];
+	Task* test = &tasks[3];
 	test->flags = TASK_OK;
 	test->eip = (uint32_t) entry;
 	test->esp = 0x700000;
-	idle->next = test;
+	idle2->next = test;
 	dummy->next = idle;
 
 	g_current_task = dummy;
