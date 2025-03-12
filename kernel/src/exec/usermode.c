@@ -9,6 +9,7 @@
 extern TSS g_tss;
 extern Task* g_current_task;
 
+// Just testing
 void execute_user_mode(void* entry)
 {
 	for(int i = 0; i < 0x4000; i += PAGE_SIZE)
@@ -84,7 +85,7 @@ void syscall_exit(CPUState* cpu)
 	printf("Process exited with code ");
 	print_uint32_t(cpu->ebx);
 	printf("\n");
-	//kernel_switch_back();
+	//kernel_switch_back(); Not sure whether this is required
 	kill_task(g_current_task->id);
 	asm("int $32");
 }

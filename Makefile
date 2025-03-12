@@ -1,7 +1,6 @@
 clean:
 	cd kernel && make clean
 	cd bootloader && make clean
-	rm build/mercury_image.img
 
 fs.bin:
 	dd if=/dev/zero of=fs.bin bs=1 count=687109

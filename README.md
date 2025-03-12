@@ -1,7 +1,7 @@
 # Mercury
 
 Mercury is a WIP x86-32 kernel. \
-Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/issues) (Issue page)
+Report problems or give suggestions [here](https://github.com/rwy420/Mercury/issues) (Issue page)
 
 **Features**
 - FAT16 driver
@@ -12,6 +12,7 @@ Report problems or give suggestions [Here](https://github.com/rwy420/Mercury/iss
 - Linux like syscalls
 - AHCI driver
 - Networking (Drivers and lwip)
+- Process isolation
 
  **Coming Features**
 - Proper terminal
