@@ -15,6 +15,8 @@ Task* g_current_task;
 Task* current_last;
 
 extern TSS g_tss;
+
+// Messages need to have a hardcoded memory address
 char* msg1 = "Task: ";
 char* msg3 = "Task2: ";
 char* msg2 = "\n";
@@ -50,10 +52,7 @@ void idle_task2()
 	}
 }
 
-
-
-
-void init_tasks()
+void tasks_init()
 {
 	memset(tasks, 0, sizeof(Task) * MAX_TASKS);
 

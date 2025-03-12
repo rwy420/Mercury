@@ -9,7 +9,7 @@
 Symbol* symtable;
 uint32_t symbol_idx;
 
-void init_symtable()
+void symtable_init()
 {
 	symtable = malloc(sizeof(Symbol) * MAX_SYMBOLS);
 	symbol_idx = 0;

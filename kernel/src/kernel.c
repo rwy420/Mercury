@@ -96,7 +96,7 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	printf("<Mercury> Setting up paging\n");
 	//paging_enable();
 
-	init_symtable();
+	symtable_init();
 
 	init_drivers();
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
@@ -114,7 +114,7 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
 
-	init_tasks();
+	tasks_init();
 	register_interrupt_handler(0x20, schedule);
 
 	while(1);

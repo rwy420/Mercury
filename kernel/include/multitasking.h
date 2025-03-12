@@ -22,7 +22,7 @@ typedef struct Task
 	struct Task* prev;
 } __attribute__((packed)) Task;
 
-void init_tasks();
+void tasks_init();
 Task* create_task(void(*entry)(), uint32_t esp);
 void kill_task(uint8_t id);
 void schedule(CPUState* cpu);

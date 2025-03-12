@@ -11,7 +11,7 @@ typedef struct
 	void* address;
 } Symbol;
 
-void init_symtable();
+void symtable_init();
 void register_symbol(string name, void* address);
 void* resolve_symbol(const char* name);
 
