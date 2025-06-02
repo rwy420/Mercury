@@ -2,12 +2,12 @@
 #include <fd.h>
 #include <vesa.h>
 #include <shell.h>
+#include <process.h>
 #include <multitasking.h>
 #include <common/screen.h>
 #include <common/types.h>
 #include <exec/elf/elf_loader.h>
 #include <exec/elf/symtable.h>
-#include <exec/usermode.h>
 #include <memory/gdt.h>
 #include <driver/driver.h>
 #include <driver/vga/vga.h>

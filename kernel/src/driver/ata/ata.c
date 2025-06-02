@@ -15,7 +15,7 @@
 Disk* g_default_disk;
 uint16_t sector_bytes = 512;
 
-Disk init_disk(uint16_t port_base, bool master)
+Disk init_disk(uint16_t port_base, int master)
 {
 	Disk result;
 	result.port_base = port_base;
@@ -24,7 +24,7 @@ Disk init_disk(uint16_t port_base, bool master)
 	return result;
 }
 
-bool identify_disk(Disk* disk)
+int identify_disk(Disk* disk)
 {
 	outb(DEVICE_PORT(disk->port_base), disk->master ? 0xA0 : 0xB0);
 	outb(CONTROL_PORT(disk->port_base), 0);
@@ -55,7 +55,7 @@ bool identify_disk(Disk* disk)
 	return true;
 }
 
-bool read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
+int read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
 {
 	if(sector & 0xF0000000) return false;
 
@@ -90,7 +90,7 @@ bool read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
 	return true;
 }
 
-bool write28_disk(Disk* disk, uint32_t sector, uint8_t* data, int length)
+int write28_disk(Disk* disk, uint32_t sector, uint8_t* data, int length)
 {
 	if(sector & 0xF0000000) 
 	{
@@ -123,7 +123,7 @@ bool write28_disk(Disk* disk, uint32_t sector, uint8_t* data, int length)
 	return true;
 }
 
-bool flush_disk(Disk* disk)
+int flush_disk(Disk* disk)
 {
 	outb(DEVICE_PORT(disk->port_base), disk->master ? 0xE0 : 0xF0);
 	outb(COMMAND_PORT(disk->port_base), 0xE7);
@@ -140,16 +140,16 @@ bool flush_disk(Disk* disk)
 	return true;
 }
 
-bool read28(uint32_t sector, uint8_t* buffer, int length)
+int read28(uint32_t sector, uint8_t* buffer, int length)
 {
 	return read28_disk(g_default_disk, sector, buffer, length);
 }
-bool write28(uint32_t sector, uint8_t* data, int length)
+int write28(uint32_t sector, uint8_t* data, int length)
 {
 	return write28_disk(g_default_disk, sector, data, length);
 }
 
-bool flush()
+int flush()
 {
 	return flush_disk(g_default_disk);
 }

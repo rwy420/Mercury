@@ -1,10 +1,8 @@
-#include "multitasking.h"
 #include <shell.h>
 #include <common/screen.h>
 #include <memory/common.h>
 #include <memory/mem_manager.h>
 #include <fs/fat16/fat16.h>
-#include <exec/usermode.h>
 #include <exec/elf/elf_loader.h>
 
 char input_buffer[0xFF];

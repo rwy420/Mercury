@@ -68,7 +68,7 @@ void* find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const c
     return 0;
 }
 
-void* image_load(char* elf_start, unsigned int size, bool debug)
+void* image_load(char* elf_start, unsigned int size, int debug)
 {
     Elf32_Ehdr* hdr;
     Elf32_Phdr* phdr;

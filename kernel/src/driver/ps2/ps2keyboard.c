@@ -8,7 +8,7 @@
 #include <common/screen.h>
 #include <shell.h>
 
-bool shift;
+int shift;
 
 void handle_interrupt()
 {

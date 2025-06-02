@@ -25,7 +25,7 @@ typedef struct Driver
 {
 	uint8_t id;
 	string name;
-	bool enabled;
+	int enabled;
 	DRIVER_TYPE type;
 	DeviceDescriptor* device_descriptor;
 	void (*init_handle)(struct Driver* self);
