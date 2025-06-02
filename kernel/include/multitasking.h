@@ -8,9 +8,11 @@
 
 typedef enum
 {
-	TASK_OK = 0x01,
-	TASK_TERMINATED = 0x02
-} TASK_FLAGS;
+	TASK_RUNNING,
+	TASK_WAITING,
+	TASK_READY,
+	TASK_TERMINATED
+} TASK_STATE;
 
 typedef struct Task
 {
@@ -18,8 +20,8 @@ typedef struct Task
 	uint32_t esp, ebp, eip;
 	uint32_t eax, ebx, ecx, edx, esi, edi;
 	uint32_t flags;
+	TASK_STATE state;
 	struct Task* next;
-	struct Task* prev;
 } __attribute__((packed)) Task;
 
 void tasks_init();

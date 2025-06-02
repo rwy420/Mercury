@@ -1,3 +1,4 @@
+#include "exec/elf/elf_loader.h"
 #include "fs/fat16/fat16.h"
 #include <multitasking.h>
 #include <shell.h>
@@ -8,13 +9,13 @@
 #include <memory/gdt.h>
 #include <common/screen.h>
 
-Task tasks[MAX_TASKS];
-Task* g_current_task;
-Task* current_last;
+Task* task_list = NULL_PTR;
+Task* g_current_task = NULL_PTR;
+uint32_t next_id = 1;
 
 extern TSS g_tss;
 
-// Messages need to have a hardcoded memory address
+// Messages need to have a fixed memory address
 char* msg1 = "Task: ";
 char* msg3 = "Task2: ";
 char* msg2 = "\n";
@@ -52,29 +53,11 @@ void idle_task2()
 
 void tasks_init()
 {
-	memset(tasks, 0, sizeof(Task) * MAX_TASKS);
+	//Fix this ..
+	create_task((void*) 0x0, 0x0);
 
-	for(int i = 0; i < MAX_TASKS; i++)
-	{
-		tasks[i].id = i;
-	}
-
-	Task* dummy = &tasks[0];
-	dummy->flags = TASK_OK;
-	dummy->eip = (uint32_t) dummy_task;
-
-	Task* idle = &tasks[1];
-	idle->flags = TASK_OK;
-	idle->eip = (uint32_t) idle_task;
-	idle->esp = 0x800000;	
-
-	Task* idle2 = &tasks[2];
-	idle2->flags = TASK_OK;
-	idle2->eip = (uint32_t) idle_task2;
-	idle2->esp = 0x900000;
-
-	idle->next = idle2;
-	idle2->prev = idle;
+	create_task(idle_task2, 0x800000);
+	create_task(idle_task, 0x900000);
 
 	int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
@@ -82,45 +65,65 @@ void tasks_init()
 	fat16_read(fd, buffer, size);
 	void(*entry)();
 	entry = image_load(buffer, size, 0);
-
-	Task* test = &tasks[3];
-	test->flags = TASK_OK;
-	test->eip = (uint32_t) entry;
-	test->esp = 0x700000;
-	idle2->next = test;
-	dummy->next = idle;
-
-	g_current_task = dummy;
-	current_last = test;
+	create_task(entry, 0x700000);
 }
 
 Task* create_task(void(*entry)(), uint32_t esp)
 {
-	for(int i = 0; i < MAX_TASKS; i++)
+	if(next_id > MAX_TASKS) return NULL_PTR;
+
+	Task* task = (Task*) malloc(sizeof(Task));
+	if(!task) return NULL_PTR;
+
+	task->esp = esp;
+	task->eip = (uint32_t) entry;
+
+	task->id = next_id++;
+	task->state = TASK_READY;
+	task->next = NULL_PTR;
+
+	if(!task_list)
 	{
-		if(tasks[i].eip == 0)
-		{
-			Task* new = &tasks[i];
-			new->eip = (uint32_t) entry;
-			
-			current_last->next = new;
-			current_last = new;
-			return new;
-		}
+		task_list = task;
+	}
+	else
+	{
+		Task* t = task_list;
+		while(t->next) t = t->next;
+		t->next = task;
 	}
 
-	return NULL_PTR;
+	return task;
 }
 
 void kill_task(uint8_t id)
 {
-	Task* task = &tasks[id];
-	task->flags = TASK_TERMINATED;
+	Task* prev = NULL_PTR, *current = task_list;
+
+	while(current)
+	{
+		if(current->id == id)
+		{
+			if(prev) prev->next = current->next;
+			else task_list = current->next;
+
+			free(current);
+		}
+
+		prev = current;
+		current = current->next;
+	}
 }
 
 void schedule(CPUState* cpu) 
 {
 	pic_confirm(0x20);
+
+	if(!g_current_task)
+	{
+		g_current_task = task_list;
+		return;
+	}
 
 	g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
@@ -133,17 +136,20 @@ void schedule(CPUState* cpu)
 	g_current_task->esi = cpu->esi;
 	g_current_task->edi = cpu->edi;
 
-	if(g_current_task->id == current_last->id)
-	{
-		g_current_task = &tasks[1];
-	}
-	else
-	{
-		g_current_task = g_current_task->next;
-	}
+	Task* start = g_current_task;
 
-	g_tss.cs = 0x18;
-	g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
+	do
+	{
+		g_current_task = g_current_task->next ? g_current_task->next : task_list;
 
-	restore_and_switch();
+		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
+		{
+			g_tss.cs = 0x18;
+			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
+			restore_and_switch();
+
+			break;
+		}
+
+	} while(g_current_task != start);
 }

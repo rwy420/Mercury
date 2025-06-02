@@ -3,24 +3,50 @@
 Mercury is a WIP x86-32 kernel. \
 Report problems or give suggestions [here](https://github.com/rwy420/Mercury/issues) (Issue page)
 
-**Features**
+### Features
 - FAT16 driver
 - ELF32 App / SO loader
 - Multitasking
 
-**Work in progress**
-- Linux like syscalls
-- AHCI driver
-- Networking (Drivers and lwip)
-- Process isolation
+## Kernel Development Roadmap
 
- **Coming Features**
-- Proper terminal
-- Default system apps (ls, cat, echo...)
-- Porting some apps made for Linux (Lua, Python...)
+### Process Isolation
+- [ ] Per-process page directories & address space separation
+- [ ] User vs. kernel memory protection via page flags
+- [ ] User stack and heap management (`brk()`-like syscall)
+- [ ] Switch `cr3` on context switch to isolate memory
 
-**Future ideas**
-- Module system for drivers / services
+### Linux-like Syscalls
+- [ ] Syscall mechanism (e.g. `int 0x80`, `syscall/sysret`)
+- [ ] Syscall table and dispatcher
+- [ ] Basic syscalls: `read`, `write`, `open`, `close`, `exit`, `execve`
+- [ ] User-space test program using syscalls
+
+### C Standard Library
+- [ ] Syscall wrappers (`write()`, `read()`, etc.)
+- [ ] String/memory functions (`memcpy`, `strlen`, etc.)
+- [ ] File I/O (`fopen`, `fread`, `fclose`)
+- [ ] Static linking support (`libc.a`)
+
+### FAT32 Filesystem
+- [ ] Block device abstraction
+- [ ] BPB and FAT table parsing
+- [ ] File access (`open`, `read`, `close`)
+
+### Driver Loading from Files
+- [ ] Define driver format (e.g. ELF + metadata)
+- [ ] Extend ELF loader for driver files
+- [ ] Kernel driver registration API
+- [ ] Load driver from FAT32 and call `init()`
+
+### Init or Shell
+- [ ] Launch shell or init from FAT32
+- [ ] Load userland apps using `execve`
+
+### On the way..
+- [ ] Finish SATA driver
+- [ ] Start with networking 
+- [ ] Maybe switch to GRUB
 
 **Screenshots** \
 Multitasking and SO loading working: \
