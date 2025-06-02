@@ -1,5 +1,3 @@
-#include "exec/elf/elf_loader.h"
-#include "exec/usermode.h"
 #include "fs/fat16/fat16.h"
 #include <multitasking.h>
 #include <shell.h>

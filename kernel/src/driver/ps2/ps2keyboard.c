@@ -85,7 +85,7 @@ void handle_interrupt()
 void ps2_kb_enable()
 {
 	shift = false;
-	register_interrupt_handler(0x21, handle_interrupt);
+	register_interrupt_handler(0x21, (isr_t) handle_interrupt);
 
 	while(inb(COMMAND_PORT) & 1) inb(DATA_PORT);
 

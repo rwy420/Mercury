@@ -19,7 +19,6 @@ typedef uint32_t size_t;
 
 typedef char* string;
 
-typedef int bool;
 #define true 1
 #define false 0
 

@@ -10,7 +10,7 @@ typedef unsigned int           uint32_t;
 typedef long long int           int64_t;
 typedef unsigned long long int uint64_t;
 typedef char* string;
-typedef uint8_t bool;
+
 #define true 1
 #define false 0
 

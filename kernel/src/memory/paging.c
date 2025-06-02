@@ -128,7 +128,7 @@ void paging_enable()
 	SET_FRAME(entry, (uint32_t) table);
 	set_page_directory(directory);
 	__asm__ __volatile__ ("orl $0x80000011, %EAX; movl %EAX, %CR0");
-	register_interrupt_handler(14, handle_page_fault);
+	register_interrupt_handler(14, (isr_t) handle_page_fault);
 }
 
 void handle_page_fault()

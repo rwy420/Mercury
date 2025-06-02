@@ -81,7 +81,7 @@ void rtl8139_init(Driver* self)
 	outb(POWERUP_PORT(port_base), 0x0);
 	outb(POWERUP_PORT(port_base), 0x0);
 
-	register_interrupt_handler(0x20 + self->device_descriptor->interrupt, rtl8139_handle_interrupt);
+	register_interrupt_handler(0x20 + self->device_descriptor->interrupt, (isr_t) rtl8139_handle_interrupt);
 }
 
 void rtl8139_enable()
