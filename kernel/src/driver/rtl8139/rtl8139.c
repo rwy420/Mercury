@@ -62,7 +62,7 @@ void rtl8139_init(Driver* self)
 
 	rtl8139_reset();
 
-	void* buffer = malloc(8192 + 16 + 1500);
+	void* buffer = kmalloc(8192 + 16 + 1500);
 	memset(buffer, 0, 8192 + 16 + 1500);;
 	outl(RBSTART_PORT(port_base), (uint32_t) buffer);
 

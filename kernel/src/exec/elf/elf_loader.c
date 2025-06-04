@@ -88,7 +88,7 @@ void* image_load(char* elf_start, unsigned int size, int debug)
         return 0;
     }
 
-    exec = malloc(size);
+    exec = kmalloc(size);
 
     if (!exec)
     {

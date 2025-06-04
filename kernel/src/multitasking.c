@@ -61,7 +61,7 @@ void tasks_init()
 
 	int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
-	char* buffer = malloc(size);
+	char* buffer = kmalloc(size);
 	fat16_read(fd, buffer, size);
 	void(*entry)();
 	entry = image_load(buffer, size, 0);
@@ -72,7 +72,7 @@ Task* create_task(void(*entry)(), uint32_t esp)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
 
-	Task* task = (Task*) malloc(sizeof(Task));
+	Task* task = (Task*) kmalloc(sizeof(Task));
 	if(!task) return NULL_PTR;
 
 	task->esp = esp;
@@ -107,7 +107,7 @@ void kill_task(uint8_t id)
 			if(prev) prev->next = current->next;
 			else task_list = current->next;
 
-			free(current);
+			kfree(current);
 		}
 
 		prev = current;

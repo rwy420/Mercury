@@ -11,7 +11,7 @@ uint32_t symbol_idx;
 
 void symtable_init()
 {
-	symtable = malloc(sizeof(Symbol) * MAX_SYMBOLS);
+	symtable = kmalloc(sizeof(Symbol) * MAX_SYMBOLS);
 	symbol_idx = 0;
 
 	//k_qslibc/qs_io.h
@@ -26,10 +26,10 @@ void symtable_init()
 	register_symbol("kprintf", printf);
 	register_symbol("kscreen_clear", clear_screen);
 	//k_qslibc/qs_mem.h
-	register_symbol("kmalloc", malloc);
-	register_symbol("kfree", free);
-	register_symbol("kmalloc_aligned", malloc_aligned);
-	register_symbol("kfree_aligned", free_aligned);
+	register_symbol("kmalloc", kmalloc);
+	register_symbol("kfree", kfree);
+	register_symbol("kmalloc_aligned", kmalloc_aligned);
+	register_symbol("kfree_aligned", kfree_aligned);
 	register_symbol("memset", memset);
 	register_symbol("memmove", memmove);
 	//k_qslibc/qs_elf.h

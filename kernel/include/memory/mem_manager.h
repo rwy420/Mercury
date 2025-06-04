@@ -17,10 +17,10 @@ uint32_t* alloc_blocks(uint32_t num_blocks);
 void free_blocks(uint32_t* address, uint32_t num_blocks);
 
 void heap_init(size_t start, size_t size);
-void* malloc(size_t size);
-void free(void* pointer);
+void* kmalloc(size_t size);
+void kfree(void* pointer);
 
-void* malloc_aligned(size_t alignment, size_t size);
-void free_aligned(void* pointer);
+void* kmalloc_aligned(size_t alignment, size_t size);
+void kfree_aligned(void* pointer);
 
 #endif

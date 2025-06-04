@@ -81,11 +81,11 @@ static void parse_command(char* command)
 			return;
 		}
 
-		char* buffer = malloc(file_size);
+		char* buffer = kmalloc(file_size);
 		fat16_read(fd, buffer, file_size);
 		void(*entry)();
 		entry = image_load(buffer, file_size, false);
-		free(buffer);
+		kfree(buffer);
 
 		entry();
 	}

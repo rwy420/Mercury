@@ -54,7 +54,7 @@ void pci_enumerate_devices(int debug)
 					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
 					device_descriptor->port_base[bar_idx] = bar->address;
 
-					free(bar);
+					kfree(bar);
 				}
 
 				if(debug) 
@@ -149,7 +149,7 @@ uint16_t pci_get_interrupt(uint16_t bus, uint16_t device, uint16_t function)
 
 BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 {
-	BAR* result = malloc(sizeof(BAR));
+	BAR* result = kmalloc(sizeof(BAR));
 
 	uint32_t header_type = pci_read(bus, device, function, 0x0E) & 0x7F;
 	int max_bars = 6 - (4 * header_type);

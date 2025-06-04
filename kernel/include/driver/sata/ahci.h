@@ -163,6 +163,6 @@ void start_cmd(HbaPort* port);
 void stop_cmd(HbaPort* port);
 int32_t find_cmd_slot(HbaPort* port);
 
-bool sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buffer);
+int sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buffer);
 
 #endif 

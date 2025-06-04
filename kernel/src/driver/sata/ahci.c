@@ -58,12 +58,12 @@ void port_rebase(HbaPort* port, int port_idx)
 {
 	stop_cmd(port);
 
-	void* clb = malloc_aligned(4096, 1024);
+	void* clb = kmalloc_aligned(4096, 1024);
 	memset(clb, 0, 1024);
 	port->clb = (uint32_t) clb;
 	port->clbu = (uint32_t)clb >> 32;
 
-	void* fb = malloc_aligned(4096, 256);
+	void* fb = kmalloc_aligned(4096, 256);
 	memset(fb, 0, 256);
 	port->fb = (uint32_t) fb;
 	port->fbu = (uint32_t) fb >> 32;
@@ -73,7 +73,7 @@ void port_rebase(HbaPort* port, int port_idx)
 	{
 		cmd_header[i].prdtl = 8;
 		
-		void* ctba_buffer = malloc_aligned(4096, 4096);
+		void* ctba_buffer = kmalloc_aligned(4096, 4096);
 		memset(ctba_buffer, 0, 4096);
 		cmd_header[i].ctba = (uint32_t) ctba_buffer;
 		cmd_header[i].ctbau = 0;
@@ -143,7 +143,7 @@ int32_t find_cmd_slot(HbaPort* port)
 	return -1;
 }
 
-bool sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buf)
+int sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, uint8_t* buf)
 {
 	port->is = (uint32_t) -1;
 	int spin = 0;

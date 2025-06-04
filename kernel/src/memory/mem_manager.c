@@ -119,7 +119,7 @@ typedef struct MemoryChunk
 {
 	struct MemoryChunk* next;
     struct MemoryChunk* prev;
-    bool allocated;
+    int allocated;
     size_t size;
 } __attribute__((packed)) MemoryChunk;
 
@@ -142,7 +142,7 @@ void heap_init(size_t start, size_t size)
     }
 }
         
-void* malloc(size_t size)
+void* kmalloc(size_t size)
 {
     MemoryChunk *result = 0;
     
@@ -172,7 +172,7 @@ void* malloc(size_t size)
     return (void*)(((size_t)result) + sizeof(MemoryChunk));
 }
 
-void free(void* ptr)
+void kfree(void* ptr)
 {
     MemoryChunk* chunk = (MemoryChunk*)((size_t)ptr - sizeof(MemoryChunk));
     
@@ -198,17 +198,17 @@ void free(void* ptr)
     
 }
 
-void* malloc_aligned(size_t alignment, size_t size)
+void* kmalloc_aligned(size_t alignment, size_t size)
 {
-	void* pointer = malloc(size + alignment - 1 + sizeof(void*));
+	void* pointer = kmalloc(size + alignment - 1 + sizeof(void*));
 	void** aligned_pointer = (void**)((void*) pointer + alignment - 1 + sizeof(void*));
 	aligned_pointer[-1] = pointer;
 
 	return (void*)(((size_t) aligned_pointer) & ~(alignment - 1));
 }
 
-void free_aligned(void* pointer)
+void kfree_aligned(void* pointer)
 {
 	void* original_pointer = ((void**) pointer)[-1];
-	free(original_pointer);
+	kfree(original_pointer);
 }

@@ -107,7 +107,7 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 
 	enable_all_drivers();
 
-	storage_dev_t* fat_dev = malloc(sizeof(storage_dev_t));
+	storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
 	fat_dev->read_byte = _read_byte;
 	fat_dev->seek = _seek;

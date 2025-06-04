@@ -17,7 +17,7 @@ int dlopen(char* path)
 {
 	int fd = fat16_open(path, 'r');
 	uint32_t size = fat16_size("/LIB/LIBC.SO");
-	uint8_t* buffer = malloc(size);
+	uint8_t* buffer = kmalloc(size);
 	fat16_read(fd, buffer, size);
 
 	Elf32_Ehdr* hdr = (Elf32_Ehdr*) buffer;
@@ -35,7 +35,7 @@ int dlopen(char* path)
 
 void dlclose(int dl)
 {
-	free(dynamic_libraries[dl].buffer);
+	kfree(dynamic_libraries[dl].buffer);
 	fat16_close(dynamic_libraries[dl].fd);
 	dl_count--;
 }
