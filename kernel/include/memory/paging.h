@@ -68,6 +68,7 @@ uint32_t* get_page(const uint32_t v_address);
 void* alloc_page(uint32_t* page);
 void free_page(uint32_t* page);
 void flush_tlb_entry(uint32_t v_address);
+void map_page_pd(PageDirectory* pd, void* p_address, void* v_address);
 void map_page(void* p_address, void* v_address);
 void unmap_page(void* v_address);
 void vmap_address(uint32_t* pd, uint32_t p_address, uint32_t v_address, uint32_t flags);

@@ -1,5 +1,6 @@
 #include "exec/elf/elf_loader.h"
 #include "fs/fat16/fat16.h"
+#include "process.h"
 #include <multitasking.h>
 #include <shell.h>
 #include <hardware/interrupts.h>
@@ -7,6 +8,7 @@
 #include <memory/common.h>
 #include <memory/mem_manager.h>
 #include <memory/gdt.h>
+#include <memory/paging.h>
 #include <common/screen.h>
 
 Task* task_list = NULL_PTR;
@@ -56,8 +58,8 @@ void tasks_init()
 	//Fix this ..
 	create_task((void*) 0x0, 0x0);
 
-	create_task(idle_task2, 0x800000);
-	create_task(idle_task, 0x900000);
+	create_task(idle_task2, 0x700000);
+	create_task(idle_task, 0x800000);
 
 	int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
@@ -65,7 +67,7 @@ void tasks_init()
 	fat16_read(fd, buffer, size);
 	void(*entry)();
 	entry = image_load(buffer, size, 0);
-	create_task(entry, 0x700000);
+	create_task(entry, 0x900000);
 }
 
 Task* create_task(void(*entry)(), uint32_t esp)
@@ -75,8 +77,16 @@ Task* create_task(void(*entry)(), uint32_t esp)
 	Task* task = (Task*) kmalloc(sizeof(Task));
 	if(!task) return NULL_PTR;
 
-	task->esp = esp;
+	/*void* stack = kmalloc(4096);
+
+	memset(stack, 0, 4096);
+	uint32_t esp = (uint32_t) stack;*/
+
+	//task->esp = 0xF00000;
 	task->eip = (uint32_t) entry;
+	//task->eip = 0x10000;
+	task->esp = esp;
+	//task->cr3 = create_user_process_pd(entry);
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -107,7 +117,8 @@ void kill_task(uint8_t id)
 			if(prev) prev->next = current->next;
 			else task_list = current->next;
 
-			kfree(current);
+			kfree((void*) current->esp);
+			kfree(current);	
 		}
 
 		prev = current;

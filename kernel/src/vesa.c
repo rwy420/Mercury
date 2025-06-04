@@ -42,11 +42,11 @@ void vesa_clear()
 	memset(vesa_fb, 0x0, g_vesa_info_block.fb_height * g_vesa_info_block.fb_width);
 }
 
-void vesa_map()
+void vesa_map(PageDirectory* pd)
 {
 	for(int i = 0; i  < g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 2; i += PAGE_SIZE)
 	{
 		void* address = (void*) (g_vesa_info_block.fb + i);
-		map_page(address, address);
+		map_page_pd(pd, address, address);
 	}
 }

@@ -6,7 +6,7 @@
 #include <vesa.h>
 
 PageDirectory* g_current_pd = 0;
-
+PageDirectory* g_default_pd = 0;
 
 
 uint32_t page_directory[1024] __attribute__((aligned(4096)));
@@ -49,9 +49,10 @@ uint32_t* get_page(const uint32_t v_address);
 void* alloc_page(uint32_t* page);
 void free_page(uint32_t* page);
 void flush_tlb_entry(uint32_t v_address);
-void map_page(void* p_address, void* v_address)
+
+void map_page_pd(PageDirectory* pd, void* p_address, void* v_address)
 {
-	uint32_t* entry = &g_current_pd->entries[PD_INDEX((uint32_t) v_address)];
+	uint32_t* entry = &pd->entries[PD_INDEX((uint32_t) v_address)];
 
 	if((*entry & PDE_PRESENT) != PDE_PRESENT)
 	{
@@ -76,6 +77,11 @@ void map_page(void* p_address, void* v_address)
 	SET_FRAME(page, (uint32_t) p_address);
 }
 
+void map_page(void* p_address, void* v_address)
+{
+	map_page_pd(g_current_pd, p_address, v_address);
+}
+
 void unmap_page(void* v_address);
 void vmap_address(uint32_t* pd, uint32_t p_address, uint32_t v_address, uint32_t flags);
 void vunmap_address(uint32_t* pd, uint32_t v_address);
@@ -89,14 +95,10 @@ void paging_init()
 	memset(directory, 0, sizeof(PageDirectory));
 	for(uint32_t i = 0; i < 1024; i++) directory->entries[i] = 0x02;
 
+	g_default_pd = directory;
+
 	PageTable* table = (PageTable*) kmalloc_aligned(4096, 4096); //malloc(4096);
 	memset(table, 0x0, sizeof(PageTable));
-
-	if(!directory || !table)
-	{
-		printf("ERROR\n");
-		return;
-	}
 
 	for(uint32_t i = 0, frame = 0, virt = 0; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
 	{

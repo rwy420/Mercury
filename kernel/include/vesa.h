@@ -13,6 +13,7 @@
 #define RGB565_ORANGE	0xFDA0
 
 #include <common/types.h>
+#include <memory/paging.h>
 
 typedef struct
 {
@@ -24,6 +25,6 @@ void vesa_init();
 void vesa_put_pixel(int x, int y, uint16_t color);
 void vesa_putc(char c, int x, int y, uint16_t fg, uint16_t bg);
 void vesa_clear();
-void vesa_map();
+void vesa_map(PageDirectory* pd);
 
 #endif

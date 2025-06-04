@@ -26,6 +26,13 @@ restore_and_switch:
 	add edi, 29
 	mov edi, [edi]
 
+	;push eax
+	;mov eax, [g_current_task]
+	;add eax, 33
+	;mov eax, [eax]
+	;mov cr3, eax
+	;pop eax
+
 	cli
 	mov ax, 0x20
 	mov ds, ax
