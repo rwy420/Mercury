@@ -31,7 +31,7 @@ typedef struct
 uint32_t pci_read(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);
 void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset, uint32_t value);
 
-void pci_enumerate_devices(bool debug);
+void pci_enumerate_devices(int debug);
 void get_driver(DeviceDescriptor* device_descriptor);
 
 uint16_t pci_get_vendor_id(uint16_t bus, uint16_t device, uint16_t function);
@@ -41,6 +41,6 @@ uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function);
 uint16_t pci_get_interrupt(uint16_t bus, uint16_t device, uint16_t function);
 
 BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar);
-bool has_functions(uint16_t bus, uint16_t device);
+int has_functions(uint16_t bus, uint16_t device);
 
 #endif 

@@ -28,7 +28,7 @@ void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset
 	outl(DATA_PORT, value);
 }
 
-void pci_enumerate_devices(bool debug)
+void pci_enumerate_devices(int debug)
 {
 	num_devices = 0;
 
@@ -92,8 +92,8 @@ void get_driver(DeviceDescriptor* device_descriptor)
 					for(int page = 0; page < 6; page++)
 					{
 						//TODO TEST THIS
-						map_page((void*)(device_descriptor->port_base[4] + (4096 * page)), (void*)(device_descriptor->port_base[4] + (4096 * page)), 
-								PTE_RW);
+						//map_page((void*)(device_descriptor->port_base[4] + (4096 * page)), (void*)(device_descriptor->port_base[4] + (4096 * page)), 
+						//		PTE_RW);
 					}
 					init_sata(device_descriptor->port_base[4]); // BAR5
 					break;
@@ -174,7 +174,7 @@ BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 	return result;
 }
 
-bool has_functions(uint16_t bus, uint16_t device)
+int has_functions(uint16_t bus, uint16_t device)
 {
 	return pci_read(bus, device, 0, 0x0E) & (1 << 7);
 }
