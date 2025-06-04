@@ -1,9 +1,24 @@
 #include <memory/paging.h>
 
-void pt_add_flags(uint32_t* pt, uint32_t flags);
-void pt_delete_flags(uint32_t* pt, uint32_t flags);
-void pd_add_flags(uint32_t* pt, uint32_t flags);
-void pd_delete_flags(uint32_t* pt, uint32_t flags);
+void pt_add_flags(uint32_t* pt, uint32_t flags)
+{
+	*pt |= flags;
+}
+
+void pt_delete_flags(uint32_t* pt, uint32_t flags)
+{
+	*pt &= ~flags;
+}
+
+void pd_add_flags(uint32_t* pd, uint32_t flags)
+{
+	*pd |= flags;
+}
+
+void pd_delete_flags(uint32_t* pd, uint32_t flags)
+{
+	*pd &= ~flags;
+}
 
 uint32_t* get_pd();
 uint32_t* get_pt_entry(uint32_t* pt, uint32_t v_address);
