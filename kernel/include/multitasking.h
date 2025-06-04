@@ -19,6 +19,7 @@ typedef struct Task
 	uint8_t id;
 	uint32_t esp, ebp, eip;
 	uint32_t eax, ebx, ecx, edx, esi, edi;
+	uint32_t cr3;
 	uint32_t flags;
 	TASK_STATE state;
 	struct Task* next;
