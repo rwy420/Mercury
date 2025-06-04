@@ -24,5 +24,6 @@ void vesa_init();
 void vesa_put_pixel(int x, int y, uint16_t color);
 void vesa_putc(char c, int x, int y, uint16_t fg, uint16_t bg);
 void vesa_clear();
+void vesa_map();
 
 #endif

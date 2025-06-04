@@ -1,7 +1,7 @@
 #include <vesa.h>
 #include <psf1.h>
 #include <memory/common.h>
-
+#include <memory/paging.h>
 
 extern VesaInfoBlock g_vesa_info_block;
 
@@ -40,4 +40,13 @@ void vesa_putc(char c, int x, int y, uint16_t fg, uint16_t bg)
 void vesa_clear()
 {
 	memset(vesa_fb, 0x0, g_vesa_info_block.fb_height * g_vesa_info_block.fb_width);
+}
+
+void vesa_map()
+{
+	for(int i = 0; i  < g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 2; i += PAGE_SIZE)
+	{
+		void* address = (void*) (g_vesa_info_block.fb + i);
+		map_page(address, address);
+	}
 }

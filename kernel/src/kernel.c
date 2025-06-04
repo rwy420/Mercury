@@ -58,6 +58,8 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	register_syscall_handler(0x06, (syscall_t) syscall_close);
 	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
 
+	register_interrupt_handler(14, (isr_t) handle_page_fault);
+
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
@@ -93,8 +95,11 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	print_hex(mem_manager_size & 0xFF);
 	printf("\n");
 
+	print_hex32(vesa_info_block.fb);
+
 	printf("<Mercury> Setting up paging\n");
-	//paging_enable();
+	paging_init();
+	vesa_map();
 
 	symtable_init();
 
@@ -114,7 +119,7 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
 
-	tasks_init();
+	//tasks_init();
 	register_interrupt_handler(0x20, schedule);
 
 	while(1);

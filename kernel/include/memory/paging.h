@@ -7,7 +7,7 @@
 #define TABLES_PER_DIRECTORY 1024
 #define PAGE_SIZE 4096
 
-#define PD_INDEX(address) ((address) >> 2)
+#define PD_INDEX(address) ((address) >> 22)
 #define PT_INDEX(address) (((address) >> 12) & 0x3FF)
 #define PAGE_PHYS_ADDRESS(dir_entry) ((*dir_entry) & ~0xFFF)
 #define SET_FRAME(entry, address) (*entry = (*entry & ~0x7FFFF000) | address)
@@ -60,13 +60,13 @@ void pt_delete_flags(uint32_t* pt, uint32_t flags);
 void pd_add_flags(uint32_t* pd, uint32_t flags);
 void pd_delete_flags(uint32_t* pd, uint32_t flags);
 
-uint32_t* get_pd();
+void set_pd(PageDirectory* pd);
+PageDirectory* get_pd();
 uint32_t* get_pt_entry(uint32_t* pt, uint32_t v_address);
 uint32_t get_pd_entry(uint32_t* pd, uint32_t v_address);
 uint32_t* get_page(const uint32_t v_address);
 void* alloc_page(uint32_t* page);
 void free_page(uint32_t* page);
-void set_pd(uint32_t* pd);
 void flush_tlb_entry(uint32_t v_address);
 void map_page(void* p_address, void* v_address);
 void unmap_page(void* v_address);
@@ -76,5 +76,6 @@ void create_pd(uint32_t* pd, uint32_t v_address, uint32_t flags);
 void unmap_pt(uint32_t* pd, uint32_t v_address);  
 void* get_p_address(uint32_t* pd, uint32_t v_address);
 void paging_init();
+void handle_page_fault();
 
 #endif 
