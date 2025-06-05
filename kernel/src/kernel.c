@@ -50,7 +50,6 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	install_idt();
 	pit_init(10);
 
-	printf("<Mercury> Registering syscalls\n");
 	fd_init();
 
 	register_syscall_handler(0x01, (syscall_t) syscall_exit);
@@ -59,6 +58,7 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	register_syscall_handler(0x05, (syscall_t) syscall_open);
 	register_syscall_handler(0x06, (syscall_t) syscall_close);
 	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
+	printf("<Mercury> Syscalls registered\n");
 
 	register_interrupt_handler(14, (isr_t) handle_page_fault);
 
@@ -85,36 +85,21 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 
 	kernel_size = kernel_end_address - kernel_start_address;
 	print_memory_info();
-	size_t mem_manager_size = 64 * 1024;
 	size_t heap_size = 0x200000;
+	uint32_t heap_start = 0x200000;
 
-	heap_init(0x200000, heap_size);
-
-	printf("<Mercury> Block manager size: 0x");
-	print_hex((mem_manager_size >> 24) & 0xFF);
-	print_hex((mem_manager_size >> 16) & 0xFF);
-	print_hex((mem_manager_size >> 8) & 0xFF);
-	print_hex(mem_manager_size & 0xFF);
-	printf("\n");
-
-	printf("<Mercury> Setting up paging\n");
-	if(!paging_init()); //TODO error handling
-}
-
-void v_kernel_start()
-{
-	vesa_map(g_kernel_pd);
+	heap_init(heap_start, heap_size);
+	
+	printf("<Mercury> Kernel heap of ");
+	print_uint32_t(heap_size / 0x400);
+	printf(" KB initialized\n");
 
 	symtable_init();
-
 	init_drivers();
-	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 
 	printf("<Mercury> Searching PCI deivce drivers\n");
 	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
-
-	enable_all_drivers();
 
 	storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
@@ -122,6 +107,17 @@ void v_kernel_start()
 	fat_dev->seek = _seek;
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
+
+	if(!paging_init()); //TODO error handling
+}
+
+void v_kernel_start()
+{
+	vesa_map(g_kernel_pd);
+	printf("<Mercury> Continuing in virtual memory\n");
+
+	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
+	enable_all_drivers();
 
 	tasks_init();
 	//register_interrupt_handler(0x20, schedule);
