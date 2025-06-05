@@ -6,6 +6,7 @@
 
 int syscall_printf(void* buffer, size_t length);
 
+void printf_color(string str, uint16_t fg, uint16_t bg);
 void printf(string str);
 void terminal_move_left();
 void clear_screen();

@@ -9,7 +9,7 @@ int syscall_printf(void* buffer, size_t length)
 	return 0;
 }
 
-void printf(string str)
+void printf_color(string str, uint16_t fg, uint16_t bg)
 {
 	for(int i = 0; str[i] != '\0'; i++)
 	{
@@ -25,7 +25,7 @@ void printf(string str)
 				break;
 
 			default:
-				vesa_putc(str[i], x, y, RGB565_WHITE, RGB565_BLACK);
+				vesa_putc(str[i], x, y, fg, bg);
 				x += 0x8;
 		}
 
@@ -40,6 +40,11 @@ void printf(string str)
 			clear_screen();
 		}
 	}
+}
+
+void printf(string str)
+{
+	printf_color(str, RGB565_WHITE, RGB565_BLACK);
 }
 
 void terminal_move_left()
