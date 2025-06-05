@@ -16,7 +16,7 @@
 #include <hardware/interrupts.h>
 #include <hardware/pci.h>
 #include <hardware/pit.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <memory/common.h>
 #include <memory/paging.h>
 #include <fs/fat16/fat16.h>

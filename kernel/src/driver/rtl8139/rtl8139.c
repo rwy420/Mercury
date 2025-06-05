@@ -14,7 +14,7 @@
 #include <hardware/pci.h>
 #include <hardware/interrupts.h>
 #include <common/screen.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <memory/common.h>
 #include <net/nic.h>
 

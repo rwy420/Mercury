@@ -1,5 +1,5 @@
 #include <hardware/pci.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <memory/paging.h>
 #include <driver/sata/sata.h>
 #include <driver/driver.h>

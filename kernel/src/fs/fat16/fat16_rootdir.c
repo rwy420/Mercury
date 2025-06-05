@@ -3,7 +3,7 @@
 #include <fs/fat16/fat16_priv.h>
 #include <fs/fat16/fat16_rootdir.h>
 #include <memory/common.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 
 extern FAT16BPB bpb;
 extern storage_dev_t* dev; 

@@ -2,7 +2,7 @@
 #include <multitasking.h>
 #include <common/screen.h>
 #include <memory/paging.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <memory/common.h>
 #include <vesa.h>
 

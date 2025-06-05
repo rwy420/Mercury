@@ -1,4 +1,4 @@
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 
 #include <common/screen.h>
 #include <memory/common.h>

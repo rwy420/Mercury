@@ -22,7 +22,7 @@ typedef struct
 
 typedef struct
 {
-	bool prefetchable;
+	int prefetchable;
 	uint32_t address;
 	uint32_t size;
  	BAR_TYPE type;

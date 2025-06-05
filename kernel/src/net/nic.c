@@ -1,5 +1,5 @@
 #include <net/nic.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <memory/common.h>
 
 NIC* current_nic;

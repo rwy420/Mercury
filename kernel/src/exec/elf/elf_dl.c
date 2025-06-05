@@ -3,7 +3,7 @@
 #include <fs/fat16/fat16.h>
 #include <common/screen.h>
 #include <memory/common.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 
 Elf32_DL dynamic_libraries[0x10];
 int dl_count;

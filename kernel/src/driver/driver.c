@@ -1,7 +1,7 @@
 #include <driver/driver.h>
 #include <common/screen.h>
 #include <memory/common.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 
 Driver drivers[0x40];
 uint8_t driver_index;

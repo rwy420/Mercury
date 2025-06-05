@@ -2,7 +2,7 @@
 #include <exec/elf/elf_dl.h>
 #include <memory/common.h>
 #include <common/screen.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <exec/elf/symtable.h>
 
 void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst, int dl)

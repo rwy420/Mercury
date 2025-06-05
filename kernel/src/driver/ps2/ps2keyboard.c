@@ -2,7 +2,7 @@
 #define COMMAND_PORT 0x64
 
 #include <driver/ps2/ps2keyboard.h>
-#include <memory/mem_manager.h>
+#include <memory/heap.h>
 #include <hardware/interrupts.h>
 #include <fs/fat16/fat16.h>
 #include <common/screen.h>
