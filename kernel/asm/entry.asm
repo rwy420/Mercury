@@ -1,4 +1,4 @@
-extern kernel_main
+extern kernel_init
 global k_entry
 
 k_entry:
@@ -12,4 +12,4 @@ k_entry:
 	push ecx
 	push ebx
 	push eax
-	call kernel_main
+	call kernel_init

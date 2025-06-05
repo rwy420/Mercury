@@ -36,7 +36,7 @@ VesaInfoBlock g_vesa_info_block;
 
 extern PageDirectory* g_kernel_pd;
 
-void kernel_main(VesaInfoBlock vesa_info_block)
+void kernel_init(VesaInfoBlock vesa_info_block)
 {
 	g_vesa_info_block.fb = vesa_info_block.fb;
 	g_vesa_info_block.fb_width = vesa_info_block.fb_width;
@@ -101,7 +101,7 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	if(!paging_init()); //TODO error handling
 }
 
-void kernel_3g()
+void v_kernel_start()
 {
 	vesa_map(g_kernel_pd);
 

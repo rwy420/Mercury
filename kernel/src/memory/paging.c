@@ -5,7 +5,7 @@
 #include <hardware/interrupts.h>
 #include <vesa.h>
 
-extern void kernel_3g();
+extern void v_kernel_start();
 
 PageDirectory* g_current_pd = 0;
 PageDirectory* g_kernel_pd = 0;
@@ -143,8 +143,10 @@ int paging_init()
 
 	register_interrupt_handler(0xE, (isr_t) handle_page_fault);
 	
-	void (*khigher_half)(void) = (void*) 0xC0000000 + (uint32_t) &kernel_3g;
-	khigher_half();
+	void (*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
+	v_kernel();
+
+	return false;
 }
 
 void handle_page_fault()
