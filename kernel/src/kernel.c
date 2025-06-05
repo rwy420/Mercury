@@ -98,8 +98,8 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	printf("\n");
 
 	printf("<Mercury> Setting up paging\n");
-	//paging_init();
-	//vesa_map(g_default_pd);
+	paging_init();
+	vesa_map(g_default_pd);
 
 	symtable_init();
 
@@ -120,7 +120,7 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	fat16_init(fat_dev , 0);
 
 	tasks_init();
-	register_interrupt_handler(0x20, schedule);
+	//register_interrupt_handler(0x20, schedule);
 
 	while(1);
 }
