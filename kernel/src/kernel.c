@@ -23,8 +23,8 @@
 
 #define ATA
 
-extern uint8_t kernel_start;
-extern uint8_t kernel_end;
+extern uint8_t ld_kernel_start;
+extern uint8_t ld_kernel_end;
 extern Disk* g_default_disk;
 
 uint32_t kernel_start_address;
@@ -78,8 +78,8 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	}
 #endif
 
-	kernel_start_address = (uint32_t) &kernel_start;
-	kernel_end_address = (uint32_t) &kernel_end;
+	kernel_start_address = (uint32_t) &ld_kernel_start;
+	kernel_end_address = (uint32_t) &ld_kernel_end;
 
 	kernel_end_address = ((kernel_end_address / 4096) + 1) * 4096;
 

@@ -5,7 +5,7 @@ ENTRY(k_entry)
 SECTIONS
 {
 	. = 1M;
-	kernel_start = 1M;
+	ld_kernel_start = 1M;
 
 	.text BLOCK(4K) : ALIGN(4K)
 	{
@@ -30,5 +30,5 @@ SECTIONS
 		*(.comment)
 	}
 
-	kernel_end = .;
+	ld_kernel_end = .;
 }
