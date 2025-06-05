@@ -12,9 +12,12 @@ image:
 	mv bootloader/build/image.img ./build/mercury_image.img
 
 vdi: image
-	dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
+	#dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
+	#mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
+	#dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352	
 	mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
-	dd if=./fs.bin of=hdd.vdi conv=notrunc oflag=seek_bytes seek=2148352	
+	dd if=./fs.bin of=build/mercury_image.img conv=notrunc oflag=seek_bytes seek=51200
+	dd if=build/mercury_image.img of=./hdd.vdi conv=notrunc oflag=seek_bytes seek=2097152
 
 full-image: image
 	mcopy -i ./fs.bin kernel/kernel.bin -o "::/BOOT/KERNEL0.ELF"
