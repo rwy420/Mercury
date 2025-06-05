@@ -76,7 +76,7 @@ void vunmap_address(uint32_t* pd, uint32_t v_address);
 void create_pd(uint32_t* pd, uint32_t v_address, uint32_t flags);
 void unmap_pt(uint32_t* pd, uint32_t v_address);  
 void* get_p_address(uint32_t* pd, uint32_t v_address);
-void paging_init();
+int paging_init();
 void handle_page_fault();
 
 #endif 

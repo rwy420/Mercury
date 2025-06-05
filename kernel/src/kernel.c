@@ -34,7 +34,7 @@ uint32_t mem_manager_end;
 
 VesaInfoBlock g_vesa_info_block;
 
-extern PageDirectory* g_default_pd;
+extern PageDirectory* g_kernel_pd;
 
 void kernel_main(VesaInfoBlock vesa_info_block)
 {
@@ -98,8 +98,12 @@ void kernel_main(VesaInfoBlock vesa_info_block)
 	printf("\n");
 
 	printf("<Mercury> Setting up paging\n");
-	paging_init();
-	vesa_map(g_default_pd);
+	if(!paging_init()); //TODO error handling
+}
+
+void kernel_3g()
+{
+	vesa_map(g_kernel_pd);
 
 	symtable_init();
 
