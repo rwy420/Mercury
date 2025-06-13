@@ -92,7 +92,7 @@ void* get_p_address(uint32_t* pd, uint32_t v_address);
 
 int paging_init()
 {
-    PageDirectory* directory = kmalloc_aligned(4096, 4096 * 3); //malloc(4096 * 3);
+    PageDirectory* directory = (PageDirectory*) 0x90000;  //kmalloc_aligned(4096, 4096 * 3); //malloc(4096 * 3);
 	if(!directory) return false;
 
 	memset(directory, 0, sizeof(PageDirectory));
@@ -100,9 +100,9 @@ int paging_init()
 
 	g_kernel_pd = directory;
 
-	PageTable* table = (PageTable*) kmalloc_aligned(4096, 4096); //malloc(4096);
+	PageTable* table = (PageTable*) 0x93000; //kmalloc_aligned(4096, 4096); //malloc(4096);
 	if(!table) return false;	
-	PageTable* table_3g = (PageTable*) kmalloc_aligned(4096, 4096); //malloc(4096);
+	PageTable* table_3g = (PageTable*) 0x94000; //kmalloc_aligned(4096, 4096); //malloc(4096);
 	if(!table_3g) return false;	
 
 	memset(table, 0x0, sizeof(PageTable));

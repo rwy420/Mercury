@@ -41,7 +41,13 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	g_vesa_info_block.fb = vesa_info_block.fb;
 	g_vesa_info_block.fb_width = vesa_info_block.fb_width;
 	g_vesa_info_block.fb_height = vesa_info_block.fb_height;
+	if(!paging_init()); //TODO error handling
+}
+
+void v_kernel_start()
+{
 	vesa_init();
+	vesa_map(g_kernel_pd);
 
 	clear_screen();
 	printf("<Mercury> Loading Mercury kernel... \n");
@@ -108,21 +114,16 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	fat_dev->write = _write;
 	fat16_init(fat_dev , 0);
 
-	if(!paging_init()); //TODO error handling
-}
-
-void v_kernel_start()
-{
-	vesa_map(g_kernel_pd);
-	printf("<Mercury> Continuing in virtual memory\n");
-
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
 	tasks_init();
 	//register_interrupt_handler(0x20, schedule);
 
-	printf_color("<Mercury> Startup done", RGB565_GREEN, RGB565_BLACK);
+	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
+
+	void* test = kmalloc(0x100);
+	print_hex32((uint32_t) test);
 
 	while(1);
 }
