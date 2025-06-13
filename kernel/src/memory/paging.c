@@ -142,10 +142,11 @@ int paging_init()
 	__asm__ __volatile__ ("movl %CR0, %EAX; orl $0x80000011, %EAX; movl %EAX, %CR0");
 
 	register_interrupt_handler(0xE, (isr_t) handle_page_fault);
-	
-	void (*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
-	v_kernel();
 
+	//void (*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
+	//v_kernel();
+	v_kernel_start();
+	
 	return false;
 }
 

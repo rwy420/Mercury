@@ -54,11 +54,12 @@ void idle_task2()
 
 void tasks_init()
 {
+	task_list = NULL_PTR;
 	//Fix this ..
-	create_task((void*) 0x0, 0x0);
+	create_task((void*) 0x0);
 
-	create_task(idle_task2, 0x700000);
-	create_task(idle_task, 0x800000);
+	create_task(idle_task2);
+	create_task(idle_task);
 
 	int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
@@ -66,32 +67,33 @@ void tasks_init()
 	fat16_read(fd, buffer, size);
 	void(*entry)();
 	entry = image_load(buffer, size, 0);
-	create_task(entry, 0x900000);
+	create_task(entry);
 }
 
-Task* create_task(void(*entry)(), uint32_t esp)
+Task* create_task(void(*entry)())
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
 
 	Task* task = (Task*) kmalloc(sizeof(Task));
 	if(!task) return NULL_PTR;
+	memset(task, 0, sizeof(Task));	
 
-	/*void* stack = kmalloc(4096);
+	void* stack = kmalloc(4096);
 
 	memset(stack, 0, 4096);
-	uint32_t esp = (uint32_t) stack;*/
+	uint32_t esp = (uint32_t) stack;
 
 	//task->esp = 0xF00000;
 	task->eip = (uint32_t) entry;
 	//task->eip = 0x10000;
-	task->esp = esp;
+	task->esp = 0x0;
 	//task->cr3 = create_user_process_pd(entry);
 
 	task->id = next_id++;
 	task->state = TASK_READY;
 	task->next = NULL_PTR;
 
-	if(!task_list)
+	if(task_list == NULL_PTR)
 	{
 		task_list = task;
 	}

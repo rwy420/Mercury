@@ -12,4 +12,5 @@ k_entry:
 	push ecx
 	push ebx
 	push eax
+
 	call kernel_init

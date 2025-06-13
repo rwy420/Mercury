@@ -29,7 +29,6 @@ extern Disk* g_default_disk;
 
 uint32_t kernel_start_address;
 uint32_t kernel_end_address;
-uint32_t kernel_size;
 uint32_t mem_manager_end;
 
 VesaInfoBlock g_vesa_info_block;
@@ -41,6 +40,7 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	g_vesa_info_block.fb = vesa_info_block.fb;
 	g_vesa_info_block.fb_width = vesa_info_block.fb_width;
 	g_vesa_info_block.fb_height = vesa_info_block.fb_height;
+	
 	if(!paging_init()); //TODO error handling
 }
 
@@ -89,10 +89,8 @@ void v_kernel_start()
 
 	kernel_end_address = ((kernel_end_address / 4096) + 1) * 4096;
 
-	kernel_size = kernel_end_address - kernel_start_address;
-	print_memory_info();
-	size_t heap_size = 0x200000;
-	uint32_t heap_start = 0x200000;
+	size_t heap_size = 0x400000;
+	uint32_t heap_start = 0xC0200000;
 
 	heap_init(heap_start, heap_size);
 	
@@ -120,10 +118,8 @@ void v_kernel_start()
 	tasks_init();
 	//register_interrupt_handler(0x20, schedule);
 
-	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
 
-	void* test = kmalloc(0x100);
-	print_hex32((uint32_t) test);
+	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
 
 	while(1);
 }

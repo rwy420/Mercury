@@ -4,31 +4,27 @@ ENTRY(k_entry)
 
 SECTIONS
 {
-	. = 1M;
-	ld_kernel_start = 1M;
+    . = 0xC0100000;
 
-	.text BLOCK(4K) : ALIGN(4K)
-	{
-		*(.text*)
-		*(.rodata)
-	}
+    .text ALIGN(4K) : AT(0x00100000) {
+        ld_kernel_start = .;
+        *(.multiboot)
+        *(.text*)
+        *(.rodata*)
+        *(.eh_frame*)
+    }
 
-	.data BLOCK(4K) : ALIGN(4K)
-	{
-		*(.data*)
-	}
+    .data ALIGN(4K) : AT(LOADADDR(.text) + SIZEOF(.text)) {
+        *(.data*)
+    }
 
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		*(.bss)
-		*stack(.bss)
-	}
+    .bss ALIGN(4K) : AT(LOADADDR(.data) + SIZEOF(.data)) {
+        *(COMMON)
+        *(.bss)
+    }
 
-	/DISCARD/  :
-	{
-		*(.fini_array*)
-		*(.comment)
-	}
+    ld_kernel_end = .;
 
-	ld_kernel_end = .;
+    /DISCARD/ : { *(.comment) *(.note*) }
 }
+

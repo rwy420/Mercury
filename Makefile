@@ -26,6 +26,9 @@ full-image: image
 qemu-run:
 	qemu-system-x86_64 -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0
 
+debug:
+	qemu-system-x86_64 -s -S -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0
+
 grub:
 	cd kernel && make grub
 	mkdir -p iso/boot/grub
