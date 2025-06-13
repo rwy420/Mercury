@@ -39,7 +39,7 @@ void* alloc_frame()
 		
 		if(!(byte & (1 << (i % 8))))
 		{
-			frame_bitmap[i / 8] |= (1 << (i % 8));
+			set_frame(i);
 
 			return (void*) (frames_start + i * FRAME_SIZE); 
 		}
