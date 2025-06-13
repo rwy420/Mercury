@@ -19,6 +19,7 @@
 #include <memory/heap.h>
 #include <memory/common.h>
 #include <memory/paging.h>
+#include <memory/frames.h>
 #include <fs/fat16/fat16.h>
 
 #define ATA
@@ -89,14 +90,22 @@ void v_kernel_start()
 
 	kernel_end_address = ((kernel_end_address / 4096) + 1) * 4096;
 
-	size_t heap_size = 0x400000;
+	size_t heap_size = 0x2000000;
 	uint32_t heap_start = 0xC0200000;
 
 	heap_init(heap_start, heap_size);
 	
 	printf("<Mercury> Kernel heap of ");
-	print_uint32_t(heap_size / 0x400);
-	printf(" KB initialized\n");
+	print_uint32_t(heap_size / 0x400 / 0x400);
+	printf(" MB initialized\n");
+
+	size_t frame_allocator_size = 0x40000000;
+	uint32_t frame_allocator_start = 0x80000000;
+
+	frame_allocator_init(frame_allocator_start, frame_allocator_size);
+	printf("<Mercury> Frame allocator of ");
+	print_uint32_t(frame_allocator_size / 0x400 / 0x400);
+	printf(" MB initialized\n");
 
 	symtable_init();
 	init_drivers();
@@ -117,7 +126,6 @@ void v_kernel_start()
 
 	tasks_init();
 	//register_interrupt_handler(0x20, schedule);
-
 
 	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
 
