@@ -63,6 +63,7 @@ void pd_delete_flags(uint32_t* pd, uint32_t flags);
 uint32_t virtual_to_physical(void* v_address);
 void set_pd(PageDirectory* pd);
 PageDirectory* get_pd();
+PageDirectory* create_kernel_pd();
 void flush_tlb_entry(uint32_t v_address);
 void map_page_pd(PageDirectory* pd, void* p_address, void* v_address);
 void map_page(void* p_address, void* v_address);

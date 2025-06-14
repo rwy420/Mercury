@@ -1,3 +1,4 @@
+#include "common/types.h"
 #include "memory/frames.h"
 #include <multitasking.h>
 #include <shell.h>
@@ -10,6 +11,7 @@
 #include <common/screen.h>
 #include <exec/elf/elf_loader.h>
 #include <fs/fat16/fat16.h>
+#include <vesa.h>
 
 Task* task_list = NULL_PTR;
 Task* g_current_task = NULL_PTR;
@@ -57,19 +59,38 @@ void idle_task2()
 void tasks_init()
 {
 	task_list = NULL_PTR;
+	g_current_task = NULL_PTR;
+
 	//Fix this ..
 	create_task((void*) 0x0);
+	//set_pd((PageDirectory*) idle->cr3);
+	
 
-	create_task(idle_task2);
+	
+	
+	Task* idle = create_task(idle_task2);
+
+	set_pd((PageDirectory*) idle->cr3);
+
+	print_hex32(virtual_to_physical((void*) idle->eip));
+	printf("\n");
+
+	for(int i = 0; i < 0x100; i++)
+	{
+		print_hex(((uint8_t*) idle->eip)[i]);
+	}
+
+	set_pd(g_kernel_pd);
+
 	create_task(idle_task);
 
-	int fd = fat16_open("/BIN/APP.ELF", 'r');
+	/*int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
 	char* buffer = kmalloc(size);
 	fat16_read(fd, buffer, size);
 	void(*entry)();
 	entry = image_load(buffer, size, 0);
-	create_task(entry);
+	create_task(entry);*/
 }
 
 Task* create_task(void(*entry)())
@@ -80,37 +101,27 @@ Task* create_task(void(*entry)())
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 
-	PageDirectory* pd = kmalloc_aligned(0x1000, 0x3000);
-	if(!pd) return NULL_PTR;
-	memset(pd, 0, sizeof(PageDirectory));
+	PageDirectory* pd = create_kernel_pd();
+	vesa_map(pd);
 
-	task->cr3 = (uint32_t) pd;
-
-	for(int i = 0xC0000000 >> 22; i < 1024; i++)
-	{
-		//print_uint32_t(i);
-		//pd[i] = g_kernel_pd[i];
-	}
-
-	uint32_t stack_base = 0x1000000;
+	uint32_t esp = 0;
 	for(uint32_t i = 0; i < 0x4000; i += FRAME_SIZE)
 	{
 		void* frame = alloc_frame();
-		map_page_pd(pd, (void*) (stack_base + i), frame);
+		map_page_pd(pd, frame, frame);
+		esp = (uint32_t) frame;
 	}
 
-	uint32_t code_base = 0x1000;
-	for(uint32_t i = 0; i < 0x4000; i += FRAME_SIZE)
-	{
-		void* frame = alloc_frame();
-		map_page_pd(pd, frame, (void*) (code_base + i));
-		map_page(frame, frame); // Does not work and I NEED to implement a page frame allocator :(
-		memcpy(frame, (void*) (((uint32_t) entry) + i), FRAME_SIZE);	
-	}
+	uint32_t eip = 0x700000;
+	void* code = alloc_frame();
+	map_page_pd(pd, code, code);
 
-	task->esp = stack_base + 0x4000;
-	task->eip = (uint32_t) entry;
-	task->eip = code_base;
+	set_pd(pd); // Kinda bad probably
+	memcpy(code, entry, 0x1000);
+	set_pd(g_kernel_pd);
+
+	task->esp = esp;
+	task->cr3 = virtual_to_physical(pd);
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -129,6 +140,8 @@ Task* create_task(void(*entry)())
 
 	printf("Created task | CR3: ");
 	print_hex32(task->cr3);
+	printf(" | EIP: ");
+	print_hex32(task->eip);
 	printf("\n");
 
 	return task;
@@ -156,16 +169,17 @@ void kill_task(uint8_t id)
 
 void schedule(CPUState* cpu) 
 {
+	printf("SCHED");
+
 	pic_confirm(0x20);
 
-	print_hex32(cpu->eip);
-
-	/*if(!g_current_task)
+	if(g_current_task == NULL_PTR)
 	{
 		g_current_task = task_list;
 		return;
 	}
 
+	// Probably the issue
 	g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
 	g_current_task->ebp = cpu->ebp;
@@ -179,6 +193,9 @@ void schedule(CPUState* cpu)
 
 	Task* start = g_current_task;
 
+print_hex32(g_current_task->eip);
+printf("\n");
+
 	do
 	{
 		g_current_task = g_current_task->next ? g_current_task->next : task_list;
@@ -187,10 +204,11 @@ void schedule(CPUState* cpu)
 		{
 			g_tss.cs = 0x18;
 			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
+			set_pd((PageDirectory*) g_current_task->cr3);
 			restore_and_switch();
 
 			break;
 		}
 
-	} while(g_current_task != start);*/
+	} while(g_current_task != start);
 }

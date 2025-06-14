@@ -133,9 +133,10 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	//tasks_init();
-	//register_interrupt_handler(0x20, schedule);
+	tasks_init();
+	register_interrupt_handler(0x20, schedule);
 
 	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
+	
 	while(1);
 }
