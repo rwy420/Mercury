@@ -13,8 +13,9 @@ int shift;
 void handle_interrupt()
 {
 	uint8_t key = inb(DATA_PORT);
+	print_hex(key);
 
-	if(key == 0x2A || key == 0x36) shift = true;
+	/*if(key == 0x2A || key == 0x36) shift = true;
 	if(key == 0xAA || key == 0xB6) shift = false;
 
 	if(key == 0x0E)
@@ -79,7 +80,7 @@ void handle_interrupt()
                 break;
             }
         }
-    }
+    }*/
 }
 
 void ps2_kb_enable()

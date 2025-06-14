@@ -1,3 +1,4 @@
+#include "common/screen.h"
 #include <vesa.h>
 #include <psf1.h>
 #include <memory/common.h>

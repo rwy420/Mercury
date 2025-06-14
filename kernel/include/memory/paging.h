@@ -7,12 +7,12 @@
 #define TABLES_PER_DIRECTORY 1024
 #define PAGE_SIZE 4096
 
+#define SET_ATTRIBUTE(entry, flag) (*entry |= flag)
+#define SET_FRAME(entry, addr) (*entry = (*entry & 0xFFF) | (addr & 0xFFFFF000))
+
 #define PD_INDEX(address) ((address) >> 22)
 #define PT_INDEX(address) (((address) >> 12) & 0x3FF)
 #define PAGE_PHYS_ADDRESS(dir_entry) ((*dir_entry) & ~0xFFF)
-#define SET_FRAME(entry, address) (*entry = (*entry & ~0x7FFFF000) | address)
-
-#define SET_ATTRIBUTE(entry, attr) (*entry |= attr)
 #define CLEAR_ATTRIBUTE(entry, addr) (*entry &= ~attr)
 #define TEST_ATTRIBUTE(entry, attr) (*entry & attr);
 

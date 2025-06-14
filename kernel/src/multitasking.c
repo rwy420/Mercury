@@ -1,3 +1,4 @@
+#include "memory/frames.h"
 #include <multitasking.h>
 #include <shell.h>
 #include <hardware/interrupts.h>
@@ -15,6 +16,7 @@ Task* g_current_task = NULL_PTR;
 uint32_t next_id = 1;
 
 extern TSS g_tss;
+extern PageDirectory* g_kernel_pd;
 
 // Messages need to have a fixed memory address
 char* msg1 = "Task: ";
@@ -78,16 +80,37 @@ Task* create_task(void(*entry)())
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 
-	void* stack = kmalloc(4096);
+	PageDirectory* pd = kmalloc_aligned(0x1000, 0x3000);
+	if(!pd) return NULL_PTR;
+	memset(pd, 0, sizeof(PageDirectory));
 
-	memset(stack, 0, 4096);
-	uint32_t esp = (uint32_t) stack;
+	task->cr3 = (uint32_t) pd;
 
-	//task->esp = 0xF00000;
+	for(int i = 0xC0000000 >> 22; i < 1024; i++)
+	{
+		//print_uint32_t(i);
+		//pd[i] = g_kernel_pd[i];
+	}
+
+	uint32_t stack_base = 0x1000000;
+	for(uint32_t i = 0; i < 0x4000; i += FRAME_SIZE)
+	{
+		void* frame = alloc_frame();
+		map_page_pd(pd, (void*) (stack_base + i), frame);
+	}
+
+	uint32_t code_base = 0x1000;
+	for(uint32_t i = 0; i < 0x4000; i += FRAME_SIZE)
+	{
+		void* frame = alloc_frame();
+		map_page_pd(pd, frame, (void*) (code_base + i));
+		map_page(frame, frame); // Does not work and I NEED to implement a page frame allocator :(
+		memcpy(frame, (void*) (((uint32_t) entry) + i), FRAME_SIZE);	
+	}
+
+	task->esp = stack_base + 0x4000;
 	task->eip = (uint32_t) entry;
-	//task->eip = 0x10000;
-	task->esp = 0x0;
-	//task->cr3 = create_user_process_pd(entry);
+	task->eip = code_base;
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -103,6 +126,10 @@ Task* create_task(void(*entry)())
 		while(t->next) t = t->next;
 		t->next = task;
 	}
+
+	printf("Created task | CR3: ");
+	print_hex32(task->cr3);
+	printf("\n");
 
 	return task;
 }

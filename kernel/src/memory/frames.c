@@ -6,9 +6,8 @@ static uint8_t* frame_bitmap;
 uint32_t total_frames;
 uint32_t frames_start;
 
-static inline void set_frame(uint32_t address)
+static inline void set_frame(uint32_t frame)
 {
-	uint32_t frame = address / FRAME_SIZE;
 	frame_bitmap[FRAME_INDEX(frame)] |= (1 << FRAME_OFFSET(frame));
 }
 

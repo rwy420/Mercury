@@ -49,8 +49,8 @@ void v_kernel_start()
 {
 	vesa_init();
 	vesa_map(g_kernel_pd);
-
 	clear_screen();
+
 	printf("<Mercury> Loading Mercury kernel... \n");
 
 	segments_install_gdt();
@@ -90,7 +90,7 @@ void v_kernel_start()
 
 	kernel_end_address = ((kernel_end_address / 4096) + 1) * 4096;
 
-	size_t heap_size = 0x2000000;
+	size_t heap_size = 0x600000;
 	uint32_t heap_start = 0xC0200000;
 
 	heap_init(heap_start, heap_size);
@@ -124,10 +124,27 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	tasks_init();
+	//tasks_init();
 	//register_interrupt_handler(0x20, schedule);
 
 	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
 
+map_page((void*) 0x900000, (void*) 0x900000);
+
+//((uint8_t*)0x900000)[0] = 0xAA;
+//print_uint8_t(((uint8_t*)0x900000)[0]);
+
+
+/*uint32_t pd_index = PD_INDEX(0x900000);
+uint32_t pt_index = PT_INDEX(0x900000);
+
+uint32_t pde = g_kernel_pd->entries[pd_index];
+uint32_t pte = g_kernel_pd->entries[pt_index];
+
+print_hex32(pde);
+printf("\n");
+print_hex32(pte);*/
+	
+	
 	while(1);
 }

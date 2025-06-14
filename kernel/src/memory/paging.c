@@ -10,9 +10,6 @@ extern void v_kernel_start();
 PageDirectory* g_current_pd = 0;
 PageDirectory* g_kernel_pd = 0;
 
-uint32_t page_directory[1024] __attribute__((aligned(4096)));
-uint32_t page_table[1024] __attribute__((aligned(4096)));
-
 void pt_add_flags(uint32_t* pt, uint32_t flags)
 {
 	*pt |= flags;
@@ -49,6 +46,7 @@ uint32_t get_pd_entry(uint32_t* pd, uint32_t v_address);
 uint32_t* get_page(const uint32_t v_address);
 void* alloc_page(uint32_t* page);
 void free_page(uint32_t* page);
+
 void flush_tlb_entry(uint32_t v_address);
 
 void map_page_pd(PageDirectory* pd, void* p_address, void* v_address)
@@ -64,7 +62,7 @@ void map_page_pd(PageDirectory* pd, void* p_address, void* v_address)
 			return;
 		}
 
-		memset(table, 0, sizeof(page_table));
+		memset(table, 0, sizeof(PageTable));
 
 		SET_ATTRIBUTE(entry, PDE_PRESENT);
 		SET_ATTRIBUTE(entry, PDE_RW);
@@ -77,6 +75,9 @@ void map_page_pd(PageDirectory* pd, void* p_address, void* v_address)
 	SET_ATTRIBUTE(page, PTE_PRESENT);
 	SET_FRAME(page, (uint32_t) p_address);
 }
+
+
+
 
 void map_page(void* p_address, void* v_address)
 {
@@ -143,8 +144,6 @@ int paging_init()
 
 	register_interrupt_handler(0xE, (isr_t) handle_page_fault);
 
-	//void (*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
-	//v_kernel();
 	v_kernel_start();
 	
 	return false;
