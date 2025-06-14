@@ -37,9 +37,9 @@ void idle_task()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		printf(msg1);
-		print_hex32(counter++);
-		printf(msg2);
+		//printf(msg1);
+		//print_hex32(counter++);
+		//printf(msg2);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -49,9 +49,9 @@ void idle_task2()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		printf(msg3);
-		print_hex32(counter++);
-		printf(msg2);
+		//printf(msg3);
+		//print_hex32(counter++);
+		//printf(msg2);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -72,12 +72,12 @@ void tasks_init()
 
 	set_pd((PageDirectory*) idle->cr3);
 
-	print_hex32(virtual_to_physical((void*) idle->eip));
+	print_hex32(idle->eip);
 	printf("\n");
 
 	for(int i = 0; i < 0x100; i++)
 	{
-		print_hex(((uint8_t*) idle->eip)[i]);
+		print_hex(((uint8_t*) (void*) idle->eip)[i]);
 	}
 
 	set_pd(g_kernel_pd);
@@ -112,15 +112,20 @@ Task* create_task(void(*entry)())
 		esp = (uint32_t) frame;
 	}
 
-	uint32_t eip = 0x700000;
 	void* code = alloc_frame();
+	map_page(code, code);
 	map_page_pd(pd, code, code);
-
-	set_pd(pd); // Kinda bad probably
 	memcpy(code, entry, 0x1000);
-	set_pd(g_kernel_pd);
+
+	//set_pd(pd); // Kinda bad probably
+	//map_page(code, code);
+
+
+
+	//set_pd(g_kernel_pd);
 
 	task->esp = esp;
+	task->eip = (uint32_t) code;
 	task->cr3 = virtual_to_physical(pd);
 
 	task->id = next_id++;
@@ -193,15 +198,15 @@ void schedule(CPUState* cpu)
 
 	Task* start = g_current_task;
 
-print_hex32(g_current_task->eip);
-printf("\n");
-
 	do
 	{
 		g_current_task = g_current_task->next ? g_current_task->next : task_list;
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
+			print_hex32(g_current_task->eip);
+			printf("\n");
+
 			g_tss.cs = 0x18;
 			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
 			set_pd((PageDirectory*) g_current_task->cr3);

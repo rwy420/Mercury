@@ -134,7 +134,7 @@ void v_kernel_start()
 	enable_all_drivers();
 
 	tasks_init();
-	register_interrupt_handler(0x20, schedule);
+	//register_interrupt_handler(0x20, schedule);
 
 	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
 	
