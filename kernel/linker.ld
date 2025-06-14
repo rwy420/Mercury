@@ -8,7 +8,6 @@ SECTIONS
 
     .text ALIGN(4K) : AT(0x00100000) {
         ld_kernel_start = .;
-        *(.multiboot)
         *(.text*)
         *(.rodata*)
         *(.eh_frame*)

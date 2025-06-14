@@ -21,16 +21,10 @@ void heap_init(size_t start, size_t size)
         first -> size = size - sizeof(MemoryChunk);
     }
 
-	uint32_t i = 0;
-
 	for(uint32_t address = 0xC0400000; address < start + size - 0x200000; address += PAGE_SIZE)
 	{
-		i = address;
 		map_page((void*) address, (void*) address);
 	}
-
-	print_hex32(i);
-	printf("\n");
 }
         
 void* kmalloc(size_t size)

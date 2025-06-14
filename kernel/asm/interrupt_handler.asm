@@ -4,10 +4,6 @@ extern interrupt_handler
 global handle_irq_%1
 handle_irq_%1:
 	push dword %1
-	jmp common_interrupt_handler
-%endmacro
-
-common_interrupt_handler:
 	push dword 0
 
 	mov [0x20000], eax
@@ -15,6 +11,28 @@ common_interrupt_handler:
 	push eax	
 	mov eax, [0x20000]
 
+	jmp common_interrupt_handler
+%endmacro
+
+%macro error_interrupt 1
+global handle_irq_%1
+handle_irq_%1:
+	push dword %1
+	
+	mov [0x20000], eax
+	mov eax, [esp + 4]
+	push eax	
+	mov eax, [0x20000]
+
+	mov [0x20000], eax
+	mov eax, [esp + 12]
+	push eax	
+	mov eax, [0x20000]
+
+	jmp common_interrupt_handler
+%endmacro
+
+common_interrupt_handler:
 	push esp
 	push ebp
 	push edi
@@ -54,7 +72,7 @@ interrupt 10
 interrupt 11
 interrupt 12
 interrupt 13
-interrupt 14	
+error_interrupt 14	
 interrupt 15
 ; Non-exception interrups
 interrupt 32

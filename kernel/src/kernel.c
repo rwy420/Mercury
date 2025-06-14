@@ -36,6 +36,8 @@ VesaInfoBlock g_vesa_info_block;
 
 extern PageDirectory* g_kernel_pd;
 
+void v_kernel_start();
+
 void kernel_init(VesaInfoBlock vesa_info_block)
 {
 	g_vesa_info_block.fb = vesa_info_block.fb;
@@ -43,16 +45,23 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	g_vesa_info_block.fb_height = vesa_info_block.fb_height;
 	
 	if(!paging_init()); //TODO error handling
-}
 
-void v_kernel_start()
-{
+	void(*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
+
 	vesa_init();
 	vesa_map(g_kernel_pd);
 	clear_screen();
 
 	printf("<Mercury> Loading Mercury kernel... \n");
+	printf("<Mercury> kernel_start is mapped to 0x");
+	print_hex32((uint32_t) v_kernel);
+	printf("\n<Mercury> Switching to higher half\n");
+	v_kernel();
 
+}
+
+void v_kernel_start()
+{
 	segments_install_gdt();
 	install_idt();
 	pit_init(10);
@@ -128,23 +137,5 @@ void v_kernel_start()
 	//register_interrupt_handler(0x20, schedule);
 
 	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
-
-map_page((void*) 0x900000, (void*) 0x900000);
-
-//((uint8_t*)0x900000)[0] = 0xAA;
-//print_uint8_t(((uint8_t*)0x900000)[0]);
-
-
-/*uint32_t pd_index = PD_INDEX(0x900000);
-uint32_t pt_index = PT_INDEX(0x900000);
-
-uint32_t pde = g_kernel_pd->entries[pd_index];
-uint32_t pte = g_kernel_pd->entries[pt_index];
-
-print_hex32(pde);
-printf("\n");
-print_hex32(pte);*/
-	
-	
 	while(1);
 }

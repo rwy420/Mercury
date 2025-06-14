@@ -59,7 +59,7 @@ typedef struct
 	uint32_t ebp;
 	uint32_t esp;
 	uint32_t eip;
-	uint32_t error;
+	uint32_t error_code;
 } __attribute__((packed)) CPUState;
 
 typedef void (*isr_t)(CPUState* cpu);

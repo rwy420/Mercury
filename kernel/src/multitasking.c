@@ -158,7 +158,9 @@ void schedule(CPUState* cpu)
 {
 	pic_confirm(0x20);
 
-	if(!g_current_task)
+	print_hex32(cpu->eip);
+
+	/*if(!g_current_task)
 	{
 		g_current_task = task_list;
 		return;
@@ -190,5 +192,5 @@ void schedule(CPUState* cpu)
 			break;
 		}
 
-	} while(g_current_task != start);
+	} while(g_current_task != start);*/
 }

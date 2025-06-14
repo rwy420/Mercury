@@ -7,7 +7,7 @@ k_entry:
 	pop ebx
 	pop ecx
 
-	mov esp, 0x90000
+	mov esp, 0x8FFF0
 
 	push ecx
 	push ebx
