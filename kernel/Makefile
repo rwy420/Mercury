@@ -12,14 +12,20 @@ BUILD_DIR := build
 
 C_SOURCES := $(wildcard $(addsuffix /*.c, $(SRC_DIRS)))
 ASM_SOURCES := $(wildcard $(addsuffix /*.asm, $(SRC_DIRS)))
+S_SOURCES := $(wildcard $(addsuffix /*.s, $(SRC_DIRS)))
 
 C_OBJECTS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(C_SOURCES))
 ASM_OBJECTS := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SOURCES))
-OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS)
+S_OJECTS := $(patsubst %.s, $(BUILD_DIR)/%.o, $(S_SOURCES))
+OBJECTS := $(ASM_OBJECTS) $(C_OBJECTS) $(S_OJECTS)
 
 $(BUILD_DIR)/%.o: %.asm
 	@mkdir -p $(dir $@)
 	nasm $(NASMPARAMS) -o $@ $< 
+
+$(BUILD_DIR)/%.o: %.s
+	@mkdir -p $(dir $@)
+	as $(ASPARAMS) -o $@ $< 
 
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)

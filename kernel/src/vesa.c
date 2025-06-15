@@ -6,11 +6,11 @@
 
 extern VesaInfoBlock g_vesa_info_block;
 
-uint16_t* vesa_fb;
+uint32_t* vesa_fb;
 
 void vesa_init()
 {
-	vesa_fb = (uint16_t*) g_vesa_info_block.fb;
+	vesa_fb = (uint32_t*) g_vesa_info_block.fb;
 }
 
 void vesa_put_pixel(int x, int y, uint16_t color)

@@ -1,3 +1,4 @@
+#include "multiboot.h"
 #include <syscalls.h>
 #include <fd.h>
 #include <vesa.h>
@@ -38,12 +39,18 @@ extern PageDirectory* g_kernel_pd;
 
 void v_kernel_start();
 
-void kernel_init(VesaInfoBlock vesa_info_block)
+void kernel_init(uint32_t, uint32_t multiboot_address)
 {
-	g_vesa_info_block.fb = vesa_info_block.fb;
-	g_vesa_info_block.fb_width = vesa_info_block.fb_width;
-	g_vesa_info_block.fb_height = vesa_info_block.fb_height;
-	
+	multiboot_info_t* mb = (multiboot_info_t*) multiboot_address;
+
+    if (mb->flags & (1 << 11)) { // Bit 11: VBE info available
+        g_vesa_info_block.fb = *(uint32_t*) mb->framebuffer_addr;
+		g_vesa_info_block.fb_height = *(uint32_t*) mb->framebuffer_height;
+		g_vesa_info_block.fb_width = *(uint32_t*) mb->framebuffer_width;
+    }
+
+	asm("xchg %bx, %bx");
+
 	if(!paging_init()); //TODO error handling
 
 	void(*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;

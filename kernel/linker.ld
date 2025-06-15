@@ -1,29 +1,45 @@
 OUTPUT_FORMAT(elf32-i386)
 OUTPUT_ARCH(i386:i386)
-ENTRY(k_entry)
+ENTRY(_start)
 
-SECTIONS
-{
-    . = 0xC0100000;
+SECTIONS {
+   /* The multiboot data and code will exist in low memory
+      starting at 0x100000 */
 
-    .text ALIGN(4K) : AT(0x00100000) {
-        ld_kernel_start = .;
-        *(.text*)
-        *(.rodata*)
-        *(.eh_frame*)
-    }
+   . = 0x00100000;
+   .multiboot.data : {
+       *(.multiboot.data)
+   }
 
-    .data ALIGN(4K) : AT(LOADADDR(.text) + SIZEOF(.text)) {
-        *(.data*)
-    }
+   .multiboot.text : {
+       *(.multiboot.text)
+   }
 
-    .bss ALIGN(4K) : AT(LOADADDR(.data) + SIZEOF(.data)) {
-        *(COMMON)
-        *(.bss)
-    }
+   /* The kernel will live at 3GB + 1MB in the virtual
+      address space, which will be mapped to 1MB in the
+      physical address space. */
 
-    ld_kernel_end = .;
+   . += 0xC0000000;
+   .text ALIGN(4096) : AT(ADDR(.text) - 0xC0000000) {
+       *(.text)
+   }
 
-    /DISCARD/ : { *(.comment) *(.note*) }
+   .data ALIGN (4096) : AT(ADDR(.data) - 0xC0000000) {
+       *(.data)
+       *(.rodata*)
+   }
+
+   .bss ALIGN (4096) : AT(ADDR(.bss) - 0xC0000000) {
+       *(COMMON)
+       *(.bss*)
+   }
+
+   /DISCARD/ : {
+       *(.eh_frame);
+       *(.comment*);
+   }
+
+  ld_kernel_end = .;
+  ld_kernel_start = .;
 }
 
