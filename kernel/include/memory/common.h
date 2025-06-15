@@ -3,9 +3,9 @@
 
 #include <common/types.h>
 
-void* memset(void* buffer, uint8_t byte, uint32_t length);
+void* memset(void* dest, uint8_t val, size_t len);
 void* memmove(void* dest, const void* src, size_t len);
-void memcpy(void* dest, void* src, size_t n);
+void* memcpy(void* dest, const void* src, size_t len);
 int strcmp(const char *a, const char *b);
 int memcmp(const void* s1, const void* s2, uint32_t size);
 

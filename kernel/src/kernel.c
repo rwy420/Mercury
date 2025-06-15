@@ -48,6 +48,11 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 
 	void(*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
 
+	size_t heap_size = 0x1000000;
+	uint32_t heap_start = 0xC0200000;
+
+	uint32_t heap_max = heap_init(heap_start, heap_size);
+
 	vesa_init();
 	vesa_map(g_kernel_pd);
 	clear_screen();
@@ -55,6 +60,10 @@ void kernel_init(VesaInfoBlock vesa_info_block)
 	printf("<Mercury> Loading Mercury kernel... \n");
 	printf("<Mercury> kernel_start is mapped to 0x");
 	print_hex32((uint32_t) v_kernel);
+	printf("\n<Mercury> Kernel heap of ");
+	print_uint32_t(heap_size / 0x400 / 0x400);
+	printf(" MB initialized\n<Mercury> Kernel heap mapped up to 0x");
+	print_hex32(heap_max);
 	printf("\n<Mercury> Switching to higher half\n");
 	v_kernel();
 
@@ -99,17 +108,8 @@ void v_kernel_start()
 
 	kernel_end_address = ((kernel_end_address / 4096) + 1) * 4096;
 
-	size_t heap_size = 0x600000;
-	uint32_t heap_start = 0xC0200000;
-
-	heap_init(heap_start, heap_size);
-	
-	printf("<Mercury> Kernel heap of ");
-	print_uint32_t(heap_size / 0x400 / 0x400);
-	printf(" MB initialized\n");
-
 	size_t frame_allocator_size = 0x40000000;
-	uint32_t frame_allocator_start = 0x80000000;
+	uint32_t frame_allocator_start = 0x40000000;
 
 	frame_allocator_init(frame_allocator_start, frame_allocator_size);
 	printf("<Mercury> Frame allocator of ");
@@ -133,10 +133,47 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	tasks_init();
+	//tasks_init();
 	//register_interrupt_handler(0x20, schedule);
 
 	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
-	
+
+	void* test = (void*) 0xFF0000;
+	void* testva = (void*) 0xDD0000;
+	map_page(test, testva);
+
+	uint8_t* testarray = (uint8_t*) test;
+
+memset(testva, 0xAB, 16);
+for (int i = 0; i < 16; i++) {
+    print_hex(((uint8_t*)testva)[i]);
+}
+
+printf("\n");
+
+void* frame = alloc_frame();
+
+printf("Frame: ");
+print_hex32((uint32_t) frame); 
+printf("\n");
+
+void* va = (void*) 0xFF0000;
+map_page(frame, va);
+
+uint32_t pde = g_kernel_pd->entries[PD_INDEX((uint32_t)va)];
+uint32_t* pt = (uint32_t*) PAGE_PHYS_ADDRESS(&pde);
+uint32_t pte = pt[PT_INDEX((uint32_t)va)];
+
+printf("PDE | PTE: ");
+print_hex32(pde); // should include 0x3
+printf(" | ");
+print_hex32(pte); // should also include 0x3
+printf("\n");
+
+memset(va, 0xAB, 16);
+for (int i = 0; i < 16; i++) {
+    print_hex(((uint8_t*)va)[i]);
+}
+
 	while(1);
 }

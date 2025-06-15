@@ -24,7 +24,7 @@ full-image: image
 	dd if=./fs.bin of=build/mercury_image.img conv=notrunc oflag=seek_bytes seek=51200
 
 qemu-run:
-	qemu-system-x86_64 -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0
+	qemu-system-x86_64 -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0 -serial stdio -d int,cpu_reset -no-reboot
 
 debug:
 	qemu-system-x86_64 -s -S -enable-kvm -cpu host -drive file=build/mercury_image.img,if=ide,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0

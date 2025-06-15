@@ -63,14 +63,10 @@ void tasks_init()
 
 	//Fix this ..
 	create_task((void*) 0x0);
-	//set_pd((PageDirectory*) idle->cr3);
-	
-
-	
 	
 	Task* idle = create_task(idle_task2);
 
-	set_pd((PageDirectory*) idle->cr3);
+	//set_pd((PageDirectory*) idle->cr3);
 
 	print_hex32(idle->eip);
 	printf("\n");
@@ -80,7 +76,7 @@ void tasks_init()
 		print_hex(((uint8_t*) (void*) idle->eip)[i]);
 	}
 
-	set_pd(g_kernel_pd);
+	//set_pd(g_kernel_pd);
 
 	create_task(idle_task);
 
@@ -101,32 +97,39 @@ Task* create_task(void(*entry)())
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 
-	PageDirectory* pd = create_kernel_pd();
-	vesa_map(pd);
+	//PageDirectory* pd = create_kernel_pd();
+	//vesa_map(pd);
 
 	uint32_t esp = 0;
 	for(uint32_t i = 0; i < 0x4000; i += FRAME_SIZE)
 	{
 		void* frame = alloc_frame();
-		map_page_pd(pd, frame, frame);
+		//map_page_pd(pd, frame, frame);
+		map_page(frame, frame);
 		esp = (uint32_t) frame;
 	}
 
-	void* code = alloc_frame();
-	map_page(code, code);
-	map_page_pd(pd, code, code);
-	memcpy(code, entry, 0x1000);
+void* code = alloc_frame();                     // Physical page
+map_page(code, code);              // Map it now
+	// Copy BEFORE changing PD
+flush_tlb_entry((uint32_t) code);
+for(int i = 0; i < PAGE_SIZE; i++)
+{
+	((uint8_t*) code)[i] = ((uint8_t*) entry)[i];
+}
 
-	//set_pd(pd); // Kinda bad probably
-	//map_page(code, code);
+//map_page_pd(pd, code, code);                    // Map in new PD AFTER memcpy
+//set_pd(pd);                                     // Now switch
+for (int i = 0; i < 0x100; i++) {
+    print_hex(((uint8_t*)code)[i]);             // Should now print valid data
+}
+//set_pd(g_kernel_pd);
 
-
-
-	//set_pd(g_kernel_pd);
 
 	task->esp = esp;
 	task->eip = (uint32_t) code;
-	task->cr3 = virtual_to_physical(pd);
+	//task->cr3 = virtual_to_physical(pd);
+	task->cr3 = (uint32_t) g_kernel_pd;
 
 	task->id = next_id++;
 	task->state = TASK_READY;

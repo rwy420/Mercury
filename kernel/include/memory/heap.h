@@ -11,7 +11,7 @@ typedef struct MemoryChunk
     size_t size;
 } __attribute__((packed)) MemoryChunk;
 
-void heap_init(size_t start, size_t size);
+uint32_t heap_init(size_t start, size_t size);
 void* kmalloc(size_t size);
 void kfree(void* pointer);
 

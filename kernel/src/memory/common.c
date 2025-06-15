@@ -1,14 +1,13 @@
 #include <memory/common.h>
 #include <common/screen.h>
 
-void* memset(void* buffer, uint8_t byte, uint32_t length)
-{
-	uint8_t* pointer = (uint8_t*) buffer;
-
-	for(uint32_t i = 0; i < length; i++) pointer[i] = byte;
-
-	return buffer;
+void* memset(void* dest, uint8_t val, size_t len) {
+    uint8_t* ptr = dest;
+    while (len-- > 0)
+        *ptr++ = val;
+    return dest;
 }
+
 
 void* memmove(void* dest, const void* src, size_t len)
 {
@@ -27,16 +26,14 @@ void* memmove(void* dest, const void* src, size_t len)
 	return dest;
 }
 
-void memcpy(void* dest, void* src, size_t n)
-{
-	uint8_t* csrc = (uint8_t*) src;
-	uint8_t* cdest = (uint8_t*) dest;
-
-	for(uint32_t i = 0; i < n; i++)
-	{
-		cdest[i] = csrc[i];
-	}
+void* memcpy(void* dest, const void* src, size_t len) {
+    uint8_t* d = dest;
+    const uint8_t* s = src;
+    while (len-- > 0)
+        *d++ = *s++;
+    return dest;
 }
+
 
 int strcmp(const char *a, const char *b)
 {

@@ -8,14 +8,15 @@
 #define TABLES_PER_DIRECTORY 1024
 #define PAGE_SIZE 4096
 
-#define SET_ATTRIBUTE(entry, flag) (*entry |= flag)
-#define SET_FRAME(entry, addr) (*entry = (*entry & 0xFFF) | (addr & 0xFFFFF000))
+#define SET_ATTRIBUTE(entry, flag) (*(entry) |= (flag))
+#define CLEAR_ATTRIBUTE(entry, flag) (*(entry) &= ~(flag))
+#define TEST_ATTRIBUTE(entry, flag) ((*(entry)) & (flag))
+#define SET_FRAME(entry, addr) (*(entry) = (*(entry) & 0xFFF) | ((addr) & 0xFFFFF000))
+#define EXTRACT_FRAME(val) ((val) & 0xFFFFF000)
+#define PAGE_PHYS_ADDRESS(entry_ptr) ((*(entry_ptr)) & 0xFFFFF000)
 
-#define PD_INDEX(address) ((address) >> 22)
-#define PT_INDEX(address) (((address) >> 12) & 0x3FF)
-#define PAGE_PHYS_ADDRESS(dir_entry) ((*dir_entry) & ~0xFFF)
-#define CLEAR_ATTRIBUTE(entry, addr) (*entry &= ~attr)
-#define TEST_ATTRIBUTE(entry, attr) (*entry & attr);
+#define PD_INDEX(addr) (((addr) >> 22) & 0x3FF)
+#define PT_INDEX(addr) (((addr) >> 12) & 0x3FF)
 
 typedef enum
 {

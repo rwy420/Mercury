@@ -90,66 +90,47 @@ PageDirectory* create_kernel_pd()
 	return directory;
 }
 
-uint32_t virtual_to_physical(void* v_address)
-{
-	uint32_t v = (uint32_t) v_address;
+uint32_t virtual_to_physical(void* v_address) {
+    uint32_t virt = (uint32_t) v_address;
 
-    uint32_t pd_index = (v >> 22) & 0x3FF;
-    uint32_t pt_index = (v >> 12) & 0x3FF;
+    uint32_t pd_index = virt >> 22;
+    uint32_t pt_index = (virt >> 12) & 0x3FF;
+    uint32_t page_offset = virt & 0xFFF;
 
-    PageDirectory* pd = g_current_pd;
+    uint32_t pd_entry = g_current_pd->entries[pd_index];
+    uint32_t* page_table = (uint32_t*)(pd_entry & ~0xFFF);
+    uint32_t pt_entry = page_table[pt_index];
 
-    uint32_t pde = pd->entries[pd_index];
-    if ((pde & PDE_PRESENT) == 0)
-        return 0; // Not mapped
-
-    PageTable* pt = (PageTable*)(pde & ~0xFFF);
-    pt = (PageTable*)((uint32_t)pt + 0xC0000000);
-
-    uint32_t pte = pt->entries[pt_index];
-    if ((pte & PTE_PRESENT) == 0)
-        return 0;
-
-    uint32_t phys_page_base = pte & ~0xFFF;
-    uint32_t offset = v & 0xFFF;
-
-    return phys_page_base + offset;
+    uint32_t phys_frame = pt_entry & ~0xFFF;
+    return phys_frame + page_offset;
 }
 
 void flush_tlb_entry(uint32_t v_address)
 {
-	__asm__ __volatile__ ("cli; invlpg (%0); sti" : : "r" (v_address));
+	asm volatile("invlpg (%0)" : : "r" (v_address) : "memory");
 }
 
-void map_page_pd(PageDirectory* pd, void* p_address, void* v_address)
+void map_page_pd(PageDirectory* pd, void* phys_addr, void* virt_addr)
 {
-	uint32_t* entry = &pd->entries[PD_INDEX((uint32_t) v_address)];
+    uint32_t paddr = (uint32_t)phys_addr;
+    uint32_t vaddr = (uint32_t)virt_addr;
 
-	if((*entry & PDE_PRESENT) != PDE_PRESENT)
-	{
-		PageTable* table = (PageTable*) kmalloc_aligned(4096, 4096);
-		if(!table)
-		{
-			printf("ERROR ALLOCATING\n");
-			return;
-		}
+    uint32_t pd_index = PD_INDEX(vaddr);
+    uint32_t pt_index = PT_INDEX(vaddr);
 
-		memset(table, 0, sizeof(PageTable));
+    // Allocate pt if necessary
+    if (!(pd->entries[pd_index] & PDE_PRESENT)) {
+        PageTable* pt = (PageTable*) kmalloc_aligned(4096, 4096);
+        memset(pt, 0, sizeof(PageTable));
+        pd->entries[pd_index] = virtual_to_physical(pt) | PDE_PRESENT | PDE_RW;
+    }
 
-		SET_ATTRIBUTE(entry, PDE_PRESENT);
-		SET_ATTRIBUTE(entry, PDE_RW);
-		SET_FRAME(entry, virtual_to_physical(table));
-	}
+    PageTable* pt = (PageTable*) PAGE_PHYS_ADDRESS(&pd->entries[pd_index]);
+    pt->entries[pt_index] = paddr | PTE_PRESENT | PTE_RW;
 
-	PageTable* table = (PageTable*) PAGE_PHYS_ADDRESS(entry);
-	uint32_t* page = &table->entries[PT_INDEX((uint32_t) v_address)];
-
-	SET_ATTRIBUTE(page, PTE_PRESENT);
-	SET_ATTRIBUTE(page, PTE_RW);
-	SET_FRAME(page, (uint32_t) p_address);
-
-	//flush_tlb_entry((uint32_t) v_address);
+    flush_tlb_entry(vaddr);
 }
+
 
 void map_page(void* p_address, void* v_address)
 {
