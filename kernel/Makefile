@@ -33,7 +33,7 @@ $(BUILD_DIR)/%.o: %.c
 
 kernel.elf: linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
-	#strip --strip-all kernel.bin
+	strip --strip-all kernel.elf
 
 clean:
 	rm -rf ./build
