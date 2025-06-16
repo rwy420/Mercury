@@ -45,47 +45,10 @@ PageDirectory* create_kernel_pd()
     PageDirectory* directory = (PageDirectory*) virtual_to_physical(kmalloc_aligned(4096, 4096 ));
 	if(!directory) return false;
 
-	memset(directory, 0, sizeof(PageDirectory));
-
-	g_kernel_pd = directory;
-
-	PageTable* table = (PageTable*) virtual_to_physical(kmalloc_aligned(4096, 4096));
-	if(!table) return false;	
-	PageTable* table_3g = (PageTable*) virtual_to_physical(kmalloc_aligned(4096, 4096));
-	if(!table_3g) return false;	
-
-	memset(table, 0x0, sizeof(PageTable));
-	memset(table_3g, 0x0, sizeof(PageTable));
-
-	for(uint32_t i = 0, frame = 0, virt = 0; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
+	for(int i = PD_INDEX(0xC0000000); i < 1024; i++)
 	{
-		uint32_t page = 0;
-		SET_ATTRIBUTE(&page, PTE_PRESENT);
-		SET_ATTRIBUTE(&page, PTE_RW);
-		SET_FRAME(&page, frame);
-
-		table_3g->entries[PT_INDEX(virt)] = page;
+		directory->entries[i] = g_kernel_pd->entries[i];
 	}
-
-	for(uint32_t i = 0x0, frame = 0x0, virt = 0xC0000000; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
-	{
-		uint32_t page = 0;
-		SET_ATTRIBUTE(&page, PTE_PRESENT);
-		SET_ATTRIBUTE(&page, PTE_RW);
-		SET_FRAME(&page, frame);
-
-		table->entries[PT_INDEX(virt)] = page;
-	}
-
-	uint32_t* entry = &directory->entries[PD_INDEX(0xC0000000)];
-	SET_ATTRIBUTE(entry, PDE_PRESENT);
-	SET_ATTRIBUTE(entry, PDE_RW);
-	SET_FRAME(entry, (uint32_t) table);
-
-	uint32_t* entry2 = &directory->entries[PD_INDEX(0x00000000)];
-	SET_ATTRIBUTE(entry2, PDE_PRESENT);
-	SET_ATTRIBUTE(entry2, PDE_RW);
-	SET_FRAME(entry2, (uint32_t) table_3g);
 
 	return directory;
 }

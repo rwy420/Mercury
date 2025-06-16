@@ -37,9 +37,9 @@ void idle_task()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		//printf(msg1);
-		//print_hex32(counter++);
-		//printf(msg2);
+		printf(msg1);
+		print_hex32(counter++);
+		printf(msg2);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -49,9 +49,9 @@ void idle_task2()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		//printf(msg3);
-		//print_hex32(counter++);
-		//printf(msg2);
+		printf(msg3);
+		print_hex32(counter++);
+		printf(msg2);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -76,6 +76,7 @@ void tasks_init()
 		print_hex(((uint8_t*) (void*) idle->eip)[i]);
 	}
 
+	print_hex32(sizeof(idle_task));
 	//set_pd(g_kernel_pd);
 
 	create_task(idle_task);
@@ -97,39 +98,18 @@ Task* create_task(void(*entry)())
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 
-	//PageDirectory* pd = create_kernel_pd();
-	//vesa_map(pd);
+	PageDirectory* pd = create_kernel_pd();
 
-	uint32_t esp = 0;
-	for(uint32_t i = 0; i < 0x4000; i += FRAME_SIZE)
-	{
-		void* frame = alloc_frame();
-		//map_page_pd(pd, frame, frame);
-		map_page(frame, frame);
-		esp = (uint32_t) frame;
-	}
-
-void* code = alloc_frame();                     // Physical page
-map_page(code, code);              // Map it now
-	// Copy BEFORE changing PD
-flush_tlb_entry((uint32_t) code);
-for(int i = 0; i < PAGE_SIZE; i++)
-{
-	((uint8_t*) code)[i] = ((uint8_t*) entry)[i];
-}
-
-//map_page_pd(pd, code, code);                    // Map in new PD AFTER memcpy
-//set_pd(pd);                                     // Now switch
-for (int i = 0; i < 0x100; i++) {
-    print_hex(((uint8_t*)code)[i]);             // Should now print valid data
-}
-//set_pd(g_kernel_pd);
-
+	void* stack_frame = alloc_frame();
+	map_page(stack_frame, stack_frame);
+	map_page_pd(pd, stack_frame, stack_frame);
+	memset(stack_frame, 0x0, 0x1000);
+	uint32_t esp = ((uint32_t) stack_frame) + 0xFFA;
 
 	task->esp = esp;
-	task->eip = (uint32_t) code;
-	//task->cr3 = virtual_to_physical(pd);
-	task->cr3 = (uint32_t) g_kernel_pd;
+	task->eip = (uint32_t) entry;
+	task->cr3 = virtual_to_physical(pd);
+	//task->cr3 = (uint32_t) g_kernel_pd;
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -177,9 +157,10 @@ void kill_task(uint8_t id)
 
 void schedule(CPUState* cpu) 
 {
-	printf("SCHED");
-
+	asm volatile("xchg %bx, %bx");
 	pic_confirm(0x20);
+
+	set_pd(g_kernel_pd);
 
 	if(g_current_task == NULL_PTR)
 	{
@@ -187,7 +168,6 @@ void schedule(CPUState* cpu)
 		return;
 	}
 
-	// Probably the issue
 	g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
 	g_current_task->ebp = cpu->ebp;
@@ -207,12 +187,8 @@ void schedule(CPUState* cpu)
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
-			print_hex32(g_current_task->eip);
-			printf("\n");
-
 			g_tss.cs = 0x18;
 			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
-			set_pd((PageDirectory*) g_current_task->cr3);
 			restore_and_switch();
 
 			break;

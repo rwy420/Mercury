@@ -137,47 +137,10 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	//tasks_init();
-	//register_interrupt_handler(0x20, schedule);
+	tasks_init();
+	register_interrupt_handler(0x20, schedule);
 
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
-
-	void* test = (void*) 0xFF0000;
-	void* testva = (void*) 0xDD0000;
-	map_page(test, testva);
-
-	uint8_t* testarray = (uint8_t*) test;
-
-memset(testva, 0xAB, 16);
-for (int i = 0; i < 16; i++) {
-    print_hex(((uint8_t*)testva)[i]);
-}
-
-printf("\n");
-
-void* frame = alloc_frame();
-
-printf("Frame: ");
-print_hex32((uint32_t) frame); 
-printf("\n");
-
-void* va = (void*) 0xFF0000;
-map_page(frame, va);
-
-uint32_t pde = g_kernel_pd->entries[PD_INDEX((uint32_t)va)];
-uint32_t* pt = (uint32_t*) PAGE_PHYS_ADDRESS(&pde);
-uint32_t pte = pt[PT_INDEX((uint32_t)va)];
-
-printf("PDE | PTE: ");
-print_hex32(pde); // should include 0x3
-printf(" | ");
-print_hex32(pte); // should also include 0x3
-printf("\n");
-
-memset(va, 0xAB, 16);
-for (int i = 0; i < 16; i++) {
-    print_hex(((uint8_t*)va)[i]);
-}
 
 	while(1);
 }
