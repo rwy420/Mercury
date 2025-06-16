@@ -38,7 +38,7 @@
 00000000000i[USBCTL] Pluggable USB devices
 00000000000i[USBCTL]   floppy mouse tablet keypad keyboard hub disk cdrom
 00000000000i[USBCTL]   printer
-00000000000i[MEM0  ] allocated memory at 0x750d557dd010. after alignment, vector=0x750d557de000
+00000000000i[MEM0  ] allocated memory at 0x7408735dd010. after alignment, vector=0x7408735de000
 00000000000i[MEM0  ] 128.00MB
 00000000000i[MEM0  ] mem block size = 0x00020000, blocks=1024
 00000000000i[MEM0  ] rom at 0xfffe0000/131072 ('/usr/share/bochs/BIOS-bochs-latest')
@@ -50,7 +50,7 @@
 00000000000i[DEV   ] PIIX3 PCI-to-ISA bridge present at device 1, function 0
 00000000000i[PLUGIN] init_dev of 'cmos' plugin device by virtual method
 00000000000i[CMOS  ] Using local time for initial clock
-00000000000i[CMOS  ] Setting initial clock to: Sun Jun 15 21:15:38 2025 (time0=1750014938)
+00000000000i[CMOS  ] Setting initial clock to: Mon Jun 16 15:19:18 2025 (time0=1750079958)
 00000000000i[PLUGIN] init_dev of 'dma' plugin device by virtual method
 00000000000i[DMA   ] channel 4 used by cascade
 00000000000i[PLUGIN] init_dev of 'pic' plugin device by virtual method
@@ -81,7 +81,7 @@
 00000000000i[IOAPIC] IOAPIC enabled (base address = 0xfec00000)
 00000000000i[PLUGIN] init_dev of 'keyboard' plugin device by virtual method
 00000000000i[PLUGIN] init_dev of 'harddrv' plugin device by virtual method
-00000000000i[HD    ] HD on ata0-0: 'os.img', 'flat' mode
+00000000000i[HD    ] HD on ata0-0: 'kernel.img', 'flat' mode
 00000000000i[IMG   ] hd_size: 536870912
 00000000000i[HD    ] ata0-0: using specified geometry: CHS=980/16/63 (sector size=512)
 00000000000i[HD    ] ata0-0: extra data outside of CHS address range
@@ -91,7 +91,8 @@
 00000000000i[PLUGIN] init_dev of 'unmapped' plugin device by virtual method
 00000000000i[PLUGIN] init_dev of 'biosdev' plugin device by virtual method
 00000000000i[PLUGIN] init_dev of 'speaker' plugin device by virtual method
-00000000000i[PCSPK ] Using /dev/console for output
+00000000000e[PCSPK ] Failed to open /dev/console: Permission denied
+00000000000e[PCSPK ] Deactivating beep on console
 00000000000i[PLUGIN] init_dev of 'extfpuirq' plugin device by virtual method
 00000000000i[PLUGIN] init_dev of 'parallel' plugin device by virtual method
 00000000000i[PAR   ] parallel port 1 at 0x0378 irq 7
@@ -236,39 +237,43 @@
 00001521996i[BXVGA ] VBE known Display Interface b0c5
 00001524639i[VBIOS ] VBE Bios $Id: vbe.c 292 2021-06-03 12:24:22Z vruppert $
 00001753432i[BIOS  ] ata0-0: PCHS=980/16/63 translation=none LCHS=980/16/63
-00005061840i[XGUI  ] charmap update. Font is 9 x 16
+00004837430i[XGUI  ] charmap update. Font is 9 x 16
 00005187129i[BIOS  ] IDE time out
-05479848743i[BIOS  ] Booting from 0000:7c00
-05900088033i[BXVGA ] VBE set bpp (16)
-05900088052i[BXVGA ] VBE set xres (1024)
-05900088071i[BXVGA ] VBE set yres (768)
-05900088159i[BXVGA ] VBE enabling x 1024, y 768, bpp 16, 1572864 bytes visible
-06281048664i[BXVGA ] VBE disabling
-06281340060i[BXVGA ] VBE set bpp (32)
-06281340079i[BXVGA ] VBE set xres (1024)
-06281340098i[BXVGA ] VBE set yres (768)
-06281340186i[BXVGA ] VBE enabling x 1024, y 768, bpp 32, 3145728 bytes visible
-06288066667i[CPU0  ] [6288066667] Stopped on MAGIC BREAKPOINT
-06386490912i[      ] Ctrl-C detected in signal handler.
-06386490913i[      ] Ctrl-C detected in signal handler.
-06386490913i[      ] dbg: Quit
-06386490913i[CPU0  ] CPU is in protected mode (active)
-06386490913i[CPU0  ] CS.mode = 32 bit
-06386490913i[CPU0  ] SS.mode = 32 bit
-06386490913i[CPU0  ] EFER   = 0x00000000
-06386490913i[CPU0  ] | EAX=00000000  EBX=c01076e0  ECX=00000000  EDX=00000000
-06386490913i[CPU0  ] | ESP=0008ff38  EBP=0008ff98  ESI=00000000  EDI=00000000
-06386490913i[CPU0  ] | IOPL=0 id vip vif ac vm rf nt of df if tf SF zf af pf CF
-06386490913i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
-06386490913i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
-06386490913i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-06386490913i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-06386490913i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-06386490913i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-06386490913i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-06386490913i[CPU0  ] | EIP=c010102d (c010102d)
-06386490913i[CPU0  ] | CR0=0xe0000011 CR2=0x00000000
-06386490913i[CPU0  ] | CR3=0x00090000 CR4=0x00000000
-06386490913i[CMOS  ] Last time is 1750015576 (Sun Jun 15 21:26:16 2025)
-06386490913i[XGUI  ] Exit
-06386490913i[SIM   ] quit_sim called with exit code 0
+05942254823i[BIOS  ] Booting from 0000:7c00
+06362612321i[BXVGA ] VBE set bpp (32)
+06362612340i[BXVGA ] VBE set xres (1024)
+06362612359i[BXVGA ] VBE set yres (768)
+06362612447i[BXVGA ] VBE enabling x 1024, y 768, bpp 32, 3145728 bytes visible
+06785680285i[BXVGA ] VBE disabling
+06785971681i[BXVGA ] VBE set bpp (32)
+06785971700i[BXVGA ] VBE set xres (1024)
+06785971719i[BXVGA ] VBE set yres (768)
+06785971807i[BXVGA ] VBE enabling x 1024, y 768, bpp 32, 3145728 bytes visible
+06792698335i[CPU0  ] [6792698335] Stopped on MAGIC BREAKPOINT
+06792698361i[CPU0  ] [6792698361] Stopped on MAGIC BREAKPOINT
+06792792709i[CPU0  ] [6792792709] Stopped on MAGIC BREAKPOINT
+06792848675i[CPU0  ] [6792848675] Stopped on MAGIC BREAKPOINT
+06808717418i[CPU0  ] [6808717418] Stopped on MAGIC BREAKPOINT
+06808961436i[CPU0  ] [6808961436] Stopped on MAGIC BREAKPOINT
+08586211067i[      ] Ctrl-C detected in signal handler.
+08586211067i[      ] dbg: Quit
+08586211067i[CPU0  ] CPU is in protected mode (active)
+08586211067i[CPU0  ] CS.mode = 32 bit
+08586211067i[CPU0  ] SS.mode = 32 bit
+08586211067i[CPU0  ] EFER   = 0x00000000
+08586211067i[CPU0  ] | EAX=00000000  EBX=001076c8  ECX=000344ff  EDX=00000008
+08586211067i[CPU0  ] | ESP=0008ff88  EBP=0008ffc0  ESI=00ff0010  EDI=00107130
+08586211067i[CPU0  ] | IOPL=0 id vip vif ac vm rf nt of df IF tf sf ZF af PF cf
+08586211067i[CPU0  ] | SEG sltr(index|ti|rpl)     base    limit G D
+08586211067i[CPU0  ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+08586211067i[CPU0  ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+08586211067i[CPU0  ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+08586211067i[CPU0  ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+08586211067i[CPU0  ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+08586211067i[CPU0  ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+08586211067i[CPU0  ] | EIP=0010175e (0010175e)
+08586211067i[CPU0  ] | CR0=0xe0000011 CR2=0x00000000
+08586211067i[CPU0  ] | CR3=0x00090000 CR4=0x00000000
+08586211067i[CMOS  ] Last time is 1750080816 (Mon Jun 16 15:33:36 2025)
+08586211067i[XGUI  ] Exit
+08586211067i[SIM   ] quit_sim called with exit code 0

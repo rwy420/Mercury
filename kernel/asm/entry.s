@@ -24,10 +24,13 @@
 .global _start
 .type _start, @function
 _start:
-	#xchg %bx, %bx
 	mov $0x8FFF0, %esp
-	mov $0x1017ad, %eax
-	call %eax
+	movl $kernel_init, %ecx
+	subl $0xC0000000, %ecx
+
+	push %eax
+	push %ebx
+	call *%ecx
 
 	cli
 1:	hlt

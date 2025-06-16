@@ -31,10 +31,10 @@ $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	gcc $(GCCPARAMS) -c $< -o $@
 
-kernel.bin: linker.ld $(OBJECTS)
+kernel.elf: linker.ld $(OBJECTS)
 	ld $(LDPARAMS) -T $< -o $@ $(OBJECTS)
 	#strip --strip-all kernel.bin
 
 clean:
 	rm -rf ./build
-	rm kernel.bin
+	rm kernel.elf

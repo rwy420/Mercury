@@ -13,12 +13,12 @@ void vesa_init()
 	vesa_fb = (uint32_t*) g_vesa_info_block.fb;
 }
 
-void vesa_put_pixel(int x, int y, uint16_t color)
+void vesa_put_pixel(int x, int y, uint32_t color)
 {
 	vesa_fb[y * g_vesa_info_block.fb_width + y] = color;
 }
 
-void vesa_putc(char c, int x, int y, uint16_t fg, uint16_t bg)
+void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg)
 {
 	uint8_t *glyph = ((uint8_t*)(&u_vga16_psf) + sizeof(PSF1Header)) + (c * 0xE);
 	
@@ -40,12 +40,12 @@ void vesa_putc(char c, int x, int y, uint16_t fg, uint16_t bg)
 
 void vesa_clear()
 {
-	memset(vesa_fb, 0x0, g_vesa_info_block.fb_height * g_vesa_info_block.fb_width);
+	memset(vesa_fb, 0x0, g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 4);
 }
 
 void vesa_map(PageDirectory* pd)
 {
-	for(int i = 0; i  < g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 2; i += PAGE_SIZE)
+	for(int i = 0; i  < g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 4; i += PAGE_SIZE)
 	{
 		void* address = (void*) (g_vesa_info_block.fb + i);
 		map_page_pd(pd, address, address);

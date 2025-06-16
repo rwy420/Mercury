@@ -2,11 +2,11 @@
 set -e
 
 # Config
-IMG=os.img
+IMG=kernel.img
 MNT=mnt
 SIZE=512M
 
-KERNEL=kernel/kernel.bin
+KERNEL=kernel/kernel.elf
 GRUBCFG=grub/grub.cfg
 
 # Clean old
@@ -43,5 +43,7 @@ sudo cp $GRUBCFG $MNT/boot/grub/grub.cfg
 sudo umount $MNT
 sudo losetup -d $LOOP
 
-echo "✅ GRUB image created successfully!"
+# Set permissions
+sudo chmod -R 777 kernel.img 
 
+echo "✅ GRUB image created successfully!"

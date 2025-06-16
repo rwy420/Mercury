@@ -39,20 +39,16 @@ extern PageDirectory* g_kernel_pd;
 
 void v_kernel_start();
 
-void kernel_init(uint32_t, uint32_t multiboot_address)
+void kernel_init(uint32_t multiboot, uint32_t magic)
 {
-	multiboot_info_t* mb = (multiboot_info_t*) multiboot_address;
+	multiboot_info_t* mb = (multiboot_info_t*) multiboot;
 
-    if (mb->flags & (1 << 11)) { // Bit 11: VBE info available
-        g_vesa_info_block.fb = *(uint32_t*) mb->framebuffer_addr;
-		g_vesa_info_block.fb_height = *(uint32_t*) mb->framebuffer_height;
-		g_vesa_info_block.fb_width = *(uint32_t*) mb->framebuffer_width;
-    }
-
-	asm("xchg %bx, %bx");
-
+	g_vesa_info_block.fb = mb->framebuffer_addr;
+	g_vesa_info_block.fb_height = mb->framebuffer_height;
+	g_vesa_info_block.fb_width = mb->framebuffer_width;
+   
 	if(!paging_init()); //TODO error handling
-
+										
 	void(*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
 
 	size_t heap_size = 0x1000000;
@@ -65,6 +61,7 @@ void kernel_init(uint32_t, uint32_t multiboot_address)
 	clear_screen();
 
 	printf("<Mercury> Loading Mercury kernel... \n");
+	
 	printf("<Mercury> kernel_start is mapped to 0x");
 	print_hex32((uint32_t) v_kernel);
 	printf("\n<Mercury> Kernel heap of ");
@@ -72,8 +69,8 @@ void kernel_init(uint32_t, uint32_t multiboot_address)
 	printf(" MB initialized\n<Mercury> Kernel heap mapped up to 0x");
 	print_hex32(heap_max);
 	printf("\n<Mercury> Switching to higher half\n");
-	v_kernel();
 
+	v_kernel_start();
 }
 
 void v_kernel_start()
@@ -130,12 +127,12 @@ void v_kernel_start()
 	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
 
-	storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
+	/*storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
 	fat_dev->read_byte = _read_byte;
 	fat_dev->seek = _seek;
 	fat_dev->write = _write;
-	fat16_init(fat_dev , 0);
+	fat16_init(fat_dev , 0);*/
 
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
@@ -143,7 +140,7 @@ void v_kernel_start()
 	//tasks_init();
 	//register_interrupt_handler(0x20, schedule);
 
-	printf_color("<Mercury> Startup done\n", RGB565_GREEN, RGB565_BLACK);
+	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
 
 	void* test = (void*) 0xFF0000;
 	void* testva = (void*) 0xDD0000;

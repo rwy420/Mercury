@@ -9,7 +9,7 @@ int syscall_printf(void* buffer, size_t length)
 	return 0;
 }
 
-void printf_color(string str, uint16_t fg, uint16_t bg)
+void printf_color(string str, uint32_t fg, uint32_t bg)
 {
 	for(int i = 0; str[i] != '\0'; i++)
 	{
@@ -44,7 +44,7 @@ void printf_color(string str, uint16_t fg, uint16_t bg)
 
 void printf(string str)
 {
-	printf_color(str, RGB565_WHITE, RGB565_BLACK);
+	printf_color(str, COLOR_WHITE, COLOR_BLACK);
 }
 
 void terminal_move_left()
