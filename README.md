@@ -3,7 +3,7 @@
 Mercury is a WIP x86-32 kernel. \
 Report problems or give suggestions [here](https://github.com/rwy420/Mercury/issues) (Issue page)
 
-### Running
+### Building and booting
 To build the kernel and create a bootable image including grub:
 `sudo make grub`
 
