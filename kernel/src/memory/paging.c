@@ -45,7 +45,7 @@ PageDirectory* create_kernel_pd()
     PageDirectory* directory = (PageDirectory*) virtual_to_physical(kmalloc_aligned(4096, 4096 ));
 	if(!directory) return false;
 
-	for(int i = PD_INDEX(0xC0000000); i < 1024; i++)
+	for(int i = 768; i < 1024; i++)
 	{
 		directory->entries[i] = g_kernel_pd->entries[i];
 	}
@@ -85,11 +85,11 @@ void map_page_pd(PageDirectory* pd, void* phys_addr, void* virt_addr)
     if (!(pd->entries[pd_index] & PDE_PRESENT)) {
         PageTable* pt = (PageTable*) kmalloc_aligned(4096, 4096);
         memset(pt, 0, sizeof(PageTable));
-        pd->entries[pd_index] = virtual_to_physical(pt) | PDE_PRESENT | PDE_RW;
+        pd->entries[pd_index] = virtual_to_physical(pt) | PDE_PRESENT | PDE_RW | PDE_USER;
     }
 
     PageTable* pt = (PageTable*) PAGE_PHYS_ADDRESS(&pd->entries[pd_index]);
-    pt->entries[pt_index] = paddr | PTE_PRESENT | PTE_RW;
+    pt->entries[pt_index] = paddr | PTE_PRESENT | PTE_RW | PTE_USER;
 
     flush_tlb_entry(vaddr);
 }

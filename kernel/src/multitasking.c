@@ -64,22 +64,8 @@ void tasks_init()
 	//Fix this ..
 	create_task((void*) 0x0);
 	
-	Task* idle = create_task(idle_task2);
-
-	//set_pd((PageDirectory*) idle->cr3);
-
-	print_hex32(idle->eip);
-	printf("\n");
-
-	for(int i = 0; i < 0x100; i++)
-	{
-		print_hex(((uint8_t*) (void*) idle->eip)[i]);
-	}
-
-	print_hex32(sizeof(idle_task));
-	//set_pd(g_kernel_pd);
-
-	create_task(idle_task);
+	Task* idle = create_task(idle_task);
+	Task* idle2 = create_task(idle_task2);
 
 	/*int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
@@ -157,10 +143,9 @@ void kill_task(uint8_t id)
 
 void schedule(CPUState* cpu) 
 {
-	asm volatile("xchg %bx, %bx");
-	pic_confirm(0x20);
+asm volatile("xchg %bx, %bx");
+			pic_confirm(0x20);
 
-	set_pd(g_kernel_pd);
 
 	if(g_current_task == NULL_PTR)
 	{
@@ -187,8 +172,21 @@ void schedule(CPUState* cpu)
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
+
 			g_tss.cs = 0x18;
 			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
+
+			/*print_hex32(g_current_task->cr3);
+			printf("\n");
+			
+			print_hex32(g_current_task->eip);
+			printf("\n");*/
+
+						
+			//__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
+			
+
+
 			restore_and_switch();
 
 			break;
