@@ -42,10 +42,10 @@ PageDirectory* get_pd()
 
 PageDirectory* create_kernel_pd()
 {
-    PageDirectory* directory = (PageDirectory*) virtual_to_physical(kmalloc_aligned(4096, 4096 ));
-	if(!directory) return false;
+    PageDirectory* directory = (PageDirectory*) virtual_to_physical(kmalloc_aligned(4096, 4096));
+	if(!directory) return NULL_PTR;
 
-	for(int i = 768; i < 1024; i++)
+	for(int i = 0; i < 1024; i++)
 	{
 		directory->entries[i] = g_kernel_pd->entries[i];
 	}

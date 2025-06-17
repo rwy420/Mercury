@@ -40,7 +40,8 @@ void idle_task()
 		printf(msg1);
 		print_hex32(counter++);
 		printf(msg2);
-		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
+		asm volatile("int $32");
+		//for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
 
@@ -52,7 +53,8 @@ void idle_task2()
 		printf(msg3);
 		print_hex32(counter++);
 		printf(msg2);
-		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
+		asm volatile("int $32");
+		//for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
 
@@ -61,9 +63,9 @@ void tasks_init()
 	task_list = NULL_PTR;
 	g_current_task = NULL_PTR;
 
-	//Fix this ..
-	create_task((void*) 0x0);
-	
+	//Fix this ..	
+	//
+	create_task(idle_task);
 	Task* idle = create_task(idle_task);
 	Task* idle2 = create_task(idle_task2);
 
@@ -93,7 +95,7 @@ Task* create_task(void(*entry)())
 	uint32_t esp = ((uint32_t) stack_frame) + 0xFFA;
 
 	task->esp = esp;
-	task->eip = (uint32_t) entry;
+	task->eip = (uint32_t) entry + 0xC0000000;
 	task->cr3 = virtual_to_physical(pd);
 	//task->cr3 = (uint32_t) g_kernel_pd;
 
@@ -143,8 +145,7 @@ void kill_task(uint8_t id)
 
 void schedule(CPUState* cpu) 
 {
-asm volatile("xchg %bx, %bx");
-			pic_confirm(0x20);
+	pic_confirm(0x20);
 
 
 	if(g_current_task == NULL_PTR)
@@ -153,7 +154,7 @@ asm volatile("xchg %bx, %bx");
 		return;
 	}
 
-	g_current_task->eip = cpu->eip;
+	/*g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
 	g_current_task->ebp = cpu->ebp;
 
@@ -162,7 +163,7 @@ asm volatile("xchg %bx, %bx");
 	g_current_task->ecx = cpu->ecx;
 	g_current_task->edx = cpu->edx;
 	g_current_task->esi = cpu->esi;
-	g_current_task->edi = cpu->edi;
+	g_current_task->edi = cpu->edi;*/
 
 	Task* start = g_current_task;
 
@@ -170,23 +171,28 @@ asm volatile("xchg %bx, %bx");
 	{
 		g_current_task = g_current_task->next ? g_current_task->next : task_list;
 
+		if(g_current_task->esp < 0x40000000) g_current_task = g_current_task->next ? g_current_task->next : task_list;
+
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
 
 			g_tss.cs = 0x18;
 			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
 
-			/*print_hex32(g_current_task->cr3);
-			printf("\n");
-			
+			printf("Task ");
+			print_uint8_t(g_current_task->id);
+			printf(" | EIP -> ");
 			print_hex32(g_current_task->eip);
-			printf("\n");*/
+			printf(" | ESP -> ");
+			print_hex32(g_current_task->esp);
+			printf(" | CR -> ");
+			print_hex32(g_current_task->cr3);
+			printf("\n");
 
-						
-			//__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
-			
-
-
+			__asm__ __volatile__("movl %%EAX, %%EAX" : : "a" (g_current_task->cr3));
+			asm volatile("xchg %bx, %bx");
+			// A bad page directory is loaded here after two iterations
+			__asm__ __volatile__("movl %EAX, %CR3");
 			restore_and_switch();
 
 			break;

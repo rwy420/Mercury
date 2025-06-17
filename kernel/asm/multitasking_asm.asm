@@ -39,10 +39,10 @@ restore_and_switch:
 
 	and esp, 0xFFFFFFF0
 
-	push 0x20
+	push 0x10
 	push esp
 	push 0x202
-	push 0x18
+	push 0x8
 
 	mov [0x20000], eax
 	mov eax, [g_current_task]
