@@ -99,6 +99,9 @@ Task* create_task(void(*entry)())
 	task->cr3 = virtual_to_physical(pd);
 	//task->cr3 = (uint32_t) g_kernel_pd;
 
+	set_pd((PageDirectory*) task->cr3);
+	set_pd(g_kernel_pd);
+
 	task->id = next_id++;
 	task->state = TASK_READY;
 	task->next = NULL_PTR;
@@ -192,7 +195,7 @@ void schedule(CPUState* cpu)
 			__asm__ __volatile__("movl %%EAX, %%EAX" : : "a" (g_current_task->cr3));
 			asm volatile("xchg %bx, %bx");
 			// A bad page directory is loaded here after two iterations
-			__asm__ __volatile__("movl %EAX, %CR3");
+			//__asm__ __volatile__("movl %EAX, %CR3");
 			restore_and_switch();
 
 			break;
