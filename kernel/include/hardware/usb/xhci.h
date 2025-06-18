@@ -3,6 +3,6 @@
 
 #include <hardware/pci.h>
 
-void xhci_take_ownership(DeviceDescriptor* device);
+int xhci_take_ownership(DeviceDescriptor* device);
 
 #endif

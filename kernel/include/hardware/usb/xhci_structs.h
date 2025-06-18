@@ -1,5 +1,5 @@
-#ifndef __MERCURY__HARDWARE__USB__XHCI_REGISTERS_H
-#define __MERCURY__HARDWARE__USB__XHCI_REGISTERS_H
+#ifndef __MERCURY__HARDWARE__USB__XHCI_STRUCTS_H
+#define __MERCURY__HARDWARE__USB__XHCI_STRUCTS_H
 
 #include <common/types.h>
 
@@ -71,7 +71,7 @@ typedef struct
 			uint8_t contignous_frame_id_capability : 1;
 			uint8_t maximum_primary_stream_array_size : 4;
 			uint16_t xhci_extented_capability_pointer;
-		} hssparams_1;
+		} hccparams_1;
 	};
 
 	union
@@ -94,5 +94,27 @@ typedef struct
 	};
 
 } xHCICapabilityRegisters;
+
+typedef struct
+{
+	uint8_t capablity_id;
+	uint8_t next_capability;
+	uint16_t rsvd;
+} ExtentedCap;
+
+typedef struct
+{
+	uint8_t capablity_id;
+	uint8_t next_capability;
+	uint8_t hc_bios_owned : 1;
+	uint8_t rsvd1 : 7;
+	uint8_t hc_os_owned : 1;
+	uint8_t rsvd2;
+} LegacyUSBSupportCap;
+
+typedef enum
+{
+	USB_LEGACY_SUPPORT = 1
+} EXTENTED_CAPABILITY_ID;
 
 #endif
