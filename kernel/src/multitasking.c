@@ -91,7 +91,7 @@ Task* create_task(void(*entry)())
 	uint32_t esp = ((uint32_t) stack_frame) + 0xFFA;
 
 	task->esp = esp;
-	task->eip = (uint32_t) entry + 0xC0000000;
+	task->eip = (uint32_t) entry;
 	task->cr3 = virtual_to_physical(pd);
 
 	set_pd((PageDirectory*) task->cr3);

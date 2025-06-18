@@ -1,7 +1,8 @@
 # Mercury
 
 Mercury is a WIP x86-32 kernel. \
-Report problems or give suggestions [here](https://github.com/rwy420/Mercury/issues) (Issue page)
+Report problems or give suggestions [here](https://github.com/rwy420/Mercury/issues) (Issue page) \
+Tested & working on REAL hardware
 
 ### Building and booting
 To build the kernel and create a bootable image including grub:
