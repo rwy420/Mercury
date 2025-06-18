@@ -41,6 +41,16 @@ uint8_t pci_read8(uint16_t bus, uint16_t device, uint16_t function, uint32_t off
     return (data >> ((offset & 3) * 8)) & 0xFF;
 }
 
+void pci_write32(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset, uint32_t value)
+{
+    uint32_t address = (1U << 31)
+                     | ((uint32_t)bus << 16)
+                     | ((uint32_t)device << 11)
+                     | ((uint32_t)function << 8)
+                     | (offset & 0xFC);
+    outl(0xCF8, address);
+    outl(0xCFC, value);
+}
 
 void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset, uint16_t value)
 {
@@ -186,26 +196,60 @@ uint16_t pci_get_prog_if(uint16_t bus, uint16_t device, uint16_t function)
 
 BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 {
+	uint8_t header_type = pci_read8(bus, device, function, 0x0E) & 0x7F;
+	int max_bars = (header_type == 0x01) ? 2 : 6;
+
+	if(bar >= max_bars) return NULL_PTR;
+
+	uint8_t bar_offset = 0x10 + 4 * bar;
 	BAR* result = kmalloc(sizeof(BAR));
 
-	uint32_t header_type = pci_read32(bus, device, function, 0x0E) & 0x7F;
-	int max_bars = 6 - (4 * header_type);
+	uint32_t bar_value = pci_read32(bus, device, function, bar_offset);
 
-	if(bar >= max_bars) return result;
-
-	uint32_t bar_value = pci_read32(bus, device, function, 0x10 + 4 * bar);
-	result->type = (bar_value & 0x1) ? IO : MM;
-	uint32_t temp;
-
-	if(result->type == MM)
+	if(bar_value & IO)
 	{
-		result->address = bar_value & 0xFFFFFFF0;
-		result->prefetchable = ((bar_value >> 3) & 0x1) == 0x1;
+		result->type = IO;
+		result->address = bar_value & ~0x3;
+		result->prefetchable = false;
+		result->is_64bit = false;
+
+		pci_write32(bus, device, function, bar_offset, 0xFFFFFFFF);
+		uint32_t size_mask = pci_read32(bus, device, function, bar_offset) & ~0x3;
+		pci_write32(bus, device, function, bar_offset, bar_value);
+		result->size = (~size_mask + 1);
 	}
 	else
 	{
-		result->address = bar_value & ~0x3;
-		result->prefetchable = false;
+		result->type = MM;
+		result->prefetchable = (bar_value >> 3) & 0x1;
+		uint8_t type = (bar_value >> 1) & 0x3;
+
+		result->is_64bit = (type == 0x2);
+		result->address = bar_value & 0xFFFFFFF0;
+
+		if(result->is_64bit)
+		{
+			uint32_t hi = pci_read32(bus, device, function, bar_offset + 4);
+			result->address |= ((uint64_t) hi << 32);
+
+			pci_write32(bus, device, function, bar_offset, 0xFFFFFFFF);
+			pci_write32(bus, device, function, bar_offset + 4, 0xFFFFFFFF);
+
+			uint32_t size_lo = pci_read32(bus, device, function, bar_offset) & 0xFFFFFFF0;
+			uint32_t size_hi = pci_read32(bus, device, function, bar_offset + 4);
+			pci_write32(bus, device, function, bar_offset, bar_value);
+			pci_write32(bus, device, function, bar_offset + 4, hi);
+
+			uint64_t size_mask = ((uint64_t) size_hi << 32) | size_lo;
+			result->size = (~size_mask + 1);
+		}
+		else
+		{
+			pci_write32(bus, device, function, bar_offset, 0xFFFFFFFF);
+			uint32_t size_mask = pci_read32(bus, device, function, bar_offset) & 0xFFFFFFF0;
+			pci_write32(bus, device, function, bar_offset, bar_value);
+			result->size = (~size_mask + 1);
+		}
 	}
 
 	return result;

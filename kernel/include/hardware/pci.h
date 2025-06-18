@@ -14,10 +14,10 @@ typedef enum
 
 typedef struct
 {
-	int prefetchable;
+ 	BAR_TYPE type;
 	uint32_t address;
 	uint32_t size;
- 	BAR_TYPE type;
+	uint8_t is_64bit, prefetchable;
 } __attribute__((packed)) BAR;
 
 typedef struct
@@ -32,6 +32,8 @@ typedef struct
 uint32_t pci_read32(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);
 uint16_t pci_read16(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);
 uint8_t pci_read8(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);
+
+void pci_write32(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset, uint32_t value);
 void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset, uint16_t value);
 
 void pci_enumerate_devices(int debug);

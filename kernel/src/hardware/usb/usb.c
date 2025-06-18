@@ -1,3 +1,4 @@
+#include "hardware/usb/xhci.h"
 #include <hardware/usb/usb.h>
 #include <hardware/pci.h>
 #include <common/screen.h>
@@ -17,6 +18,7 @@ void usb_init()
 			{
 				case 0x30:
 					printf("<Mercury> Found xHCI USB Controller\n");
+					xhci_take_ownership(device);
 					break;
 
 				default:
