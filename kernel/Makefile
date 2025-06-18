@@ -6,8 +6,8 @@ ASPARAMS = --32
 NASMPARAMS = -felf32
 LDPARAMS = -melf_i386
 
-SRC_DIRS := asm src src/common src/exec/elf src/exec src/fs/fat16 src/hardware src/memory src/net src/driver src/driver/am79c973 src/driver/ata \
-			src/driver/ps2 src/driver/rtl8139 src/driver/sata src/driver/vga
+SRC_DIRS := asm src src/common src/exec/elf src/exec src/fs/fat16 src/hardware src/hardware/usb src/memory src/net src/driver src/driver/am79c973 \
+			src/driver/ata src/driver/ps2 src/driver/rtl8139 src/driver/sata src/driver/vga
 BUILD_DIR := build
 
 C_SOURCES := $(wildcard $(addsuffix /*.c, $(SRC_DIRS)))

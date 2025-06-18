@@ -1,3 +1,4 @@
+#include "hardware/usb/usb.h"
 #include "multiboot.h"
 #include <syscalls.h>
 #include <fd.h>
@@ -127,6 +128,9 @@ void v_kernel_start()
 	pci_enumerate_devices(false);
 	printf("<Mercury> PCI Initialization done\n");
 
+	printf("<Mercury> Initializing USB\n");
+	usb_init();
+		
 	/*storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
 	fat_dev->read_byte = _read_byte;
