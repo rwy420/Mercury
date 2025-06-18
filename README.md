@@ -20,10 +20,10 @@ Or using bochs:
 ## Kernel Development Roadmap
 
 ### Process Isolation
-- [ ] Per-process page directories & address space separation
+- [X] Per-process page directories & address space separation
 - [ ] User vs. kernel memory protection via page flags
 - [ ] User stack and heap management (`brk()`-like syscall)
-- [ ] Switch `cr3` on context switch to isolate memory
+- [X] Switch `cr3` on context switch to isolate memory
 
 ### Linux-like Syscalls
 - [ ] Syscall mechanism (e.g. `int 0x80`, `syscall/sysret`)
