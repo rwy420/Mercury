@@ -46,7 +46,7 @@ void am79c973_init(Driver* self)
 	register_interrupt_handler(0x20 + self->device_descriptor->interrupt, am79c973_handle_interrupt);
 
 	interface = (EthernetInterface*) self->driver_interface;
-	port_base = self->device_descriptor->port_base[0];
+	port_base = self->device_descriptor->bars[0]->address;
 
 	interface->send = am79c973_send;
 	interface->receive = am79c973_receive;

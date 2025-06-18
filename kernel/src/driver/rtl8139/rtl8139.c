@@ -56,7 +56,7 @@ void rtl8139_init(Driver* self)
 	interface->send = rtl8139_send;
 	interface->receive = rtl8139_receive;
 
-	port_base = self->device_descriptor->port_base[0] & ~0x3;
+	port_base = self->device_descriptor->bars[0]->address & ~0x3;
 
 	outb(POWERUP_PORT(port_base), 0x0);
 

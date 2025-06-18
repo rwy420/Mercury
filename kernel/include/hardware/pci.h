@@ -14,20 +14,20 @@ typedef enum
 
 typedef struct
 {
-	uint16_t vendor_id, device_id;
-	uint16_t bus, function;
-	uint8_t class_id, subclass_id, prog_if;
-	uint32_t interrupt;
-	uint32_t port_base[6];
-} DeviceDescriptor;
-
-typedef struct
-{
 	int prefetchable;
 	uint32_t address;
 	uint32_t size;
  	BAR_TYPE type;
 } __attribute__((packed)) BAR;
+
+typedef struct
+{
+	uint16_t vendor_id, device_id;
+	uint16_t bus, function;
+	uint8_t class_id, subclass_id, prog_if;
+	uint32_t interrupt;
+	BAR** bars;
+} DeviceDescriptor;
 
 uint32_t pci_read32(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);
 uint16_t pci_read16(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);

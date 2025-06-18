@@ -81,14 +81,10 @@ void pci_enumerate_devices(int debug)
 				device_descriptor->class_id = pci_get_class_id(bus, device, function);
 				device_descriptor->subclass_id = pci_get_subclass_id(bus, device, function);
 
-
-
 				for(uint8_t bar_idx = 0; bar_idx < 6; bar_idx++)
 				{
 					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
-					device_descriptor->port_base[bar_idx] = bar->address;
-
-					kfree(bar);
+					device_descriptor->bars[bar_idx] = bar;
 				}
 
 				if(debug) 
@@ -136,7 +132,7 @@ void get_driver(DeviceDescriptor* device_descriptor)
 						//map_page((void*)(device_descriptor->port_base[4] + (4096 * page)), (void*)(device_descriptor->port_base[4] + (4096 * page)), 
 						//		PTE_RW);
 					}
-					init_sata(device_descriptor->port_base[4]); // BAR5
+					init_sata(device_descriptor->bars[4]->address); // BAR5
 					break;
 			}
 			break;
