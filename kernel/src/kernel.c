@@ -131,7 +131,8 @@ void v_kernel_start()
 
 	printf("<Mercury> Initializing USB\n");
 	usb_init();
-		
+	pci_init_devices();
+
 	/*storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
 	fat_dev->read = _read;
 	fat_dev->read_byte = _read_byte;

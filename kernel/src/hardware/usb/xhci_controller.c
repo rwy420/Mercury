@@ -1,4 +1,4 @@
-#include <hardware/usb/xhci.h>
+#include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/xhci_structs.h>
 #include <memory/paging.h>
 #include <common/screen.h>
@@ -41,6 +41,29 @@ int xhci_take_ownership(DeviceDescriptor* device)
 
 		extented_address += extented_cap->next_capability;
 	}
+
+	return true;
+}
+
+int xhci_create_controller(DeviceDescriptor* device)
+{
+	// TODO
+
+	if(xhci_init_controller(device))
+		return true;
+	else
+		return false;
+}
+
+int xhci_init_controller(DeviceDescriptor* device)
+{
+	printf("<Mercury> Initializing xHCI Controller at ");
+	print_hex(device->bus);
+	printf(" ");
+	print_hex(device->device_id);
+	printf(" ");
+	print_hex(device->function);
+	printf("\n");
 
 	return true;
 }

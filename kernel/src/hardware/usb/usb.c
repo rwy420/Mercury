@@ -1,6 +1,5 @@
-#include "hardware/usb/xhci.h"
+#include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/usb.h>
-#include <hardware/pci.h>
 #include <common/screen.h>
 
 extern DeviceDescriptor* g_pci_devices;
@@ -28,5 +27,19 @@ void usb_init()
 					break;
 			}
 		}
+	}
+}
+
+void usb_init_controller(DeviceDescriptor* device)
+{
+	switch(device->prog_if)
+	{
+		case 0x30:
+			if(!xhci_create_controller(device))
+				printf("<Mercury> Failed to initialize xHCI Controller\n");
+			break;
+
+		default:
+			break;
 	}
 }

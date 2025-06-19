@@ -1,3 +1,4 @@
+#include "hardware/usb/usb.h"
 #include <hardware/pci.h>
 #include <memory/heap.h>
 #include <memory/paging.h>
@@ -57,6 +58,11 @@ void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset
 	uint32_t id = 0x1 << 31 | ((bus & 0xFF) << 16) | ((device & 0x1F) << 11) | ((function & 0x07) << 8) | (offset & 0xFC);
 	outl(COMMAND_PORT, id);
 	outl(DATA_PORT, value);
+}
+
+void pci_set_command_bits(uint16_t bus, uint16_t device, uint16_t function, uint16_t mask)
+{
+	pci_write32(bus, device, function, 0x4, pci_read32(bus, device, function, 0x4) | mask);
 }
 
 void pci_enumerate_devices(int debug)
@@ -128,6 +134,33 @@ void pci_enumerate_devices(int debug)
 	}
 }
 
+void pci_init_devices()
+{
+	for(int i = 0; i < g_pci_num_devices; i++)
+	{
+		DeviceDescriptor* device = &g_pci_devices[i];
+
+		switch(device->class_id)
+		{
+			case 0xC:
+				switch(device->subclass_id)
+				{
+					case 0x3:
+						usb_init_controller(device);
+						break;
+
+					default:
+						break;
+				}
+
+				break;
+
+			default:
+				break;
+		}
+	}
+}
+
 void get_driver(DeviceDescriptor* device_descriptor)
 {
 	switch(device_descriptor->vendor_id)
@@ -192,6 +225,16 @@ uint16_t pci_get_interrupt(uint16_t bus, uint16_t device, uint16_t function)
 uint16_t pci_get_prog_if(uint16_t bus, uint16_t device, uint16_t function)
 {
 	return pci_read8(bus, device, function, 0x9);
+}
+
+void pci_enable_bus_mastering(DeviceDescriptor* device)
+{
+	pci_set_command_bits(device->bus, device->device_id, device->function, (1 << 2));
+}
+
+void pci_enable_memory(DeviceDescriptor* device)
+{
+	pci_set_command_bits(device->bus, device->device_id, device->function, (1 << 1));
 }
 
 BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
