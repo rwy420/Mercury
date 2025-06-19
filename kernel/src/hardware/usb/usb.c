@@ -18,7 +18,10 @@ void usb_init()
 			{
 				case 0x30:
 					printf("<Mercury> Found xHCI USB Controller\n");
-					xhci_take_ownership(device);
+					if(xhci_take_ownership(device))
+						printf("<Mercury> Took ownership of xHCI Controller\n");
+					else
+						printf("<Mercury> Failed to take ownership of xHCI Controller\n");
 					break;
 
 				default:

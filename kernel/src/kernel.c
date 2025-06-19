@@ -29,6 +29,7 @@
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
 extern Disk* g_default_disk;
+extern uint32_t g_ms_since_init;
 
 uint32_t kernel_start_address;
 uint32_t kernel_end_address;
@@ -142,9 +143,11 @@ void v_kernel_start()
 	enable_all_drivers();
 
 	tasks_init();
-	register_interrupt_handler(0x20, schedule);
-
+	pit_set_schedule(true);
+		
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
+
+	
 
 	while(1);
 }

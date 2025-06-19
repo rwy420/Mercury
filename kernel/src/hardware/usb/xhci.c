@@ -2,6 +2,7 @@
 #include <hardware/usb/xhci_structs.h>
 #include <memory/paging.h>
 #include <common/screen.h>
+#include <hardware/pit.h>
 
 int xhci_take_ownership(DeviceDescriptor* device)
 {
@@ -28,8 +29,11 @@ int xhci_take_ownership(DeviceDescriptor* device)
 
 			legacy->hc_os_owned = true;
 
-			//TODO: Timeout timer to set ownership
-			
+			const uint32_t timeout = ms_since_init() + 1000;
+			while(legacy->hc_bios_owned)
+				if(ms_since_init() > timeout)
+					return false;
+
 			return true;
 		}
 
