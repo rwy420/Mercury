@@ -68,6 +68,7 @@ PageDirectory* create_kernel_pd();
 void flush_tlb_entry(uint32_t v_address);
 void map_page_pd(PageDirectory* pd, void* p_address, void* v_address);
 void map_page(void* p_address, void* v_address);
+void map_page_pd_flags(PageDirectory* pd, void* p_address, void* v_address, int flags);
 
 int paging_init();
 void handle_page_fault(CPUState* cpu);

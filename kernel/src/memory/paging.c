@@ -75,8 +75,13 @@ void flush_tlb_entry(uint32_t v_address)
 
 void map_page_pd(PageDirectory* pd, void* phys_addr, void* virt_addr)
 {
-    uint32_t paddr = (uint32_t)phys_addr;
-    uint32_t vaddr = (uint32_t)virt_addr;
+	map_page_pd_flags(pd, phys_addr, virt_addr, PDE_PRESENT | PDE_RW | PDE_USER);
+}
+
+void map_page_pd_flags(PageDirectory* pd, void* p_address, void* v_address, int flags)
+{
+    uint32_t paddr = (uint32_t)p_address;
+    uint32_t vaddr = (uint32_t)v_address;
 
     uint32_t pd_index = PD_INDEX(vaddr);
     uint32_t pt_index = PT_INDEX(vaddr);
@@ -85,11 +90,11 @@ void map_page_pd(PageDirectory* pd, void* phys_addr, void* virt_addr)
     if (!(pd->entries[pd_index] & PDE_PRESENT)) {
         PageTable* pt = (PageTable*) kmalloc_aligned(4096, 4096);
         memset(pt, 0, sizeof(PageTable));
-        pd->entries[pd_index] = virtual_to_physical(pt) | PDE_PRESENT | PDE_RW | PDE_USER;
+        pd->entries[pd_index] = virtual_to_physical(pt) | flags;
     }
 
     PageTable* pt = (PageTable*) PAGE_PHYS_ADDRESS(&pd->entries[pd_index]);
-    pt->entries[pt_index] = paddr | PTE_PRESENT | PTE_RW | PTE_USER;
+    pt->entries[pt_index] = paddr | flags;
 
     flush_tlb_entry(vaddr);
 }

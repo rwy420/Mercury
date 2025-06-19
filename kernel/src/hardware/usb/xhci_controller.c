@@ -6,47 +6,19 @@
 #include <hardware/pit.h>
 
 xHCIController xhci_controller;
+extern PageDirectory* g_kernel_pd;
 
 int xhci_take_ownership(DeviceDescriptor* device)
 {
 	BAR* bar = device->bars[0];
-
-	printf("xHCI BAR at: 0x");
-	print_hex32(bar->address);
-	printf(" with size of 0x");
-	print_hex32(bar->size);
-	printf("\n");
-
-	for(uint32_t i = bar->address; i < bar->address + bar->size; i += PAGE_SIZE) map_page((void*) i, (void*) i);
+	for(uint32_t i = bar->address; i < bar->address + bar->size * 2; i += PAGE_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i, 
+			PDE_PRESENT | PDE_RW | PDE_CACHE_DISABLE | PDE_WRITE_THROUGH);
 
 	pci_enable_bus_mastering(device);
 	pci_enable_memory(device);
 
-	xHCICapabilityRegs* capabilities = (xHCICapabilityRegs*) bar->address;
+	volatile xHCICapabilityRegs* capabilities = (volatile xHCICapabilityRegs*) bar->address;
 	uint16_t extented_offset = capabilities->hccparams_1.xhci_extented_capability_pointer;
-
-	for(int i = 0; i < 0x100; i += 0x10)
-	{
-		print_hex(i);
-		printf(": ");
-		for(int j = 0; j < 0x10; j++)
-		{
-			uint8_t offset = i + j;
-			print_hex(((uint8_t*) bar->address)[offset]);
-			printf(" ");
-		}
-		printf("\n");
-	}
-
-	uint16_t ext_off = *(uint16_t*) &capabilities + 0x10;
-
-	extented_offset = ext_off;
-
-	printf("EXT: ");
-	print_hex32(ext_off);
-	printf(" AT ADDRESS ");
-	print_hex32((uint32_t) &capabilities->hccparams_1.xhci_extented_capability_pointer);
-	printf("\n");
 
 	if(extented_offset == 0x0)
 	{
@@ -54,17 +26,15 @@ int xhci_take_ownership(DeviceDescriptor* device)
 		return false;
 	}
 
-
-
 	uint32_t extented_address = bar->address + extented_offset * 4;
 
 	while(true)
 	{
-		xHCIExtentedCap* extented_cap = (xHCIExtentedCap*) extented_address;
+		volatile xHCIExtentedCap* extented_cap = (volatile xHCIExtentedCap*) extented_address;
 
 		if(extented_cap->capablity_id == USB_LEGACY_SUPPORT)
 		{
-			xHCILegacyUSBSupportCap* legacy = (xHCILegacyUSBSupportCap*) extented_address;
+			volatile xHCILegacyUSBSupportCap* legacy = (volatile xHCILegacyUSBSupportCap*) extented_address;
 			if(!legacy->hc_bios_owned) return true;
 
 			legacy->hc_os_owned = true;

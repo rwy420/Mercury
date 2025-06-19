@@ -29,7 +29,7 @@ rebuild: kernel.elf
 
 
 qemu:
-	qemu-system-x86_64 -enable-kvm -cpu host -drive file=kernel.img,if=none,id=disk,format=raw -usb -device qemu-xhci -device usb-storage,drive=disk -device rtl8139,netdev=net0 -netdev user,id=net0 -m 2048M
+	qemu-system-x86_64 -enable-kvm -cpu host -device qemu-xhci -device usb-storage,drive=disk -drive file=kernel.img,if=none,id=disk,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0 -m 2048M -no-reboot -no-shutdown
 
 bochs:
 	bochs -f bochs_config

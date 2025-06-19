@@ -1,6 +1,6 @@
 GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
 			-fno-leading-underscore -fno-stack-protector -Wwrite-strings \
-			-Os -ffunction-sections -fdata-sections -mno-sse -msoft-float -finline-small-functions
+			-Os -ffunction-sections -fdata-sections -mno-sse -msoft-float -finline-small-functions -fstrict-volatile-bitfields
 
 ASPARAMS = --32
 NASMPARAMS = -felf32

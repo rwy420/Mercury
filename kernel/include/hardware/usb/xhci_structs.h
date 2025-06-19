@@ -7,71 +7,96 @@
 
 typedef struct
 {
-	uint8_t cap_length;
-	uint8_t rsvd1;
-	uint16_t hci_version;
+	uint32_t cap_length		: 8;
+	uint32_t rsvd1			: 8;
+	uint32_t hci_version	: 16;
 
-	struct
+	union
 	{
-		uint8_t max_slots;
-		uint16_t max_ints : 11;
-		uint8_t rsvd2 : 5;
-		uint8_t max_ports;
-	} hcsparams_1;
+		uint32_t hcsparams_1_raw;
 
+		struct
+		{
+			uint32_t max_slots	: 8;
+			uint32_t max_ints	: 11;
+			uint32_t rsvd2		: 5;
+			uint32_t max_ports	: 8;
+		} hcsparams_1;
+	};
 
-	struct
+	union
 	{
-		uint8_t isocronous_sched_treshold : 4;
-		uint8_t event_ring_segment_table_max : 4;
-		uint16_t rsvd3 : 13;
-		uint8_t max_scratchpad_buffers_hi : 5;
-		uint8_t scrachpad_restore : 1;
-		uint8_t max_scratchpad_buffers_lo : 5;
-	} hcsparams_2;
+		uint32_t hcsparams_2_raw;
+		
+		struct
+		{
+			uint32_t isocronous_sched_treshold		: 4;
+			uint32_t event_ring_segment_table_max	: 4;
+			uint32_t rsvd3							: 13;
+			uint32_t max_scratchpad_buffers_hi		: 5;
+			uint32_t scrachpad_restore				: 1;
+			uint32_t max_scratchpad_buffers_lo		: 5;
+		} hcsparams_2;
+	};
 
-	struct
+	union
 	{
-		uint8_t u1_device_exit_latency;
-		uint8_t rsvd4;
-		uint16_t u2_device_exit_latency;
-	} hcsparams_3;
+		uint32_t hcsparams_3_raw;
 
-	struct
+		struct
+		{
+			uint32_t u1_device_exit_latency : 8;
+			uint32_t rsvd4					: 8;
+			uint32_t u2_device_exit_latency : 16;
+		} hcsparams_3;
+	};
+
+	union
 	{
-		uint8_t addressing_capability_64 : 1;
-		uint8_t bw_negotiation_capability : 1;
-		uint8_t context_size : 1;
-		uint8_t port_power_control : 1;
-		uint8_t port_indicators : 1;
-		uint8_t light_hc_reset_capability : 1;
-		uint8_t latency_tolerance_messaging_capability : 1;
-		uint8_t no_secondary_sid_support : 1;
-		uint8_t parse_all_event_data : 1;
-		uint8_t stopped_short_packet_capability : 1;
-		uint8_t stopped_edtla_capability : 1;
-		uint8_t contignous_frame_id_capability : 1;
-		uint8_t maximum_primary_stream_array_size : 4;
-		uint16_t xhci_extented_capability_pointer;
-	} hccparams_1;
+		uint32_t hccparams_1_raw;
+
+		struct
+		{
+			uint32_t addressing_capability_64 : 1;
+			uint32_t bw_negotiation_capability : 1;
+			uint32_t context_size : 1;
+			uint32_t port_power_control : 1;
+			uint32_t port_indicators : 1;
+			uint32_t light_hc_reset_capability : 1;
+			uint32_t latency_tolerance_messaging_capability : 1;
+			uint32_t no_secondary_sid_support : 1;
+			uint32_t parse_all_event_data : 1;
+			uint32_t stopped_short_packet_capability : 1;
+			uint32_t stopped_edtla_capability : 1;
+			uint32_t contignous_frame_id_capability : 1;
+			uint32_t maximum_primary_stream_array_size : 4;
+			uint32_t xhci_extented_capability_pointer : 16;
+		} hccparams_1;
+	};
 
 	uint32_t dboff;
 	uint32_t rstoff;
-
-	struct
+	
+	union
 	{
-		uint8_t u3_entry_capability : 1;
-		uint8_t configure_endpoint_command_max_latency_too_large_capability : 1;
-		uint8_t force_save_context_capability : 1;
-		uint8_t compliance_transition_capability : 1;
-		uint8_t large_esit_payload_capability : 1;
-		uint8_t configuration_information_capability : 1;
-		uint8_t extented_tbc_capability : 1;
-		uint8_t extented_tbc_trb_status_capability : 1;
-		uint8_t get_set_extented_property_capability : 1;
-		uint32_t rsvd5 : 22;
-	} hccparams_2;
-} __attribute__((packed)) xHCICapabilityRegs;
+		uint32_t hccparams_2_raw;
+
+		struct
+		{
+			uint32_t u3_entry_capability : 1;
+			uint32_t configure_endpoint_command_max_latency_too_large_capability : 1;
+			uint32_t force_save_context_capability : 1;
+			uint32_t compliance_transition_capability : 1;
+			uint32_t large_esit_payload_capability : 1;
+			uint32_t configuration_information_capability : 1;
+			uint32_t extented_tbc_capability : 1;
+			uint32_t extented_tbc_trb_status_capability : 1;
+			uint32_t get_set_extented_property_capability : 1;
+			uint32_t rsvd5 : 22;
+		} hccparams_2;
+	};
+
+} xHCICapabilityRegs;
 
 typedef struct
 {
