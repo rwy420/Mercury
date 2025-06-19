@@ -37,6 +37,8 @@ void usb_init_controller(DeviceDescriptor* device)
 		case 0x30:
 			if(!xhci_create_controller(device))
 				printf("<Mercury> Failed to initialize xHCI Controller\n");
+			else
+				printf("<Mercury> Initialized xHCI Controller\n");
 			break;
 
 		default:

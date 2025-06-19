@@ -8,8 +8,9 @@
 
 typedef enum 
 {
-	MM = 0,
-	IO = 1
+	INVALID,
+	MM,
+	IO
 } BAR_TYPE;
 
 typedef struct
@@ -26,7 +27,7 @@ typedef struct
 	uint16_t bus, function;
 	uint8_t class_id, subclass_id, prog_if;
 	uint32_t interrupt;
-	BAR** bars;
+	BAR* bars[6];
 } DeviceDescriptor;
 
 uint32_t pci_read32(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset);

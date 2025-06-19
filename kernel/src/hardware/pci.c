@@ -97,10 +97,9 @@ void pci_enumerate_devices(int debug)
 				device_descriptor->class_id = pci_get_class_id(bus, device, function);
 				device_descriptor->subclass_id = pci_get_subclass_id(bus, device, function);
 
-				for(uint8_t bar_idx = 0; bar_idx < 6; bar_idx++)
+				for(uint8_t bar_idx = 0; bar_idx < 5; bar_idx++)
 				{
-					BAR* bar = pci_get_bar(bus, device, function, bar_idx);
-					device_descriptor->bars[bar_idx] = bar;
+					device_descriptor->bars[bar_idx] = pci_get_bar(bus, device, function, bar_idx);
 				}
 
 				if(debug) 
@@ -244,8 +243,10 @@ BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 
 	if(bar >= max_bars) return NULL_PTR;
 
-	uint8_t bar_offset = 0x10 + 4 * bar;
 	BAR* result = kmalloc(sizeof(BAR));
+	memset(result, 0, sizeof(BAR));
+
+	uint8_t bar_offset = 0x10 + 4 * bar;
 
 	uint32_t bar_value = pci_read32(bus, device, function, bar_offset);
 
