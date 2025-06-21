@@ -1,9 +1,10 @@
-#include "hardware/dma.h"
-#include "hardware/interrupts.h"
 #include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/xhci_structs.h>
+#include <hardware/interrupts.h>
+#include <hardware/dma.h>
+#include <memory/heap.h>
 #include <memory/paging.h>
-#include <memory/paging.h>
+#include <memory/frames.h>
 #include <common/screen.h>
 #include <memory/common.h>
 #include <hardware/pit.h>
@@ -120,6 +121,10 @@ int xhci_init_controller(DeviceDescriptor* device)
 	operational->crcr_hi = command_ring_phsy >> 32;
 
 	if(!xchi_init_primary_int()) return false;
+	if(!xhci_init_scratchpad()) return false;
+
+	operational->usb_cmd.run_stop = 1;
+	while(operational->usbsts & HC_HALTED) continue;
 
 	return true;
 }
@@ -202,6 +207,33 @@ int xchi_init_primary_int()
 	primary_interrupter->iman = primary_interrupter->iman | INTERRUPT_PEDNING | INTERRUPT_ENBLE;
 
 	register_interrupt_handler(xhci_controller.irq, (isr_t) xhci_handle_interrupt);
+
+	return true;
+}
+
+int xhci_init_scratchpad()
+{
+	volatile xHCICapabilityRegs* capabilities = xhci_controller.capability_regs;
+
+	const uint32_t max_scratchpads = (capabilities->hcsparams_2.max_scratchpad_buffers_hi << 5) | capabilities->hcsparams_2.max_scratchpad_buffers_lo;
+	if(max_scratchpads == 0) return true;
+
+	printf("<CPU> xHCI Controller is using scratchpads\n");
+
+	xhci_controller.scrachpad_buffer_region = dma_create(max_scratchpads * sizeof(uint64_t));
+	uint64_t* scratchpad_buffer_array = (uint64_t*) xhci_controller.scrachpad_buffer_region->phys;
+	xhci_controller.scratchpad_buffers = kmalloc(sizeof(uint32_t) * max_scratchpads);
+
+	for(int i = 0; i < max_scratchpads; i++)
+	{
+		const uint32_t address = (uint32_t) alloc_frame();
+		if(address == 0) return false;
+
+		xhci_controller.scratchpad_buffers[i] =	address;
+		scratchpad_buffer_array[i] = address;
+	} 
+
+	*(uint64_t*) xhci_controller.dcbaa_region->phys = xhci_controller.scrachpad_buffer_region->phys;
 
 	return true;
 }

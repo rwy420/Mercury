@@ -19,6 +19,8 @@ typedef struct
 	DMARegion* dcbaa_region;
 	DMARegion* command_ring_region;
 	DMARegion* event_ring_region;
+	DMARegion* scrachpad_buffer_region;
+	uint32_t* scratchpad_buffers;
 } xHCIController;
 
 int xhci_take_ownership(DeviceDescriptor* device);
@@ -27,6 +29,7 @@ int xhci_init_controller(DeviceDescriptor* device);
 int xhci_init_ports();
 int xchi_init_primary_int();
 int xhci_reset_controller();
+int xhci_init_scratchpad();
 
 void xhci_handle_interrupt();
 
