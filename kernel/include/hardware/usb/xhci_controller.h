@@ -9,12 +9,14 @@ typedef struct
 	volatile xHCICapabilityRegs* capability_regs;
 	volatile xHCIOperationalRegs* operational_regs;
 	volatile xHCIRuntimeRegs* runtime_regs;
+	xHCIPort ports[0x10];
+	uint32_t bar0;
 } xHCIController;
 
 int xhci_take_ownership(DeviceDescriptor* device);
 int xhci_create_controller(DeviceDescriptor* device);
 int xhci_init_controller(DeviceDescriptor* device);
-
+int xhci_init_ports();
 int xhci_reset_controller();
 
 #endif

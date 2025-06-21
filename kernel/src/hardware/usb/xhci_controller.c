@@ -66,7 +66,7 @@ int xhci_create_controller(DeviceDescriptor* device)
 
 int xhci_init_controller(DeviceDescriptor* device)
 {
-	printf("<Mercury> Initializing xHCI Controller at ");
+	printf("<USB> Initializing xHCI Controller at ");
 	print_hex(device->bus);
 	printf(" ");
 	print_hex(device->device_id);
@@ -76,21 +76,84 @@ int xhci_init_controller(DeviceDescriptor* device)
 
 	BAR* bar = device->bars[0];
 
-
-
 	xhci_controller.capability_regs = (volatile xHCICapabilityRegs*) bar->address;
 	xhci_controller.operational_regs = (volatile xHCIOperationalRegs*) (bar->address + xhci_controller.capability_regs->cap_length);
 	xhci_controller.runtime_regs = (volatile xHCIRuntimeRegs*) (bar->address + (xhci_controller.capability_regs->rstoff & ~0x1Fu));
-
+	xhci_controller.bar0 = bar->address;
 
 	if(bar->type != MM) return false;
 	if(!xhci_reset_controller()) return false;
 
-	printf("<Mercury> xHCI Version: ");
+	printf("<USB>   xHCI Version: ");
 	print_hex(xhci_controller.capability_regs->hci_version >> 8);
 	printf(".");
 	print_hex(xhci_controller.capability_regs->hci_version & 0xFF);
 	printf("\n");
+
+	printf("<USB>   Max slots ");
+	print_hex32(+xhci_controller.capability_regs->hcsparams_1.max_slots);
+	printf("\n<USB>   Max intrs ");
+	print_hex32(+xhci_controller.capability_regs->hcsparams_1.max_ints);
+	printf("\n<USB>   Max ports ");
+	print_hex32(+xhci_controller.capability_regs->hcsparams_1.max_ports);
+	printf("\n");
+
+	if(!xhci_init_ports()) return false;
+
+	return true;
+}
+
+int xhci_init_ports()
+{
+	volatile xHCICapabilityRegs* capabilities  = xhci_controller.capability_regs;
+	uint8_t max_ports = capabilities->hcsparams_1.max_ports;
+
+
+	uint16_t extented_offset = capabilities->hccparams_1.xhci_extented_capability_pointer;
+	uint32_t extented_address = xhci_controller.bar0 + extented_offset * 4;
+
+	while(true)
+	{
+		const volatile xHCIExtentedCap* ext_cap = (volatile xHCIExtentedCap*) extented_address;
+
+		if(ext_cap->capablity_id == SUPPORTED_PROTOCOL)
+		{
+			const volatile xHCISupportedProtocolCap* protocol = (volatile xHCISupportedProtocolCap*) ext_cap;
+			const uint32_t protocol_name = ' BSU'; // "USB "
+
+			if(protocol->name_string != protocol_name)
+			{
+				printf("<USB> Invalid protocol name\n");
+				return false;
+			}
+
+			if(protocol->compatible_port_offset == 0 || protocol->compatible_port_offset + protocol->compatible_port_count -  1 > max_ports)
+			{
+				printf("<USB> Invalid ports\n");
+				return false;
+			}
+
+			if(protocol->protocol_slot_type != 0)
+			{
+				printf("<USB> Invalid slot type\n");
+				return false;
+			}
+
+			for(uint32_t i = 0; i < protocol->compatible_port_count; i++)
+			{
+				xHCIPort* port = &xhci_controller.ports[i];
+				port->revision_major = protocol->major_version;
+				port->revision_minor = protocol->minor_version;
+			}
+		}
+
+		if(ext_cap->next_capability == 0) break;
+
+		extented_address += ext_cap->next_capability * 4;
+	}
+	
+
+	xhci_controller.operational_regs->config.max_device_slots_enabled = capabilities->hcsparams_1.max_slots;
 
 	return true;
 }

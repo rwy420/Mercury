@@ -100,20 +100,35 @@ typedef struct
 
 typedef struct
 {
-	uint8_t capablity_id;
-	uint8_t next_capability;
-	uint16_t rsvd;
+	uint32_t capablity_id : 8;
+	uint32_t next_capability : 8;
+	uint32_t rsvd : 16;
 } xHCIExtentedCap;
 
 typedef struct
 {
-	uint8_t capablity_id;
-	uint8_t next_capability;
-	uint8_t hc_bios_owned : 1;
-	uint8_t rsvd1 : 7;
-	uint8_t hc_os_owned : 1;
-	uint8_t rsvd2;
+	uint32_t capablity_id;
+	uint32_t next_capability;
+	uint32_t hc_bios_owned : 1;
+	uint32_t rsvd1 : 7;
+	uint32_t hc_os_owned : 1;
+	uint32_t rsvd2;
 } xHCILegacyUSBSupportCap;
+
+typedef struct
+{
+	uint32_t capablity_id : 8;
+	uint32_t next_capability : 8;
+	uint32_t minor_version : 8;
+	uint32_t major_version  : 8;
+	uint32_t name_string : 32;
+	uint32_t compatible_port_offset : 8;
+	uint32_t compatible_port_count : 8;
+	uint32_t protocol_defied : 12;
+	uint32_t protocol_speed_id_ount : 4;
+	uint32_t protocol_slot_type : 5;
+	uint32_t rsvd : 27;
+} xHCISupportedProtocolCap;
 
 typedef struct
 {
@@ -125,27 +140,34 @@ typedef struct
 
 typedef struct
 {
+	uint8_t revision_major;
+	uint8_t revision_minor;
+	uint8_t slot_id;
+} xHCIPort;
+
+typedef struct
+{
 	union
 	{
 		uint32_t usb_cmd_raw;
 
 		struct
 		{
-			uint8_t run_stop : 1;
-			uint8_t host_controller_reset : 1;
-			uint8_t interrupter_enable : 1;
-			uint8_t host_system_error_enable : 1;
-			uint8_t rsvd1 : 3;
-			uint8_t light_host_controller_reset : 1;
-			uint8_t controller_save_state : 1;
-			uint8_t controller_restore_state : 1;
-			uint8_t controller_wrap_event : 1;
-			uint8_t enable_u3_mf_index_stop : 1;
-			uint8_t rsvd2 : 1;
-			uint8_t cem_enable : 1;
-			uint8_t extented_tbc_enable : 1;
-			uint8_t extented_tbc_trb_status_enable : 1;
-			uint8_t vtio_enable : 1;
+			uint32_t run_stop : 1;
+			uint32_t host_controller_reset : 1;
+			uint32_t interrupter_enable : 1;
+			uint32_t host_system_error_enable : 1;
+			uint32_t rsvd1 : 3;
+			uint32_t light_host_controller_reset : 1;
+			uint32_t controller_save_state : 1;
+			uint32_t controller_restore_state : 1;
+			uint32_t controller_wrap_event : 1;
+			uint32_t enable_u3_mf_index_stop : 1;
+			uint32_t rsvd2 : 1;
+			uint32_t cem_enable : 1;
+			uint32_t extented_tbc_enable : 1;
+			uint32_t extented_tbc_trb_status_enable : 1;
+			uint32_t vtio_enable : 1;
 			uint16_t rsvd3 : 15;
 		} usb_cmd;
 	};
@@ -166,9 +188,9 @@ typedef struct
 
 		struct
 		{
-			uint8_t max_device_slots_enabled;
-			uint8_t u3_entry_enable : 1;
-			uint8_t configuration_information_enable : 1;
+			uint32_t max_device_slots_enabled : 8;
+			uint32_t u3_entry_enable : 1;
+			uint32_t configuration_information_enable : 1;
 			uint32_t rsvd5 : 22;
 		} config;
 	};
@@ -197,7 +219,8 @@ typedef struct
 
 typedef enum
 {
-	USB_LEGACY_SUPPORT = 1
+	USB_LEGACY_SUPPORT = 1,
+	SUPPORTED_PROTOCOL = 2,
 } XHCI_EXTENTED_CAPABILITY_ID;
 
 typedef enum
