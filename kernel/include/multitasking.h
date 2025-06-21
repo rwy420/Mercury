@@ -21,12 +21,13 @@ typedef struct Task
 	uint32_t eax, ebx, ecx, edx, esi, edi;
 	uint32_t cr3;
 	uint32_t flags;
+	int kernel;
 	TASK_STATE state;
 	struct Task* next;
 } __attribute__((packed)) Task;
 
 void tasks_init();
-Task* create_task(void(*entry)());
+Task* create_task(void(*entry)(), int kernel);
 void kill_task(uint8_t id);
 void schedule(CPUState* cpu);
 

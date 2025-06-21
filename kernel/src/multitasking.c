@@ -61,9 +61,9 @@ void tasks_init()
 	task_list = NULL_PTR;
 	g_current_task = NULL_PTR;
 
-	create_task(idle_task);
-	create_task(idle_task);
-	create_task(idle_task2);
+	create_task(idle_task, false);
+	create_task(idle_task, true);
+	create_task(idle_task2, false);
 
 	/*int fd = fat16_open("/BIN/APP.ELF", 'r');
 	int size = fat16_size("/BIN/APP.ELF");
@@ -74,28 +74,33 @@ void tasks_init()
 	create_task(entry);*/
 }
 
-Task* create_task(void(*entry)())
+Task* create_task(void(*entry)(), int kernel)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
 
 	Task* task = (Task*) kmalloc(sizeof(Task));
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
-
-	PageDirectory* pd = create_kernel_pd();
-
+	
 	void* stack_frame = alloc_frame();
 	map_page(stack_frame, stack_frame);
-	map_page_pd(pd, stack_frame, stack_frame);
 	memset(stack_frame, 0x0, 0x1000);
 	uint32_t esp = ((uint32_t) stack_frame) + 0xFFA;
+	
+	if(!kernel)
+	{
+		PageDirectory* pd = create_kernel_pd();
+		map_page_pd(pd, stack_frame, stack_frame);
+		task->cr3 = virtual_to_physical(pd);
+	}
+	else
+	{
+		task->cr3 = (uint32_t) g_kernel_pd;
+	}
 
+	task->kernel = kernel;
 	task->esp = esp;
 	task->eip = (uint32_t) entry;
-	task->cr3 = virtual_to_physical(pd);
-
-	set_pd((PageDirectory*) task->cr3);
-	set_pd(g_kernel_pd);
 
 	task->id = next_id++;
 	task->state = TASK_READY;
