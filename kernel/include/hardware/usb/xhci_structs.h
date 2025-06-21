@@ -431,4 +431,12 @@ typedef enum
 	CONTROLLER_NOT_READY = 1 << 11
 } XHCI_USB_STATUS;
 
+typedef enum : uint32_t
+{
+	RING_CYCLE_STATE = 1 << 0,
+	COMMAND_STOP = 1 << 1,
+	COMMAND_ABOIRT = 1 << 2,
+	COMMAND_RING_RUNNING = 1 << 3
+} XHCI_CRCR;
+
 #endif

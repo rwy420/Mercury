@@ -104,14 +104,17 @@ int xhci_init_controller(DeviceDescriptor* device)
 	if(!xhci_init_ports()) return false;
 
 	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
-	uint32_t dma_size = capabilities->hcsparams_1.max_slots * 8;
 	xhci_controller.dcbaa_region = dma_create(capabilities->hcsparams_1.max_slots * 8);
 	memset((void*) xhci_controller.dcbaa_region->phys, 0, xhci_controller.dcbaa_region->size);
 	uint64_t dcbaap_phys = xhci_controller.dcbaa_region->phys;
 	operational->dcbaap_lo = dcbaap_phys & 0xFFFFFFFF;
 	operational->dcbaap_hi = dcbaap_phys >> 32;
 
-	print_hex32(sizeof(xHCITRB));
+	xhci_controller.command_ring_region = dma_create(0x100 * sizeof(xHCITRB));
+	memset((void*) xhci_controller.command_ring_region->phys, 0, xhci_controller.command_ring_region->size);
+	uint64_t command_ring_phsy = xhci_controller.command_ring_region->phys;
+	operational->crcr_lo = command_ring_phsy | RING_CYCLE_STATE;
+	operational->crcr_hi = command_ring_phsy >> 32;
 
 	return true;
 }
