@@ -45,3 +45,17 @@ void usb_init_controller(DeviceDescriptor* device)
 			break;
 	}
 }
+
+USB_SPEED usb_speed_to_class(uint8_t speed_id)
+{
+	switch(speed_id)
+	{
+		case 1: return LOW_SPEED;
+		case 2: return FULL_SPEED;
+		case 3: return HIGH_SPEED;
+		case 4: return SUPER_SPEED;
+	}
+
+	// TODO ERROR
+	return 0;
+}

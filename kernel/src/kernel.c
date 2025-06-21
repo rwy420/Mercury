@@ -72,7 +72,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	print_hex32(heap_max);
 	printf("\n<Mercury> Switching to higher half\n");
 
-	v_kernel_start();
+	v_kernel();
 }
 
 void v_kernel_start()
@@ -122,6 +122,7 @@ void v_kernel_start()
 	print_uint32_t(frame_allocator_size / 0x400 / 0x400);
 	printf(" MB initialized\n");
 
+	tasks_init();
 	symtable_init();
 	init_drivers();
 
@@ -144,7 +145,6 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	tasks_init();
 	pit_set_schedule(true);
 		
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);

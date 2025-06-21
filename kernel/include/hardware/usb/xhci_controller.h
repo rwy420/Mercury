@@ -7,6 +7,7 @@
 #include <hardware/usb/xhci_structs.h>
 #include <hardware/pci.h>
 #include <hardware/dma.h>
+#include <hardware/usb/usb.h>
 
 typedef struct
 {
@@ -30,7 +31,10 @@ int xhci_init_ports();
 int xchi_init_primary_int();
 int xhci_reset_controller();
 int xhci_init_scratchpad();
+uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id);
+int xhci_deinitialize_slot(uint8_t slot_id);
 
 void xhci_handle_interrupt();
+void xhci_port_updater_task();
 
 #endif

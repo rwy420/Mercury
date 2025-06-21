@@ -25,10 +25,7 @@ uint32_t heap_init(size_t start, size_t size)
 	for(uint32_t address = 0xC0400000; address < start + size - 0x200000; address += PAGE_SIZE)
 	{
 		max = address + 0x1000;
-
-		//TODO: make sure this works
-		uint32_t addr = address - 0xC0000000;
-		//map_page((void*) address, (void*) addr);
+		map_page((void*) address, (void*) address);
 	}
 
 	return max;

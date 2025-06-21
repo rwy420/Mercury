@@ -20,13 +20,6 @@ uint32_t next_id = 1;
 extern TSS g_tss;
 extern PageDirectory* g_kernel_pd;
 
-// Messages need to have a fixed memory address
-char* msg1 = "Task: ";
-char* msg3 = "Task2: ";
-char* msg2 = "\n";
-
-void kernel_schedule();
-
 void dummy_task()
 {
 	asm("int $32");
@@ -37,9 +30,9 @@ void idle_task()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		printf(msg1);
+		printf("Task 1 ");
 		print_hex32(counter++);
-		printf(msg2);
+		printf("\n");
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -49,9 +42,9 @@ void idle_task2()
 	static uint32_t counter = 0;
 	while(1)
 	{
-		printf(msg3);
+		printf("Task 2 ");
 		print_hex32(counter++);
-		printf(msg2);
+		printf("\n");
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
@@ -82,10 +75,10 @@ Task* create_task(void(*entry)(), int kernel)
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 	
-	void* stack_frame = alloc_frame();
-	map_page(stack_frame, stack_frame);
-	memset(stack_frame, 0x0, 0x1000);
-	uint32_t esp = ((uint32_t) stack_frame) + 0xFFA;
+	void* stack_frame = alloc_frames(4);
+	for(uint32_t i = (uint32_t) stack_frame; i < (uint32_t) stack_frame + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page((void*) i, (void*) i);
+	memset(stack_frame, 0x0, 0x4000);
+	uint32_t esp = ((uint32_t) stack_frame) + 0x3000;
 	
 	if(!kernel)
 	{

@@ -8,6 +8,7 @@
 #include <common/screen.h>
 #include <memory/common.h>
 #include <hardware/pit.h>
+#include <multitasking.h>
 
 xHCIController xhci_controller;
 extern PageDirectory* g_kernel_pd;
@@ -125,6 +126,8 @@ int xhci_init_controller(DeviceDescriptor* device)
 
 	operational->usb_cmd.run_stop = 1;
 	while(operational->usbsts & HC_HALTED) continue;
+
+	create_task(xhci_port_updater_task, true);
 
 	return true;
 }
@@ -255,7 +258,32 @@ int xhci_reset_controller()
 	return true;
 }
 
+uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id)
+{
+	//printf("INIT USB DEVICE");
+
+	return true;
+}
+
+int xhci_deinitialize_slot(uint8_t slot_id)
+{
+	return true;
+}
+
 void xhci_handle_interrupt()
 {
 	printf("xHCI Interrupt\n");
+}
+
+extern uint32_t g_ms_since_init;
+
+void xhci_port_updater_task()
+{
+	while(1)
+	{
+		print_hex32(ms_since_init());
+		printf(" ");
+
+		for(volatile uint32_t i = 0; i < 0x6000000; i++);
+	}
 }

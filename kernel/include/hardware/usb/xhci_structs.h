@@ -197,7 +197,6 @@ typedef struct
 
 	uint32_t rsvd5[241];
 	xHCIPortRegs ports[];
-
 } xHCIOperationalRegs;
 
 typedef struct
@@ -464,5 +463,18 @@ typedef enum : uint32_t
 	INTERRUPT_PEDNING = 1 << 0,
 	INTERRUPT_ENBLE = 1 << 1
 } XHCI_EMAN;
+
+typedef enum : uint32_t
+{
+	CCS = 1u < 0,
+	PED = 1u << 1,
+	PR = 1u << 4,
+	PP = 1u << 9,
+	CSC = 1u << 17,
+	PRC = 1u << 21,
+
+	PORT_SPEED_SHIFT = 10,
+	PORT_SPEED_MASK = 0xF
+} PORTSC;
 
 #endif

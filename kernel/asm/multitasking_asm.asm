@@ -10,20 +10,24 @@ restore_and_switch:
 	add eax, 13
 	mov eax, [eax]
 
+	mov ebx, [g_current_task]
+	add ebx, 17
+	mov ebx, [ebx]
+
 	mov ecx, [g_current_task]
-	add ecx, 17
+	add ecx, 21
 	mov ecx, [ecx]
 
 	mov edx, [g_current_task]
-	add edx, 21
+	add edx, 25
 	mov edx, [edx]
 
 	mov esi, [g_current_task]
-	add esi, 25
+	add esi, 29
 	mov esi, [esi]
 
 	mov edi, [g_current_task]
-	add edi, 29
+	add edi, 33
 	mov edi, [edi]
 
 	cli
