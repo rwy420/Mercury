@@ -39,7 +39,7 @@ void pci_write(uint16_t bus, uint16_t device, uint16_t function, uint32_t offset
 
 void pci_set_command_bits(uint16_t bus, uint16_t device, uint16_t function, uint16_t mask);
 
-void pci_enumerate_devices(int debug);
+void pci_enumerate_devices();
 void pci_init_devices();
 void get_driver(DeviceDescriptor* device_descriptor);
 DeviceDescriptor* pci_get_devices();

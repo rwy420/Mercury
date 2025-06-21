@@ -125,12 +125,13 @@ void v_kernel_start()
 	symtable_init();
 	init_drivers();
 
-	printf("<Mercury> Searching PCI deivce drivers\n");
-	pci_enumerate_devices(false);
-	printf("<Mercury> PCI Initialization done\n");
-
-	printf("<Mercury> Initializing USB\n");
+	printf("<PCI> Enumerating PCI devices\n");
+	pci_enumerate_devices();
+	
+	printf("<USB> Initializing USB\n");
 	usb_init();
+
+	printf("<PCI> Initializing PCI devices\n");
 	pci_init_devices();
 
 	/*storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));

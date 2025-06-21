@@ -87,17 +87,17 @@ int xhci_init_controller(DeviceDescriptor* device)
 	if(bar->type != MM) return false;
 	if(!xhci_reset_controller()) return false;
 
-	printf("<USB>   xHCI Version: ");
+	printf("   Version: ");
 	print_hex(capabilities->hci_version >> 8);
 	printf(".");
 	print_hex(capabilities->hci_version & 0xFF);
 	printf("\n");
 
-	printf("<USB>   Max slots ");
+	printf("   Max slots ");
 	print_hex32(+capabilities->hcsparams_1.max_slots);
-	printf("\n<USB>   Max intrs ");
+	printf("\n   Max intrs ");
 	print_hex32(+capabilities->hcsparams_1.max_ints);
-	printf("\n<USB>   Max ports ");
+	printf("\n   Max ports ");
 	print_hex32(+capabilities->hcsparams_1.max_ports);
 	printf("\n");
 

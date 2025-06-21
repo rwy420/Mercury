@@ -65,7 +65,7 @@ void pci_set_command_bits(uint16_t bus, uint16_t device, uint16_t function, uint
 	pci_write32(bus, device, function, 0x4, pci_read32(bus, device, function, 0x4) | mask);
 }
 
-void pci_enumerate_devices(int debug)
+void pci_enumerate_devices()
 {
 	g_pci_devices = kmalloc(sizeof(DeviceDescriptor) * 256);
 	memset(g_pci_devices, 0, sizeof(DeviceDescriptor) * 256);
@@ -97,34 +97,29 @@ void pci_enumerate_devices(int debug)
 				device_descriptor->class_id = pci_get_class_id(bus, device, function);
 				device_descriptor->subclass_id = pci_get_subclass_id(bus, device, function);
 
+				printf("<PCI> Found device at ");
+				print_hex(bus & 0xFF);
+				printf(".");
+				print_hex(device & 0xFF);
+				printf(".");
+				print_hex(function & 0xFF);
+				printf("\n");
+
 				for(uint8_t bar_idx = 0; bar_idx < 5; bar_idx++)
 				{
-					device_descriptor->bars[bar_idx] = pci_get_bar(bus, device, function, bar_idx);
-				}
-
-				if(debug) 
-				{
-					print_hex(bus & 0xFF);
-					printf(" ");
-					print_hex(device & 0xFF);
-					printf(" ");
-					print_hex(function & 0xFF);
-					printf(" ");
-					/*print_hex((device_descriptor->vendor_id & 0xFF00) >> 8);
-					print_hex(device_descriptor->vendor_id & 0xFF);
-					printf(" ");
-					print_hex((device_descriptor->device_id & 0xFF00) >> 8);
-					print_hex(device_descriptor->device_id & 0xFF);
-					printf(" ");
-					print_hex32(device_descriptor->port_base[0]);
-					printf(" ");*/
-					print_hex(device_descriptor->class_id);
-					printf(" ");
-					print_hex(device_descriptor->subclass_id);
-					printf(" ");
-					print_hex((device_descriptor->prog_if & 0xFF00) >> 8);
-					print_hex(device_descriptor->prog_if & 0xFF);
-					printf("\n");
+					BAR* bar = pci_get_bar(bus, device, function, bar_idx); 
+					device_descriptor->bars[bar_idx] = bar; 
+					
+					if(bar->size != 0)
+					{
+						printf("   Memory region ");
+						print_hex(bar_idx);
+						printf(" at 0x");
+						print_hex32(bar->address);
+						printf("-");
+						print_hex32(bar->address + bar->size);
+						printf("\n");
+					}
 				}
 
 				//get_driver(device_descriptor);
@@ -145,6 +140,7 @@ void pci_init_devices()
 				switch(device->subclass_id)
 				{
 					case 0x3:
+						printf("<PCI> Initializing USB Controller\n");
 						usb_init_controller(device);
 						break;
 
