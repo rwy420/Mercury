@@ -3,6 +3,7 @@
 
 #include <hardware/usb/xhci_structs.h>
 #include <hardware/pci.h>
+#include <hardware/dma.h>
 
 typedef struct
 {
@@ -11,6 +12,7 @@ typedef struct
 	volatile xHCIRuntimeRegs* runtime_regs;
 	xHCIPort ports[0x10];
 	uint32_t bar0;
+	DMARegion* dcbaa_region;
 } xHCIController;
 
 int xhci_take_ownership(DeviceDescriptor* device);

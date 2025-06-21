@@ -1,8 +1,9 @@
-#include "hardware/pci.h"
 #include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/xhci_structs.h>
 #include <memory/paging.h>
+#include <memory/paging.h>
 #include <common/screen.h>
+#include <memory/common.h>
 #include <hardware/pit.h>
 
 xHCIController xhci_controller;
@@ -81,24 +82,34 @@ int xhci_init_controller(DeviceDescriptor* device)
 	xhci_controller.runtime_regs = (volatile xHCIRuntimeRegs*) (bar->address + (xhci_controller.capability_regs->rstoff & ~0x1Fu));
 	xhci_controller.bar0 = bar->address;
 
+	volatile xHCICapabilityRegs* capabilities = xhci_controller.capability_regs;
+
 	if(bar->type != MM) return false;
 	if(!xhci_reset_controller()) return false;
 
 	printf("<USB>   xHCI Version: ");
-	print_hex(xhci_controller.capability_regs->hci_version >> 8);
+	print_hex(capabilities->hci_version >> 8);
 	printf(".");
-	print_hex(xhci_controller.capability_regs->hci_version & 0xFF);
+	print_hex(capabilities->hci_version & 0xFF);
 	printf("\n");
 
 	printf("<USB>   Max slots ");
-	print_hex32(+xhci_controller.capability_regs->hcsparams_1.max_slots);
+	print_hex32(+capabilities->hcsparams_1.max_slots);
 	printf("\n<USB>   Max intrs ");
-	print_hex32(+xhci_controller.capability_regs->hcsparams_1.max_ints);
+	print_hex32(+capabilities->hcsparams_1.max_ints);
 	printf("\n<USB>   Max ports ");
-	print_hex32(+xhci_controller.capability_regs->hcsparams_1.max_ports);
+	print_hex32(+capabilities->hcsparams_1.max_ports);
 	printf("\n");
 
 	if(!xhci_init_ports()) return false;
+
+	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
+	uint32_t dma_size = capabilities->hcsparams_1.max_slots * 8;
+	xhci_controller.dcbaa_region = dma_create(capabilities->hcsparams_1.max_slots * 8);
+	memset((void*) xhci_controller.dcbaa_region->phys, 0, xhci_controller.dcbaa_region->size);
+	uint64_t dcbaap_phys = xhci_controller.dcbaa_region->phys;
+	operational->dcbaap_lo = dcbaap_phys & 0xFFFFFFFF;
+	operational->dcbaap_hi = dcbaap_phys >> 32;
 
 	return true;
 }
@@ -152,7 +163,6 @@ int xhci_init_ports()
 		extented_address += ext_cap->next_capability * 4;
 	}
 	
-
 	xhci_controller.operational_regs->config.max_device_slots_enabled = capabilities->hcsparams_1.max_slots;
 
 	return true;

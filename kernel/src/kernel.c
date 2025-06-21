@@ -148,7 +148,5 @@ void v_kernel_start()
 		
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
 
-	
-
 	while(1);
 }
