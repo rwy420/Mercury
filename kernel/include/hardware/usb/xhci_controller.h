@@ -13,6 +13,7 @@ typedef struct
 	xHCIPort ports[0x10];
 	uint32_t bar0;
 	DMARegion* dcbaa_region;
+	DMARegion* command_ring_region;
 } xHCIController;
 
 int xhci_take_ownership(DeviceDescriptor* device);

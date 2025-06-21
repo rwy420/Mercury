@@ -217,6 +217,209 @@ typedef struct
 	xHCIInterruptRegs irs[];
 } xHCIRuntimeRegs;
 
+typedef struct
+{
+	union
+	{
+		struct
+		{
+			uint64_t parameter : 64;
+			uint32_t status : 32;
+			uint32_t cycle : 1;
+			uint32_t ent : 1;
+			uint32_t rsvd : 8;
+			uint32_t trb_type : 6;
+			uint32_t control : 16;
+		};
+
+		struct
+		{
+			uint32_t dw0;
+			uint32_t dw1;
+			uint32_t dw2;
+			uint32_t dw3;
+		} raw;
+
+		struct
+		{
+			uint64_t data_buffer_pointer : 64;
+			uint32_t trb_transfer_length : 17;
+			uint32_t td_size : 5;
+			uint32_t interrupt_target : 10;
+			uint32_t cycle_bit : 1;
+			uint32_t evaluate_next_trb : 1;
+			uint32_t interrupt_on_short_packet : 1;
+			uint32_t no_snoop : 1;
+			uint32_t chain_bit : 1;
+			uint32_t interrupt_on_completion : 1;
+			uint32_t immediate_data : 1;
+			uint32_t rsvd1 : 2;
+			uint32_t block_event_interrupt : 1;
+			uint32_t trb_type : 6;
+			uint32_t rsvd2 : 16;
+		} normal;
+
+		struct
+		{
+			uint32_t b_request_type : 8;
+			uint32_t b_request : 8;
+			uint32_t w_value : 16;
+			uint32_t w_index : 16;
+			uint32_t w_length : 16;
+			uint32_t trb_transfer_length : 17;
+			uint32_t rsvd1 : 5;
+			uint32_t interrupt_target : 10;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd2 : 4;
+			uint32_t interrupt_on_completion : 1;
+			uint32_t immediate_data : 1;
+			uint32_t rsvd3 : 3;
+			uint32_t trb_type : 6;
+			uint32_t transfer_type : 2;
+			uint32_t rsvd4 : 14;
+		} setup_stage;
+
+		struct
+		{
+			uint64_t data_buffer_pointer : 64;
+			uint32_t trb_transfer_length : 17;
+			uint32_t td_size : 5;
+			uint32_t interrupt_target : 10;
+			uint32_t cycle_bit : 1;
+			uint32_t evaluate_next_trb : 1;
+			uint32_t interrupt_on_short_packet : 1;
+			uint32_t no_snoop : 1;
+			uint32_t chain_bit : 1;
+			uint32_t interrupt_on_completion : 1;
+			uint32_t immediate_data : 1;
+			uint32_t rsvd1 : 3;
+			uint32_t trb_type : 6;
+			uint32_t direction : 1;
+			uint32_t rsvd2 : 15;
+		} data_stage;
+
+		struct
+		{
+			uint32_t rsvd1 : 32;
+			uint32_t rsvd2 : 32;
+			uint32_t rsvd3 : 22;
+			uint32_t interrupt_target : 10;
+			uint32_t cycle_bit : 1;
+			uint32_t evaluate_next_trb : 1;
+			uint32_t rsvd4 : 2;
+			uint32_t chain_bit : 1;
+			uint32_t interrupt_on_completion : 1;
+			uint32_t rsvd5 : 4;
+			uint32_t trb_type : 6;
+			uint32_t direction : 1;
+			uint32_t rsvd6 : 15;
+		} status_range;
+
+		struct
+		{
+			uint64_t trb_pointer : 64;
+			uint32_t trb_transfer_length : 24;
+			uint32_t completion_code : 8;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd1 : 1;
+			uint32_t event_data : 1;
+			uint32_t rsvd2 : 7;
+			uint32_t trb_type : 6;
+			uint32_t endpoint_id : 5;
+			uint32_t rsvd3 : 3;
+			uint32_t slot_id : 8;
+		} transfer_event;
+
+		struct
+		{
+			uint64_t command_trb_pointer : 64;
+			uint32_t command_completion_parameter : 24;
+			uint32_t completion_code : 8;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd1 : 9;
+			uint32_t trb_type : 6;
+			uint32_t vf_id : 8;
+			uint32_t slot_id : 8;
+		} command_completion_event;
+
+		struct
+		{
+			uint32_t rsvd1 : 24;
+			uint32_t port_id : 8;
+			uint32_t rsvd2 : 32;
+			uint32_t rsvd3 : 24;
+			uint32_t completion_code : 8;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd4 : 9;
+			uint32_t trb_type : 6;
+			uint32_t rsvd5 : 16;
+		} port_status_change_event;
+
+		struct
+		{
+			uint32_t rsvd1 : 32;
+			uint32_t rsvd2 : 32;
+			uint32_t rsvd3 : 32;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd4 : 9;
+			uint32_t trb_type : 6;
+			uint32_t slot_type : 5;
+			uint32_t rsvd5 : 11;
+		} enable_slot_command;
+		
+		struct
+		{
+			uint32_t rsvd1 : 32;
+			uint32_t rsvd2 : 32;
+			uint32_t rsvd3 : 32;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd4 : 9;
+			uint32_t trb_type : 6;
+			uint32_t rsvd5 : 8;
+			uint32_t slot_id : 8;
+		} disable_slot_command;
+
+		struct
+		{
+			uint64_t input_context_pointer : 64;
+			uint32_t rsvd1 : 32;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd2 : 8;
+			uint32_t block_set_address_request : 1;
+			uint32_t trb_type : 6;
+			uint32_t rsvd3 : 8;
+			uint32_t slot_id : 8;
+		} address_device_command;
+
+		struct
+		{
+			uint64_t input_context_pointer : 64;
+			uint32_t rsvd1 : 32;
+			uint32_t cycle_bit : 1;
+			uint32_t rsvd2 : 8;
+			uint32_t deconfigure : 1;
+			uint32_t trb_type : 6;
+			uint32_t rsvd3 : 8;
+			uint32_t slot_id : 8;
+		} configure_endpoint_command;
+
+		struct
+		{
+			uint64_t ring_segment_pointer : 64;
+			uint32_t rsvd1 : 22;
+			uint32_t interrupt_target : 10;
+			uint32_t cycle_bit : 1;
+			uint32_t toggle_cycle : 1;
+			uint32_t rsvd2 : 2;
+			uint32_t chain_bit : 1;
+			uint32_t interrupt_on_completion : 1;
+			uint32_t rsvd3 : 4;
+			uint32_t trb_type : 6;
+			uint32_t rsvd4 : 16;
+		} link_trb;
+	};
+} xHCITRB;
+
 typedef enum
 {
 	USB_LEGACY_SUPPORT = 1,

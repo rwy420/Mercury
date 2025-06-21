@@ -111,6 +111,8 @@ int xhci_init_controller(DeviceDescriptor* device)
 	operational->dcbaap_lo = dcbaap_phys & 0xFFFFFFFF;
 	operational->dcbaap_hi = dcbaap_phys >> 32;
 
+	print_hex32(sizeof(xHCITRB));
+
 	return true;
 }
 
