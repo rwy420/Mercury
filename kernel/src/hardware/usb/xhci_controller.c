@@ -22,7 +22,6 @@ int xhci_take_ownership(DeviceDescriptor* device)
 
 	if(extented_offset == 0x0)
 	{
-		printf("xHCI missing extented capabilities\n");
 		return false;
 	}
 
@@ -79,15 +78,15 @@ int xhci_init_controller(DeviceDescriptor* device)
 
 
 
-	xhci_controller.capability_regs = (xHCICapabilityRegs*) bar->address;
-	xhci_controller.operational_regs = (xHCIOperationalRegs*) (bar->address + xhci_controller.capability_regs->cap_length);
-	xhci_controller.runtime_regs = (xHCIRuntimeRegs*) (bar->address + (xhci_controller.capability_regs->rstoff & ~0x1Fu));
+	xhci_controller.capability_regs = (volatile xHCICapabilityRegs*) bar->address;
+	xhci_controller.operational_regs = (volatile xHCIOperationalRegs*) (bar->address + xhci_controller.capability_regs->cap_length);
+	xhci_controller.runtime_regs = (volatile xHCIRuntimeRegs*) (bar->address + (xhci_controller.capability_regs->rstoff & ~0x1Fu));
 
 
 	if(bar->type != MM) return false;
 	if(!xhci_reset_controller()) return false;
 
-	printf("xHCI Version: ");
+	printf("<Mercury> xHCI Version: ");
 	print_hex(xhci_controller.capability_regs->hci_version >> 8);
 	printf(".");
 	print_hex(xhci_controller.capability_regs->hci_version & 0xFF);
@@ -98,7 +97,7 @@ int xhci_init_controller(DeviceDescriptor* device)
 
 int xhci_reset_controller()
 {
-	xHCIOperationalRegs* operational = xhci_controller.operational_regs;
+	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
 	const uint32_t timeout = ms_since_init() + 500;
 
 	while(operational->usbsts & CONTROLLER_NOT_READY)

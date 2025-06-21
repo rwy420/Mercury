@@ -6,9 +6,9 @@
 
 typedef struct
 {
-	xHCICapabilityRegs* capability_regs;
-	xHCIOperationalRegs* operational_regs;
-	xHCIRuntimeRegs* runtime_regs;
+	volatile xHCICapabilityRegs* capability_regs;
+	volatile xHCIOperationalRegs* operational_regs;
+	volatile xHCIRuntimeRegs* runtime_regs;
 } xHCIController;
 
 int xhci_take_ownership(DeviceDescriptor* device);
