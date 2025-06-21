@@ -214,7 +214,7 @@ uint16_t pci_get_subclass_id(uint16_t bus, uint16_t device, uint16_t function)
 
 uint16_t pci_get_interrupt(uint16_t bus, uint16_t device, uint16_t function)
 {
-	return pci_read16(bus, device, function, 0x3C);
+	return pci_read8(bus, device, function, 0x3C);
 }
 
 uint16_t pci_get_prog_if(uint16_t bus, uint16_t device, uint16_t function)

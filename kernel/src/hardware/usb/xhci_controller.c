@@ -1,3 +1,5 @@
+#include "hardware/dma.h"
+#include "hardware/interrupts.h"
 #include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/xhci_structs.h>
 #include <memory/paging.h>
@@ -80,6 +82,7 @@ int xhci_init_controller(DeviceDescriptor* device)
 	xhci_controller.capability_regs = (volatile xHCICapabilityRegs*) bar->address;
 	xhci_controller.operational_regs = (volatile xHCIOperationalRegs*) (bar->address + xhci_controller.capability_regs->cap_length);
 	xhci_controller.runtime_regs = (volatile xHCIRuntimeRegs*) (bar->address + (xhci_controller.capability_regs->rstoff & ~0x1Fu));
+	xhci_controller.irq = 0x20 + device->interrupt;
 	xhci_controller.bar0 = bar->address;
 
 	volatile xHCICapabilityRegs* capabilities = xhci_controller.capability_regs;
@@ -110,11 +113,13 @@ int xhci_init_controller(DeviceDescriptor* device)
 	operational->dcbaap_lo = dcbaap_phys & 0xFFFFFFFF;
 	operational->dcbaap_hi = dcbaap_phys >> 32;
 
-	xhci_controller.command_ring_region = dma_create(0x100 * sizeof(xHCITRB));
+	xhci_controller.command_ring_region = dma_create(COMMAND_RING_TRB_COUNT * sizeof(xHCITRB));
 	memset((void*) xhci_controller.command_ring_region->phys, 0, xhci_controller.command_ring_region->size);
 	uint64_t command_ring_phsy = xhci_controller.command_ring_region->phys;
 	operational->crcr_lo = command_ring_phsy | RING_CYCLE_STATE;
 	operational->crcr_hi = command_ring_phsy >> 32;
+
+	if(!xchi_init_primary_int()) return false;
 
 	return true;
 }
@@ -173,6 +178,34 @@ int xhci_init_ports()
 	return true;
 }
 
+int xchi_init_primary_int()
+{
+	volatile xHCIRuntimeRegs* runtime = xhci_controller.runtime_regs;
+	static uint32_t event_ring_table_offset  = EVENT_RING_TRB_COUNT * sizeof(xHCITRB);
+	xhci_controller.event_ring_region = dma_create(EVENT_RING_TRB_COUNT * sizeof(xHCITRB) + sizeof(xHCIEventRingTableEntry));
+	memset((void*) xhci_controller.event_ring_region->phys, 0, xhci_controller.event_ring_region->size);
+
+
+
+	volatile xHCIEventRingTableEntry* event_ring_table_entry = (volatile xHCIEventRingTableEntry*) (xhci_controller.event_ring_region->phys + event_ring_table_offset);
+	event_ring_table_entry->rsba = xhci_controller.event_ring_region->phys;
+	event_ring_table_entry->rsz = EVENT_RING_TRB_COUNT;
+
+	volatile xHCIInterruptRegs* primary_interrupter = (volatile xHCIInterruptRegs*) &runtime->irs[0];
+	primary_interrupter->erstsz = (primary_interrupter->erstsz & 0xFFFF0000) | 1;
+	primary_interrupter->erdp = xhci_controller.event_ring_region->phys | EVENT_HANDLER_BUSY;
+	primary_interrupter->erstba = xhci_controller.event_ring_region->phys + event_ring_table_offset;
+
+	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
+	operational->usb_cmd.interrupter_enable = true;
+
+	primary_interrupter->iman = primary_interrupter->iman | INTERRUPT_PEDNING | INTERRUPT_ENBLE;
+
+	register_interrupt_handler(xhci_controller.irq, (isr_t) xhci_handle_interrupt);
+
+	return true;
+}
+
 int xhci_reset_controller()
 {
 	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
@@ -188,4 +221,9 @@ int xhci_reset_controller()
 			return false;
 
 	return true;
+}
+
+void xhci_handle_interrupt()
+{
+	printf("xHCI Interrupt\n");
 }

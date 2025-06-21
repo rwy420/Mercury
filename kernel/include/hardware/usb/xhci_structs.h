@@ -420,6 +420,13 @@ typedef struct
 	};
 } xHCITRB;
 
+typedef struct
+{
+	uint64_t rsba;
+	uint32_t rsz;
+	uint32_t rsvd;
+} xHCIEventRingTableEntry;
+
 typedef enum
 {
 	USB_LEGACY_SUPPORT = 1,
@@ -438,5 +445,16 @@ typedef enum : uint32_t
 	COMMAND_ABOIRT = 1 << 2,
 	COMMAND_RING_RUNNING = 1 << 3
 } XHCI_CRCR;
+
+typedef enum
+{
+	EVENT_HANDLER_BUSY = 1 << 3
+} XHCI_ERDP;
+
+typedef enum : uint32_t
+{
+	INTERRUPT_PEDNING = 1 << 0,
+	INTERRUPT_ENBLE = 1 << 1
+} XHCI_EMAN;
 
 #endif
