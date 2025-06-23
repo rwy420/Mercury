@@ -3,7 +3,7 @@ extern g_current_task
 
 restore_and_switch:
 	mov ebp, [g_current_task]
-	add ebp, 5
+	add ebp, 9
 	mov ebp, [ebp]
 
 	mov eax, [g_current_task]
@@ -50,7 +50,7 @@ restore_and_switch:
 
 	mov [0x20000], eax
 	mov eax, [g_current_task]
-	add eax, 9
+	add eax, 5
 	push dword [eax]
 	mov eax, [0x20000]
 

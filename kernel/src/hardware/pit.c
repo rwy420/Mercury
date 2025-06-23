@@ -2,7 +2,7 @@
 #include <multitasking.h>
 #include <common/screen.h>
 
-uint32_t g_ms_since_init;
+volatile uint32_t g_ms_since_init;
 uint32_t pit_hz;
 int pit_schedule;
 

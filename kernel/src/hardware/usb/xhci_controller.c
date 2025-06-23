@@ -127,7 +127,7 @@ int xhci_init_controller(DeviceDescriptor* device)
 	operational->usb_cmd.run_stop = 1;
 	while(operational->usbsts & HC_HALTED) continue;
 
-	create_task(xhci_port_updater_task, true);
+	create_task(xhci_updater_task, true);
 
 	return true;
 }
@@ -275,15 +275,40 @@ void xhci_handle_interrupt()
 	printf("xHCI Interrupt\n");
 }
 
-extern uint32_t g_ms_since_init;
+extern volatile uint32_t g_ms_since_init;
 
-void xhci_port_updater_task()
+void xhci_updater_task()
 {
+	int ports_changed = true;
+	int ports_initialized = false;
+	uint32_t last_port_update = g_ms_since_init;
+
 	while(1)
 	{
-		print_hex32(ms_since_init());
-		printf(" ");
+		{
+			int expected = true;
 
-		for(volatile uint32_t i = 0; i < 0x6000000; i++);
+			while(!atomic_compare_exchange(&ports_changed, &expected, false))
+			{
+				if(!ports_initialized && g_ms_since_init - last_port_update >= 100)
+				{
+					printf("INIT\n");
+					ports_initialized = true;
+				}
+
+				uint32_t timeout = g_ms_since_init + 100;
+	
+				while(g_ms_since_init < timeout);
+
+				expected = true;
+			}
+		}
+
+		last_port_update = g_ms_since_init;
+
+		for(int i = 0; i < 0x10; i++)
+		{
+
+		}
 	}
 }

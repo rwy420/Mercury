@@ -83,12 +83,18 @@ Task* create_task(void(*entry)(), int kernel)
 	if(!kernel)
 	{
 		PageDirectory* pd = create_kernel_pd();
-		map_page_pd(pd, stack_frame, stack_frame);
 		task->cr3 = virtual_to_physical(pd);
 	}
 	else
 	{
 		task->cr3 = (uint32_t) g_kernel_pd;
+	}
+
+	for(int i = 0; i < 4; i++)
+	{
+		void* address = (void*) ((uint32_t) stack_frame) + i * FRAME_SIZE;
+		map_page(address, address);
+		if(!kernel) map_page_pd((PageDirectory*) task->cr3, address, address);
 	}
 
 	task->kernel = kernel;
@@ -148,12 +154,13 @@ void schedule(CPUState* cpu)
 
 	g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
+	
 	g_current_task->ebp = cpu->ebp;
-
 	g_current_task->eax = cpu->eax;
 	g_current_task->ebx = cpu->ebx;
 	g_current_task->ecx = cpu->ecx;
 	g_current_task->edx = cpu->edx;
+
 	g_current_task->esi = cpu->esi;
 	g_current_task->edi = cpu->edi;
 

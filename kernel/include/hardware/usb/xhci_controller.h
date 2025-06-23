@@ -35,6 +35,6 @@ uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, u
 int xhci_deinitialize_slot(uint8_t slot_id);
 
 void xhci_handle_interrupt();
-void xhci_port_updater_task();
+void xhci_updater_task();
 
 #endif

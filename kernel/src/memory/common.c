@@ -53,3 +53,22 @@ int memcmp(const void* s1, const void* s2, uint32_t size)
 
 	return 0;
 }
+
+int atomic_compare_exchange(int* ptr, int* expected, int desired) {
+    int success;
+    int old_value;
+
+    __asm__ __volatile__(
+        "lock cmpxchg %3, %1"
+        : "=a"(old_value), "+m"(*ptr)
+        : "a"(*expected), "r"(desired)
+        : "memory"
+    );
+
+    success = (old_value == *expected);
+    if (!success) {
+        *expected = old_value;
+    }
+
+    return success;
+}

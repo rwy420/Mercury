@@ -17,8 +17,9 @@ typedef enum
 typedef struct Task
 {
 	uint8_t id;
-	uint32_t esp, ebp, eip;
-	uint32_t eax, ebx, ecx, edx, esi, edi;
+	uint32_t esp, eip;
+	uint32_t ebp, eax, ebx, ecx, edx;
+	uint32_t esi, edi;
 	uint32_t cr3;
 	uint32_t flags;
 	int kernel;
