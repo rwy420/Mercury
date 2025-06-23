@@ -466,12 +466,12 @@ typedef enum : uint32_t
 
 typedef enum : uint32_t
 {
-	CCS = 1u < 0,
-	PED = 1u << 1,
-	PR = 1u << 4,
-	PP = 1u << 9,
-	CSC = 1u << 17,
-	PRC = 1u << 21,
+	CCS = 1 << 0,
+	PED = 1 << 1,
+	PR = 1 << 4,
+	PP = 1 << 9,
+	CSC = 1 << 17,
+	PRC = 1 << 21,
 
 	PORT_SPEED_SHIFT = 10,
 	PORT_SPEED_MASK = 0xF

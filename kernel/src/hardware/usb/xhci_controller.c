@@ -1,3 +1,4 @@
+#include "hardware/usb/usb.h"
 #include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/xhci_structs.h>
 #include <hardware/interrupts.h>
@@ -260,7 +261,7 @@ int xhci_reset_controller()
 
 uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id)
 {
-	//printf("INIT USB DEVICE");
+	printf("INIT USB DEVICE");
 
 	return true;
 }
@@ -308,7 +309,48 @@ void xhci_updater_task()
 
 		for(int i = 0; i < 0x10; i++)
 		{
+			xHCIPort* port = &xhci_controller.ports[i];
+			if(port->revision_major == 0) continue;
 
+			volatile xHCIPortRegs* op_port = (volatile xHCIPortRegs*) &xhci_controller.operational_regs->ports[i];
+			if(!(op_port->portsc & PP)) continue;
+
+			const int reset_change = op_port->portsc & PRC;
+			const int connection_change = op_port->portsc & CSC;
+			const int port_enabled = op_port->portsc & PED;
+			op_port->portsc = CSC | PRC | PP;
+
+			if(!(op_port->portsc & CCS))
+			{
+				if(port->slot_id != 0)
+				{
+					xhci_deinitialize_slot(port->slot_id);
+					port->slot_id = 0;
+				}
+
+				continue;
+			}
+
+			switch(port->revision_major)
+			{
+				case 2:
+					if(port_enabled && reset_change) break;
+					if(connection_change) op_port->portsc = PR | PP;
+
+					continue;
+
+				case 3:
+					if(!connection_change || !port_enabled) continue;
+
+					break;
+
+				default:
+					continue;
+			}
+
+			const uint8_t speed_id = (op_port->portsc >> PORT_SPEED_SHIFT) & PORT_SPEED_MASK;
+			
+			port->slot_id = xhci_initialize_device(i + 1, 0, usb_speed_to_class(speed_id), 0);
 		}
 	}
 }
