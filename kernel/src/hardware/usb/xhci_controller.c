@@ -266,14 +266,12 @@ uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, u
 	enable_slot.enable_slot_command.trb_type = ENABLE_SLOT_COMMAND;
 
 	enable_slot.enable_slot_command.slot_type = 0;
-	xHCITRB result = xhci_send_command(&enable_slot);
+	xHCITRB* result = xhci_send_command(&enable_slot);
 
-	printf("a");
+	const uint8_t slot_id = result->command_completion_event.slot_id;
 
-	const uint8_t slot_id = result.command_completion_event.slot_id;
 	if(slot_id == 0 || slot_id > xhci_controller.capability_regs->hcsparams_1.max_slots)
 	{
-		printf("ERROR");
 		return 0;
 	}
 
@@ -286,16 +284,16 @@ int xhci_deinitialize_slot(uint8_t slot_id)
 }
 
 
-xHCITRB xhci_send_command(xHCITRB* trb)
+xHCITRB* xhci_send_command(xHCITRB* trb)
 {
 	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
 	if(operational->usbsts & HC_HALTED)
 	{
-		return *(xHCITRB*) 0;
+		return NULL_PTR;
 	}
 
-	volatile xHCITRB* command_trb = (volatile xHCITRB*) &((xHCITRB*) xhci_controller.command_ring_region->phys)[xhci_controller.command_queue];
-	volatile xHCITRB* completion_trb = (volatile xHCITRB*) &(xhci_controller.command_completions[xhci_controller.command_queue]);
+	volatile xHCITRB* command_trb = (volatile xHCITRB*) &((xHCITRB*) xhci_controller.command_ring_region->phys)[xhci_controller.command_dequeue];
+	volatile xHCITRB* completion_trb = (volatile xHCITRB*) &(xhci_controller.command_completions[xhci_controller.command_dequeue]);
 
 	command_trb->raw.dw0 = trb->raw.dw0;
 	command_trb->raw.dw1 = trb->raw.dw1;
@@ -304,40 +302,40 @@ xHCITRB xhci_send_command(xHCITRB* trb)
 	command_trb->cycle = xhci_controller.command_cycle;
 
 	completion_trb->raw.dw0 = 0;
-	completion_trb->raw.dw0 = 0;
-	completion_trb->raw.dw0 = 0;
-	completion_trb->raw.dw0 = 0;
+	completion_trb->raw.dw1 = 0;
+	completion_trb->raw.dw2 = 0;
+	completion_trb->raw.dw3 = 0;
 
 	xhci_advance_command_queue();
 
+
+	// ISR not working yet, therefore this is actually being handled by a polling task TODO
 	*xhci_doorbell_reg(0) = 0;
 
-	uint32_t timeout = g_ms_since_init + 5000;
+	uint32_t timeout = g_ms_since_init + 1000;
 	volatile uint32_t* dw2 = &completion_trb->raw.dw2;
 	while((*dw2 >> 24) == 0)
 	{
 		if(g_ms_since_init > timeout)
 		{
-			printf("TIMEOUT");
-			return *(xHCITRB*) 0;
+			return NULL_PTR;
 		}
 	}
 
 	if(completion_trb->command_completion_event.completion_code != 1)
 	{
-		printf("COMPLETION ERROR");
-		return *(xHCITRB*) 0;
+		return NULL_PTR;
 	}
 
-	return *command_trb;
+	return completion_trb;
 }
 
 void xhci_advance_command_queue()
 {
-	xhci_controller.command_queue++;
-	if(xhci_controller.command_queue < COMMAND_RING_TRB_COUNT - 1) return;
+	xhci_controller.command_dequeue++;
+	if(xhci_controller.command_dequeue < COMMAND_RING_TRB_COUNT - 1) return;
 
-	volatile xHCITRB* link_trb = (volatile xHCITRB*) &((xHCITRB*) xhci_controller.command_ring_region->phys)[xhci_controller.command_queue];
+	volatile xHCITRB* link_trb = (volatile xHCITRB*) &((xHCITRB*) xhci_controller.command_ring_region->phys)[xhci_controller.command_dequeue];
 	link_trb->link_trb.trb_type = LINK;
 	link_trb->link_trb.ring_segment_pointer = xhci_controller.command_ring_region->phys;
 	link_trb->link_trb.interrupt_target = 0;
@@ -346,7 +344,7 @@ void xhci_advance_command_queue()
 	link_trb->link_trb.chain_bit = 0;
 	link_trb->link_trb.interrupt_on_completion = 0;
 
-	xhci_controller.command_queue = 0;
+	xhci_controller.command_dequeue = 0;
 	xhci_controller.command_cycle = !xhci_controller.command_cycle;
 }
 
@@ -446,13 +444,36 @@ void xhci_event_poll_task()
 
 		if((trb->raw.dw3 & 1) != cycle_state)
 		{
+			// yield
 			asm("int $0x20");
 			continue;
 		}
 
-		uint8_t trb_type = (trb->raw.dw3 >> 10) & 0x3F;
+		switch(trb->trb_type)
+		{
+			case TRANSFER_EVENT:
+			{
+				break;
+			}
 
-		printf("CHANGE DETECTED");
+			case COMMAND_COMPLETION_EVENT:
+			{
+				const uint32_t trb_index = (trb->command_completion_event.command_trb_pointer - xhci_controller.command_ring_region->phys) / sizeof(xHCITRB);
+
+				volatile xHCITRB* completion_trb = (volatile xHCITRB*) &xhci_controller.command_completions[trb_index];
+				completion_trb->raw.dw0 = trb->raw.dw0;
+				completion_trb->raw.dw1 = trb->raw.dw1;
+				completion_trb->raw.dw2 = trb->raw.dw2;
+				completion_trb->raw.dw3 = trb->raw.dw3;
+
+				break;
+			}
+
+			default:
+				printf("<USB> Unhandled event: 0x");
+				print_hex(trb->trb_type);
+				printf("\n");
+		}
 
 		dequeue_index++;
 		if(dequeue_index >= EVENT_RING_TRB_COUNT)
@@ -461,10 +482,8 @@ void xhci_event_poll_task()
 			cycle_state ^= 1; 
 		}
 
-		uint32_t new_erdp = xhci_controller.event_ring_region->phys + dequeue_index * sizeof(xHCITRB);
-		intr->erdp = new_erdp;
-
-		intr->iman |= (1 << 0);
+		intr->erdp = xhci_controller.event_ring_region->phys + dequeue_index * sizeof(xHCITRB);
+		intr->iman |= INTERRUPT_PEDNING;
 	}
 }
 

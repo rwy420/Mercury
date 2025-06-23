@@ -15,7 +15,8 @@ typedef struct
 	volatile xHCIOperationalRegs* operational_regs;
 	volatile xHCIRuntimeRegs* runtime_regs;
 	xHCIPort ports[0x10];
-	uint32_t command_queue;
+	uint32_t command_dequeue;
+	uint32_t event_dequeue;
 	xHCITRB command_completions[COMMAND_RING_TRB_COUNT];
 	int command_cycle;
 	uint32_t bar0;
@@ -36,7 +37,7 @@ int xhci_reset_controller();
 int xhci_init_scratchpad();
 uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id);
 int xhci_deinitialize_slot(uint8_t slot_id);
-xHCITRB xhci_send_command(xHCITRB* trb);
+xHCITRB* xhci_send_command(xHCITRB* trb);
 void xhci_advance_command_queue();
 
 void xhci_handle_interrupt();
