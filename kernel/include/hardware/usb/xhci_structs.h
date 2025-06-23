@@ -477,4 +477,10 @@ typedef enum : uint32_t
 	PORT_SPEED_MASK = 0xF
 } PORTSC;
 
+typedef enum
+{
+	LINK = 6,
+	ENABLE_SLOT_COMMAND = 9
+} xHCITRBCommandType;
+
 #endif

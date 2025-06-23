@@ -13,6 +13,7 @@
 
 xHCIController xhci_controller;
 extern PageDirectory* g_kernel_pd;
+extern volatile uint32_t g_ms_since_init;
 
 int xhci_take_ownership(DeviceDescriptor* device)
 {
@@ -87,6 +88,7 @@ int xhci_init_controller(DeviceDescriptor* device)
 	xhci_controller.runtime_regs = (volatile xHCIRuntimeRegs*) (bar->address + (xhci_controller.capability_regs->rstoff & ~0x1Fu));
 	xhci_controller.irq = 0x20 + device->interrupt;
 	xhci_controller.bar0 = bar->address;
+	xhci_controller.command_cycle = 1;
 
 	volatile xHCICapabilityRegs* capabilities = xhci_controller.capability_regs;
 
@@ -129,6 +131,7 @@ int xhci_init_controller(DeviceDescriptor* device)
 	while(operational->usbsts & HC_HALTED) continue;
 
 	create_task(xhci_updater_task, true);
+	create_task(xhci_event_poll_task, true);
 
 	return true;
 }
@@ -194,8 +197,6 @@ int xchi_init_primary_int()
 	xhci_controller.event_ring_region = dma_create(EVENT_RING_TRB_COUNT * sizeof(xHCITRB) + sizeof(xHCIEventRingTableEntry));
 	memset((void*) xhci_controller.event_ring_region->phys, 0, xhci_controller.event_ring_region->size);
 
-
-
 	volatile xHCIEventRingTableEntry* event_ring_table_entry = (volatile xHCIEventRingTableEntry*) (xhci_controller.event_ring_region->phys + event_ring_table_offset);
 	event_ring_table_entry->rsba = xhci_controller.event_ring_region->phys;
 	event_ring_table_entry->rsz = EVENT_RING_TRB_COUNT;
@@ -207,8 +208,8 @@ int xchi_init_primary_int()
 
 	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
 	operational->usb_cmd.interrupter_enable = true;
-
-	primary_interrupter->iman = primary_interrupter->iman | INTERRUPT_PEDNING | INTERRUPT_ENBLE;
+	
+	primary_interrupter->iman |= INTERRUPT_PEDNING | INTERRUPT_ENBLE;
 
 	register_interrupt_handler(xhci_controller.irq, (isr_t) xhci_handle_interrupt);
 
@@ -261,7 +262,20 @@ int xhci_reset_controller()
 
 uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id)
 {
-	printf("INIT USB DEVICE");
+	xHCITRB enable_slot;
+	enable_slot.enable_slot_command.trb_type = ENABLE_SLOT_COMMAND;
+
+	enable_slot.enable_slot_command.slot_type = 0;
+	xHCITRB result = xhci_send_command(&enable_slot);
+
+	printf("a");
+
+	const uint8_t slot_id = result.command_completion_event.slot_id;
+	if(slot_id == 0 || slot_id > xhci_controller.capability_regs->hcsparams_1.max_slots)
+	{
+		printf("ERROR");
+		return 0;
+	}
 
 	return true;
 }
@@ -271,12 +285,75 @@ int xhci_deinitialize_slot(uint8_t slot_id)
 	return true;
 }
 
+
+xHCITRB xhci_send_command(xHCITRB* trb)
+{
+	volatile xHCIOperationalRegs* operational = xhci_controller.operational_regs;
+	if(operational->usbsts & HC_HALTED)
+	{
+		return *(xHCITRB*) 0;
+	}
+
+	volatile xHCITRB* command_trb = (volatile xHCITRB*) &((xHCITRB*) xhci_controller.command_ring_region->phys)[xhci_controller.command_queue];
+	volatile xHCITRB* completion_trb = (volatile xHCITRB*) &(xhci_controller.command_completions[xhci_controller.command_queue]);
+
+	command_trb->raw.dw0 = trb->raw.dw0;
+	command_trb->raw.dw1 = trb->raw.dw1;
+	command_trb->raw.dw2 = trb->raw.dw2;
+	command_trb->raw.dw3 = trb->raw.dw3;
+	command_trb->cycle = xhci_controller.command_cycle;
+
+	completion_trb->raw.dw0 = 0;
+	completion_trb->raw.dw0 = 0;
+	completion_trb->raw.dw0 = 0;
+	completion_trb->raw.dw0 = 0;
+
+	xhci_advance_command_queue();
+
+	*xhci_doorbell_reg(0) = 0;
+
+	uint32_t timeout = g_ms_since_init + 5000;
+	volatile uint32_t* dw2 = &completion_trb->raw.dw2;
+	while((*dw2 >> 24) == 0)
+	{
+		if(g_ms_since_init > timeout)
+		{
+			printf("TIMEOUT");
+			return *(xHCITRB*) 0;
+		}
+	}
+
+	if(completion_trb->command_completion_event.completion_code != 1)
+	{
+		printf("COMPLETION ERROR");
+		return *(xHCITRB*) 0;
+	}
+
+	return *command_trb;
+}
+
+void xhci_advance_command_queue()
+{
+	xhci_controller.command_queue++;
+	if(xhci_controller.command_queue < COMMAND_RING_TRB_COUNT - 1) return;
+
+	volatile xHCITRB* link_trb = (volatile xHCITRB*) &((xHCITRB*) xhci_controller.command_ring_region->phys)[xhci_controller.command_queue];
+	link_trb->link_trb.trb_type = LINK;
+	link_trb->link_trb.ring_segment_pointer = xhci_controller.command_ring_region->phys;
+	link_trb->link_trb.interrupt_target = 0;
+	link_trb->link_trb.cycle_bit = xhci_controller.command_cycle;
+	link_trb->link_trb.toggle_cycle = 1;
+	link_trb->link_trb.chain_bit = 0;
+	link_trb->link_trb.interrupt_on_completion = 0;
+
+	xhci_controller.command_queue = 0;
+	xhci_controller.command_cycle = !xhci_controller.command_cycle;
+}
+
 void xhci_handle_interrupt()
 {
 	printf("xHCI Interrupt\n");
 }
-
-extern volatile uint32_t g_ms_since_init;
 
 void xhci_updater_task()
 {
@@ -353,4 +430,45 @@ void xhci_updater_task()
 			port->slot_id = xhci_initialize_device(i + 1, 0, usb_speed_to_class(speed_id), 0);
 		}
 	}
+}
+
+void xhci_event_poll_task()
+{
+	while(1)
+	{
+		volatile xHCITRB* ring = (volatile xHCITRB*) xhci_controller.event_ring_region->phys;
+		volatile xHCIInterruptRegs* intr = &xhci_controller.runtime_regs->irs[0];
+
+		static size_t dequeue_index = 0;
+		static int cycle_state = true;
+
+		volatile xHCITRB* trb = &ring[dequeue_index];
+
+		if((trb->raw.dw3 & 1) != cycle_state)
+		{
+			asm("int $0x20");
+			continue;
+		}
+
+		uint8_t trb_type = (trb->raw.dw3 >> 10) & 0x3F;
+
+		printf("CHANGE DETECTED");
+
+		dequeue_index++;
+		if(dequeue_index >= EVENT_RING_TRB_COUNT)
+		{
+			dequeue_index = 0;
+			cycle_state ^= 1; 
+		}
+
+		uint32_t new_erdp = xhci_controller.event_ring_region->phys + dequeue_index * sizeof(xHCITRB);
+		intr->erdp = new_erdp;
+
+		intr->iman |= (1 << 0);
+	}
+}
+
+volatile uint32_t* xhci_doorbell_reg(uint32_t slot_id)
+{
+	return (volatile uint32_t*) &((uint32_t*) (xhci_controller.bar0 + xhci_controller.capability_regs->dboff))[slot_id];
 }
