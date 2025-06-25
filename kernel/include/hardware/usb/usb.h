@@ -3,13 +3,20 @@
 
 #include <hardware/pci.h>
 
-typedef enum
+typedef enum : uint8_t
 {
 	LOW_SPEED = 1,
 	FULL_SPEED = 2,
 	HIGH_SPEED = 3,
 	SUPER_SPEED = 4
 } USB_SPEED;
+
+typedef struct
+{
+	uint8_t parent_port_id, slot_id, depth;
+	USB_SPEED speed;
+	uint32_t route;
+} USBInfo; 
 
 void usb_init();
 void usb_init_controller(DeviceDescriptor* device);

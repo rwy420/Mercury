@@ -275,7 +275,24 @@ uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, u
 		return 0;
 	}
 
-	return true;
+
+	xHCIPort* root_port = &xhci_controller.ports[(route & 0xF) - 1];
+
+	USBInfo* info = kmalloc(sizeof(USBInfo));
+	*info = (USBInfo) {parent_port_id, slot_id, depth, speed, route};
+	xHCIDevice* device = xhci_device_create(&xhci_controller, info);
+
+	xhci_controller.slots[slot_id - 1] = device;
+
+	printf("<USB> Initialized USB ");
+	print_hex(root_port->revision_major);
+	printf(".");
+	print_hex(root_port->revision_minor);
+	printf(" device on slot ");
+	print_hex(slot_id);
+	printf("\n");
+
+	return slot_id;
 }
 
 int xhci_deinitialize_slot(uint8_t slot_id)

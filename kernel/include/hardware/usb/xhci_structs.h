@@ -1,7 +1,12 @@
 #ifndef __MERCURY__HARDWARE__USB__XHCI_STRUCTS_H
 #define __MERCURY__HARDWARE__USB__XHCI_STRUCTS_H
 
+#define COMMAND_RING_TRB_COUNT 256
+#define EVENT_RING_TRB_COUNT 252
+
 #include <common/types.h>
+#include <hardware/dma.h>
+#include <hardware/usb/usb.h>
 
 // https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/extensible-host-controler-interface-usb-xhci.pdf
 
@@ -490,5 +495,30 @@ typedef enum
 	DEVICE_NOTIFICATION_EVENT = 38,
 	NF_INDEX_WRAP_EVENT = 39
 } xHCITRBCommandType;
+
+typedef struct
+{
+	USBInfo* info;
+} xHCIDevice;
+
+typedef struct
+{
+	volatile xHCICapabilityRegs* capability_regs;
+	volatile xHCIOperationalRegs* operational_regs;
+	volatile xHCIRuntimeRegs* runtime_regs;
+	xHCIPort ports[0x10];
+	xHCIDevice* slots[0x60];
+	uint32_t command_dequeue;
+	uint32_t event_dequeue;
+	xHCITRB command_completions[COMMAND_RING_TRB_COUNT];
+	int command_cycle;
+	uint32_t bar0;
+	uint8_t irq;
+	DMARegion* dcbaa_region;
+	DMARegion* command_ring_region;
+	DMARegion* event_ring_region;
+	DMARegion* scrachpad_buffer_region;
+	uint32_t* scratchpad_buffers;
+} xHCIController;
 
 #endif

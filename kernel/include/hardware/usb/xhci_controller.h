@@ -1,32 +1,11 @@
 #ifndef __MERCURY__HARDWARE__USB__XHCI_CONTROLLER_H
 #define __MERCURY__HARDWARE__USB__XHCI_CONTROLLER_H
 
-#define COMMAND_RING_TRB_COUNT 256
-#define EVENT_RING_TRB_COUNT 252
-
 #include <hardware/usb/xhci_structs.h>
+#include <hardware/usb/xhci_device.h>
 #include <hardware/pci.h>
 #include <hardware/dma.h>
 #include <hardware/usb/usb.h>
-
-typedef struct
-{
-	volatile xHCICapabilityRegs* capability_regs;
-	volatile xHCIOperationalRegs* operational_regs;
-	volatile xHCIRuntimeRegs* runtime_regs;
-	xHCIPort ports[0x10];
-	uint32_t command_dequeue;
-	uint32_t event_dequeue;
-	xHCITRB command_completions[COMMAND_RING_TRB_COUNT];
-	int command_cycle;
-	uint32_t bar0;
-	uint8_t irq;
-	DMARegion* dcbaa_region;
-	DMARegion* command_ring_region;
-	DMARegion* event_ring_region;
-	DMARegion* scrachpad_buffer_region;
-	uint32_t* scratchpad_buffers;
-} xHCIController;
 
 int xhci_take_ownership(DeviceDescriptor* device);
 int xhci_create_controller(DeviceDescriptor* device);
