@@ -1,4 +1,5 @@
-#include "hardware/usb/usb.h"
+#include <hardware/usb/usb.h>
+#include <hardware/usb/usb_device.h>
 #include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/xhci_structs.h>
 #include <hardware/interrupts.h>
@@ -283,6 +284,7 @@ uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, u
 	xHCIDevice* device = xhci_device_create(&xhci_controller, info);
 
 	xhci_controller.slots[slot_id - 1] = device;
+	usb_device_init(&xhci_controller, info); 
 
 	printf("<USB> Initialized USB ");
 	print_hex(root_port->revision_major);
