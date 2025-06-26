@@ -463,6 +463,28 @@ typedef struct
 	uint32_t rsvd4[4];
 } SlotContext;
 
+typedef struct
+{
+	uint32_t endpoint_state : 3;
+	uint32_t rsvd1 : 5;
+	uint32_t mult : 2;
+	uint32_t max_primary_streams : 5;
+	uint32_t linear_stream_array : 1;
+	uint32_t interval : 8;
+	uint32_t max_esit_payload_hi : 8;
+	uint32_t rsvd2 : 1;
+	uint32_t error_count : 2;
+	uint32_t endpoint_type : 3;
+	uint32_t rsvd3 : 1;
+	uint32_t host_initiate_disable : 1;
+	uint32_t max_burst_size : 8;
+	uint32_t max_packet_size : 16;
+	uint64_t tr_dequeue_pointer;
+	uint32_t avr_trb_length : 16;
+	uint32_t max_esit_payload_lo : 16;
+	uint32_t rsvd4 [3];
+} EndpointContext;
+
 typedef enum
 {
 	USB_LEGACY_SUPPORT = 1,

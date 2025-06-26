@@ -261,7 +261,7 @@ int xhci_reset_controller()
 	return true;
 }
 
-uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id)
+uint8_t xhci_init_device(uint32_t route, uint8_t depth, USB_SPEED speed, uint8_t parent_port_id)
 {
 	xHCITRB enable_slot;
 	enable_slot.enable_slot_command.trb_type = ENABLE_SLOT_COMMAND;
@@ -398,7 +398,7 @@ void xhci_init_control_endpoint(USBDevice* device)
 	device->endpoints[0].transfer_ring = dma_create(TRANSFER_RING_TRB_COUNT * sizeof(xHCITRB));
 	memset((void*) device->endpoints[0].transfer_ring->phys, 0, device->endpoints[0].transfer_ring->size);
 
-	print_hex32(sizeof(SlotContext));
+	print_hex32(sizeof(EndpointContext));
 }
 
 void xhci_handle_interrupt()
@@ -478,7 +478,7 @@ void xhci_updater_task()
 
 			const uint8_t speed_id = (op_port->portsc >> PORT_SPEED_SHIFT) & PORT_SPEED_MASK;
 			
-			port->slot_id = xhci_initialize_device(i + 1, 0, usb_speed_to_class(speed_id), 0);
+			port->slot_id = xhci_init_device(i + 1, 0, usb_speed_to_class(speed_id), 0);
 		}
 	}
 }
