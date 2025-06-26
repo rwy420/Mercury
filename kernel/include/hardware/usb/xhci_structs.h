@@ -426,6 +426,15 @@ typedef struct
 
 typedef struct
 {
+	DMARegion* transfer_ring;
+	uint32_t max_packet_size, dequeue_index, enqueue_index;
+	int cycle;
+	volatile uint32_t transfer_count;
+	volatile xHCITRB completion_trb;
+} xHCIEndpoint;
+
+typedef struct
+{
 	uint64_t rsba;
 	uint32_t rsz;
 	uint32_t rsvd;
@@ -508,6 +517,7 @@ typedef struct
 	volatile xHCIRuntimeRegs* runtime_regs;
 	xHCIPort ports[0x10];
 	xHCIDevice* slots[0x60];
+	xHCIEndpoint endpoints[0x20];
 	uint32_t command_dequeue;
 	uint32_t event_dequeue;
 	xHCITRB command_completions[COMMAND_RING_TRB_COUNT];

@@ -367,6 +367,11 @@ void xhci_advance_command_queue()
 	xhci_controller.command_cycle = !xhci_controller.command_cycle;
 }
 
+void xhci_init_control_endpoint()
+{
+
+}
+
 void xhci_handle_interrupt()
 {
 	printf("xHCI Interrupt\n");

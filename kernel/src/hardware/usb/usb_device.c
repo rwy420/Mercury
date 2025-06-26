@@ -3,5 +3,5 @@
 
 void usb_device_init(xHCIController* controller, USBInfo* info)
 {
-	printf("INITDEV\n");
+
 }
