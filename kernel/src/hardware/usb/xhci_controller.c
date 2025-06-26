@@ -398,6 +398,39 @@ void xhci_init_control_endpoint(USBDevice* device)
 	device->endpoints[0].transfer_ring = dma_create(TRANSFER_RING_TRB_COUNT * sizeof(xHCITRB));
 	memset((void*) device->endpoints[0].transfer_ring->phys, 0, device->endpoints[0].transfer_ring->size);
 
+	volatile xHCIInputControlContext* input_control_context = (volatile xHCIInputControlContext*) device->input_context->phys + 0 * context_size;
+	volatile xHCISlotContext* slot_context = (volatile xHCISlotContext*) device->input_context->phys + 1 * context_size;
+	volatile xHCIEndpointContext* endpoint0_context = (volatile xHCIEndpointContext*) device->input_context->phys + 2 * context_size;
+
+	input_control_context->add_context_flags = (1 << 1) | (1 << 0);
+
+	slot_context->route = device->info->route >> 4;
+	slot_context->root_hub_port_number = device->info->route & 0x0F;
+	slot_context->context_entries = 1;
+	slot_context->interrupter_target = 0;
+	slot_context->speed = usb_class_to_speed(device->info->speed);
+
+	endpoint0_context->endpoint_type = CONTROL;
+	endpoint0_context->max_packet_size = device->endpoints[0].max_packet_size;
+	endpoint0_context->max_burst_size = 0;
+	endpoint0_context->interval = 0;
+	endpoint0_context->tr_dequeue_pointer = device->endpoints[0].transfer_ring->phys | 1;
+	endpoint0_context->max_primary_streams = 0;
+	endpoint0_context->error_count = 3;
+
+	volatile uint32_t dcbaa_reg = ((uint32_t*) device->controller->dcbaa_region->phys)[device->info->slot_id];
+	dcbaa_reg = device->output_context->phys;
+
+	for(int i = 0; i < 2; i++)
+	{
+		xHCITRB address_device;
+		address_device.address_device_command.trb_type = ADDRESS_DEVICE_COMMAND;
+		address_device.address_device_command.input_context_pointer = device->input_context->phys;
+		address_device.address_device_command.block_set_address_request = (i == 0);
+		address_device.address_device_command.slot_id = device->info->slot_id;
+
+		xhci_send_command(&address_device);
+	}
 
 }
 

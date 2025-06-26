@@ -22,5 +22,6 @@ void usb_init();
 void usb_init_controller(DeviceDescriptor* device);
 
 USB_SPEED usb_speed_to_class(uint8_t speed_id);
+uint8_t usb_class_to_speed(USB_SPEED speed);
 
 #endif

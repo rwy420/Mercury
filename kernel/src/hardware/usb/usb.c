@@ -56,6 +56,18 @@ USB_SPEED usb_speed_to_class(uint8_t speed_id)
 		case 4: return SUPER_SPEED;
 	}
 
-	// TODO ERROR
+	return 0;
+}
+
+uint8_t usb_class_to_speed(USB_SPEED speed)
+{
+	switch(speed)
+	{
+		case LOW_SPEED: return 1;
+		case FULL_SPEED: return 2;
+		case HIGH_SPEED: return 3;
+		case SUPER_SPEED: return 4;
+	}
+
 	return 0;
 }

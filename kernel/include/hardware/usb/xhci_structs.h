@@ -461,7 +461,7 @@ typedef struct
 	uint32_t rsvd3 : 19;
 	uint32_t slot_state : 5;
 	uint32_t rsvd4[4];
-} SlotContext;
+} xHCISlotContext;
 
 typedef struct
 {
@@ -483,7 +483,7 @@ typedef struct
 	uint32_t avr_trb_length : 16;
 	uint32_t max_esit_payload_lo : 16;
 	uint32_t rsvd4 [3];
-} EndpointContext;
+} xHCIEndpointContext;
 
 typedef struct
 {
@@ -494,7 +494,7 @@ typedef struct
 	uint8_t interface_number;
 	uint8_t alternate_setting;
 	uint8_t rsvd2;
-} InputControlContext;
+} xHCIInputControlContext;
 
 typedef enum
 {
@@ -551,6 +551,7 @@ typedef enum
 {
 	LINK = 6,
 	ENABLE_SLOT_COMMAND = 9,
+	ADDRESS_DEVICE_COMMAND = 11,
 	TRANSFER_EVENT = 32,
 	COMMAND_COMPLETION_EVENT = 33,
 	PORT_STATUS_CHANGE_EVENT = 34,
@@ -560,6 +561,12 @@ typedef enum
 	DEVICE_NOTIFICATION_EVENT = 38,
 	NF_INDEX_WRAP_EVENT = 39
 } xHCITRBCommandType;
+
+
+typedef enum
+{
+	CONTROL = 4
+} xHCIEndpointType;
 
 struct xHCIController;
 
