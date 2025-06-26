@@ -3,6 +3,7 @@
 
 #define COMMAND_RING_TRB_COUNT 256
 #define EVENT_RING_TRB_COUNT 252
+#define TRANSFER_RING_TRB_COUNT PAGE_SIZE / sizeof(xHCITRB)
 
 #include <common/types.h>
 #include <hardware/dma.h>
@@ -505,18 +506,24 @@ typedef enum
 	NF_INDEX_WRAP_EVENT = 39
 } xHCITRBCommandType;
 
-typedef struct
-{
-	USBInfo* info;
-} xHCIDevice;
+struct xHCIController;
 
 typedef struct
+{
+	struct xHCIController* controller;
+	USBInfo* info;
+	DMARegion* input_context;
+	DMARegion* output_context;
+	xHCIEndpoint endpoints[32];
+} USBDevice;
+
+typedef struct xHCIController
 {
 	volatile xHCICapabilityRegs* capability_regs;
 	volatile xHCIOperationalRegs* operational_regs;
 	volatile xHCIRuntimeRegs* runtime_regs;
 	xHCIPort ports[0x10];
-	xHCIDevice* slots[0x60];
+	USBDevice* slots[0x60];
 	xHCIEndpoint endpoints[0x20];
 	uint32_t command_dequeue;
 	uint32_t event_dequeue;

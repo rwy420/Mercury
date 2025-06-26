@@ -281,7 +281,7 @@ uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, u
 
 	USBInfo* info = kmalloc(sizeof(USBInfo));
 	*info = (USBInfo) {parent_port_id, slot_id, depth, speed, route};
-	xHCIDevice* device = xhci_device_create(&xhci_controller, info);
+	USBDevice* device = xhci_device_create(&xhci_controller, info);
 
 	xhci_controller.slots[slot_id - 1] = device;
 	usb_device_init(&xhci_controller, info); 
@@ -367,9 +367,36 @@ void xhci_advance_command_queue()
 	xhci_controller.command_cycle = !xhci_controller.command_cycle;
 }
 
-void xhci_init_control_endpoint()
+void xhci_init_control_endpoint(USBDevice* device)
 {
+	const uint32_t context_size = device->controller->capability_regs->hccparams_1.context_size ? 64 : 32;
+	device->controller->endpoints[0].cycle = 1;
+	device->controller->endpoints[0].max_packet_size = 0;
 
+	switch(device->info->speed)
+	{
+		case LOW_SPEED:
+		case FULL_SPEED:
+			device->endpoints[0].max_packet_size = 8;
+			break;
+		case HIGH_SPEED:
+			device->endpoints[0].max_packet_size = 64;
+			break;
+		case SUPER_SPEED:
+			device->endpoints[0].max_packet_size = 512;
+			break;
+		default:
+			break;
+	}
+
+	device->input_context = dma_create(33 * context_size);
+	memset((void*) device->input_context->phys, 0, device->input_context->size);
+
+	device->output_context = dma_create(32 * context_size);
+	memset((void*) device->output_context->phys, 0, device->output_context->size);
+
+	device->endpoints[0].transfer_ring = dma_create(TRANSFER_RING_TRB_COUNT * sizeof(xHCITRB));
+	memset((void*) device->endpoints[0].transfer_ring->phys, 0, device->endpoints[0].transfer_ring->size);
 }
 
 void xhci_handle_interrupt()

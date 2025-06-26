@@ -5,6 +5,6 @@
 #include <hardware/usb/usb.h>
 #include <common/types.h>
 
-xHCIDevice* xhci_device_create(xHCIController* controller, USBInfo* info);
+USBDevice* xhci_device_create(xHCIController* controller, USBInfo* info);
 
 #endif
