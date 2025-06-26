@@ -485,6 +485,17 @@ typedef struct
 	uint32_t rsvd4 [3];
 } EndpointContext;
 
+typedef struct
+{
+	uint32_t drop_context_flags;
+	uint32_t add_context_flags;
+	uint32_t rsvd1[5];
+	uint8_t config_value;
+	uint8_t interface_number;
+	uint8_t alternate_setting;
+	uint8_t rsvd2;
+} InputControlContext;
+
 typedef enum
 {
 	USB_LEGACY_SUPPORT = 1,

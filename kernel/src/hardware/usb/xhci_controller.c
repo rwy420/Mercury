@@ -398,7 +398,7 @@ void xhci_init_control_endpoint(USBDevice* device)
 	device->endpoints[0].transfer_ring = dma_create(TRANSFER_RING_TRB_COUNT * sizeof(xHCITRB));
 	memset((void*) device->endpoints[0].transfer_ring->phys, 0, device->endpoints[0].transfer_ring->size);
 
-	print_hex32(sizeof(EndpointContext));
+
 }
 
 void xhci_handle_interrupt()
