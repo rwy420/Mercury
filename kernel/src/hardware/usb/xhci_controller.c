@@ -284,7 +284,7 @@ uint8_t xhci_initialize_device(uint32_t route, uint8_t depth, USB_SPEED speed, u
 	USBDevice* device = xhci_device_create(&xhci_controller, info);
 
 	xhci_controller.slots[slot_id - 1] = device;
-	usb_device_init(&xhci_controller, info); 
+	usb_device_init(device); 
 
 	printf("<USB> Initialized USB ");
 	print_hex(root_port->revision_major);
@@ -397,6 +397,8 @@ void xhci_init_control_endpoint(USBDevice* device)
 
 	device->endpoints[0].transfer_ring = dma_create(TRANSFER_RING_TRB_COUNT * sizeof(xHCITRB));
 	memset((void*) device->endpoints[0].transfer_ring->phys, 0, device->endpoints[0].transfer_ring->size);
+
+	print_hex32(sizeof(SlotContext));
 }
 
 void xhci_handle_interrupt()

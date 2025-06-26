@@ -1,7 +1,7 @@
+#include <hardware/usb/xhci_controller.h>
 #include <hardware/usb/usb_device.h>
-#include <common/screen.h>
 
-void usb_device_init(xHCIController* controller, USBInfo* info)
+void usb_device_init(USBDevice* device)
 {
-
+	xhci_init_control_endpoint(device);
 }
