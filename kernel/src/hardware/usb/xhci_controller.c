@@ -432,6 +432,14 @@ void xhci_init_control_endpoint(USBDevice* device)
 		xhci_send_command(&address_device);
 	}
 
+
+}
+
+void xhci_update_packet_size(USBDevice* device)
+{
+	uint8_t buffer[8];
+
+	USBRequestDescriptor request = {DEVICE_TO_HOST | STANDART | DEVICE, GET_DESCRIPTOR, DEVICE_DESCRIPTOR << 8, 0, 8};
 }
 
 void xhci_handle_interrupt()

@@ -18,6 +18,33 @@ typedef struct
 	uint32_t route;
 } USBInfo; 
 
+typedef struct
+{
+	uint8_t request_type;
+	uint8_t request;
+	uint16_t value;
+	uint16_t index;
+	uint16_t length;
+} USBRequestDescriptor;
+
+typedef enum : uint8_t
+{
+	DEVICE_TO_HOST = 0b1 << 7,
+	STANDART = 0b00 << 5,
+	DEVICE = 0b00000
+} USBRequestType;
+
+typedef enum : uint8_t
+{
+	GET_DESCRIPTOR = 6,
+	SET_DESCRIPTOR = 7
+} USBRequest;
+
+typedef enum : uint8_t
+{
+	DEVICE_DESCRIPTOR = 1
+} USBRequestDescriptorType;
+
 void usb_init();
 void usb_init_controller(DeviceDescriptor* device);
 

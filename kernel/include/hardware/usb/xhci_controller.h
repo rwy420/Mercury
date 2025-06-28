@@ -20,6 +20,7 @@ int xhci_deinitialize_slot(uint8_t slot_id);
 xHCITRB* xhci_send_command(xHCITRB* trb);
 void xhci_advance_command_queue();
 void xhci_init_control_endpoint(USBDevice* device);
+void xhci_update_packet_size(USBDevice* device);
 
 void xhci_handle_interrupt();
 void xhci_updater_task();
