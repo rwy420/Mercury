@@ -22,7 +22,7 @@ void pit_init(uint32_t hz)
 
 void pit_handle_interrupt(CPUState* cpu)
 {
-	g_ms_since_init += pit_hz * 10;
+	g_ms_since_init += 1000 / pit_hz;
 
 	if(pit_schedule) schedule(cpu);
 }

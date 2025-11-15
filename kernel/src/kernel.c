@@ -79,7 +79,7 @@ void v_kernel_start()
 {
 	segments_install_gdt();
 	install_idt();
-	pit_init(10);
+	pit_init(250);
 
 	fd_init();
 
@@ -128,7 +128,9 @@ void v_kernel_start()
 
 	printf("<PCI> Enumerating PCI devices\n");
 	pci_enumerate_devices();
-	
+
+	pit_set_schedule(true);
+
 	printf("<USB> Initializing USB\n");
 	usb_init();
 
@@ -146,8 +148,6 @@ void v_kernel_start()
 	enable_all_drivers();
 	
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
-
-	pit_set_schedule(true);
 
 	while(1);
 }
