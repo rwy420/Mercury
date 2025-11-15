@@ -25,6 +25,33 @@ void dummy_task()
 	asm("int $32");
 }
 
+const char msg[] = "printf via write syscall!\n";
+
+void test_task()
+{
+    uint32_t len = sizeof(msg) - 1;
+
+	asm volatile(
+		"mov $4, %%eax\n"
+		"mov $1, %%ebx\n"
+		"mov %0, %%ecx\n"
+		"mov %1, %%edx\n"
+		"int $0x80\n"
+		:
+		: "r"(msg), "r"(len)
+		: "eax", "ebx", "ecx", "edx"
+	);
+
+    asm volatile(
+        "mov $1, %%eax \n"
+        "mov $1, %%ebx \n"
+        "int $0x80"
+        :
+        :
+        : "eax", "edi"
+    );
+}
+
 void idle_task()
 {
 	static uint32_t counter = 0;
@@ -57,14 +84,7 @@ void tasks_init()
 	create_task(idle_task, false);
 	create_task(idle_task, true);
 	create_task(idle_task2, false);
-
-	/*int fd = fat16_open("/BIN/APP.ELF", 'r');
-	int size = fat16_size("/BIN/APP.ELF");
-	char* buffer = kmalloc(size);
-	fat16_read(fd, buffer, size);
-	void(*entry)();
-	entry = image_load(buffer, size, 0);
-	create_task(entry);*/
+	create_task(test_task, false);
 }
 
 Task* create_task(void(*entry)(), int kernel)

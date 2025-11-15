@@ -134,10 +134,6 @@ int xhci_init_controller(DeviceDescriptor* device)
 	create_task(xhci_updater_task, true);
 	create_task(xhci_event_poll_task, true);
 
-	printf("   [GOOD]\n");
-
-	printf("   TASKS RUNNING\n");
-
 	return true;
 }
 
@@ -215,10 +211,6 @@ int xchi_init_primary_int()
 	operational->usb_cmd.interrupter_enable = true;
 	
 	primary_interrupter->iman |= INTERRUPT_PEDNING | INTERRUPT_ENBLE;
-
-	printf("xHCI INT: ");
-	print_hex32(xhci_controller.irq);
-	printf("\n");
 
 	register_interrupt_handler(xhci_controller.irq, (isr_t) xhci_handle_interrupt);
 
@@ -452,7 +444,6 @@ void xhci_update_packet_size(USBDevice* device)
 
 	USBRequestDescriptor request = {DEVICE_TO_HOST | STANDART | DEVICE, GET_DESCRIPTOR, DEVICE_DESCRIPTOR << 8, 0, 8};
 	xhci_send_request(device, &request, buffer);
-	printf("DEVICE_DESCRIPTOR");
 }
 
 uint32_t xhci_send_request(USBDevice* device, USBRequestDescriptor* request, uint8_t* buffer)
@@ -525,18 +516,7 @@ uint32_t xhci_send_request(USBDevice* device, USBRequestDescriptor* request, uin
 
 	endpoint->transfer_count = request->length;
 
-volatile xHCITRB* trb = (volatile xHCITRB*)device->endpoints[0].transfer_ring->phys;
-printf("TRB0 type: ");
-print_hex(trb->setup_stage.trb_type);
-printf("CYCLE: ");
-print_hex(trb->setup_stage.cycle_bit);
-printf("\n");
-
 	*xhci_doorbell_reg(device->info->slot_id) = 1;
-
-	printf("AA");
-
-	for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 
 	uint32_t timeout = g_ms_since_init + 1000;
 	volatile uint32_t* dw2 = &completion_trb->raw.dw2;
@@ -544,7 +524,6 @@ printf("\n");
 	{
 		if(g_ms_since_init > timeout)
 		{
-			printf("TIMEOUT\n");
 			return 0;
 		}
 	}
@@ -553,7 +532,6 @@ printf("\n");
 
 	if(completion_trb->transfer_event.completion_code != 1)
 	{
-		printf("USB COMPLETION ERROR ");
 		print_hex(completion_trb->transfer_event.completion_code);
 		printf("\n");
 		return 0;
@@ -600,7 +578,6 @@ void xhci_updater_task()
 			{
 				if(!ports_initialized && g_ms_since_init - last_port_update >= 100)
 				{
-					printf("INIT\n");
 					ports_initialized = true;
 				}
 
@@ -681,13 +658,10 @@ void xhci_event_poll_task()
 			continue;
 		}
 
-		printf("EVENT: ");
-
 		switch(trb->trb_type)
 		{
 			case COMMAND_COMPLETION_EVENT:
 			{
-				printf("COMP\n");
 				const uint32_t trb_index = (trb->command_completion_event.command_trb_pointer - xhci_controller.command_ring_region->phys) / sizeof(xHCITRB);
 				volatile xHCITRB* completion_trb = (volatile xHCITRB*) &xhci_controller.command_completions[trb_index];
 				completion_trb->raw.dw0 = trb->raw.dw0;
