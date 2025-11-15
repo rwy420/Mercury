@@ -56,7 +56,7 @@ Or using bochs:
 ### On the way..
 - [ ] Finish SATA driver
 - [ ] Start with networking 
-- [ ] Maybe switch to GRUB
+- [X] Maybe switch to GRUB
 
 **Screenshots** \
 Multitasking and SO loading working: \

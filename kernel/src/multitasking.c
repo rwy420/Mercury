@@ -175,8 +175,7 @@ void schedule(CPUState* cpu)
 
 			g_tss.cs = 0x18;
 			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
-
-			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_kernel_pd));
+			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
 			restore_and_switch();
 
 			break;
