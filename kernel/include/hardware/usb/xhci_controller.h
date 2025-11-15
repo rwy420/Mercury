@@ -22,6 +22,10 @@ void xhci_advance_command_queue();
 void xhci_init_control_endpoint(USBDevice* device);
 void xhci_update_packet_size(USBDevice* device);
 
+uint32_t xhci_send_request(USBDevice* device, USBRequestDescriptor* request, uint8_t* buffer);
+
+void xhci_advance_endpoint_enqueue(volatile xHCIEndpoint* endpoint, int chain);
+
 void xhci_handle_interrupt();
 void xhci_updater_task();
 void xhci_event_poll_task();

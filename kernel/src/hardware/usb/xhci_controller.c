@@ -134,6 +134,10 @@ int xhci_init_controller(DeviceDescriptor* device)
 	create_task(xhci_updater_task, true);
 	create_task(xhci_event_poll_task, true);
 
+	printf("   [GOOD]\n");
+
+	printf("   TASKS RUNNING\n");
+
 	return true;
 }
 
@@ -211,6 +215,10 @@ int xchi_init_primary_int()
 	operational->usb_cmd.interrupter_enable = true;
 	
 	primary_interrupter->iman |= INTERRUPT_PEDNING | INTERRUPT_ENBLE;
+
+	printf("xHCI INT: ");
+	print_hex32(xhci_controller.irq);
+	printf("\n");
 
 	register_interrupt_handler(xhci_controller.irq, (isr_t) xhci_handle_interrupt);
 
@@ -376,9 +384,9 @@ void xhci_init_control_endpoint(USBDevice* device)
 	switch(device->info->speed)
 	{
 		case LOW_SPEED:
-		case FULL_SPEED:
 			device->endpoints[0].max_packet_size = 8;
 			break;
+		case FULL_SPEED:
 		case HIGH_SPEED:
 			device->endpoints[0].max_packet_size = 64;
 			break;
@@ -398,11 +406,12 @@ void xhci_init_control_endpoint(USBDevice* device)
 	device->endpoints[0].transfer_ring = dma_create(TRANSFER_RING_TRB_COUNT * sizeof(xHCITRB));
 	memset((void*) device->endpoints[0].transfer_ring->phys, 0, device->endpoints[0].transfer_ring->size);
 
-	volatile xHCIInputControlContext* input_control_context = (volatile xHCIInputControlContext*) device->input_context->phys + 0 * context_size;
-	volatile xHCISlotContext* slot_context = (volatile xHCISlotContext*) device->input_context->phys + 1 * context_size;
-	volatile xHCIEndpointContext* endpoint0_context = (volatile xHCIEndpointContext*) device->input_context->phys + 2 * context_size;
+	uint8_t* base = (uint8_t*)device->input_context->phys;
+	volatile xHCIEndpointContext* endpoint0_context = (volatile xHCIEndpointContext*)(base + 2 * context_size);
+	volatile xHCIInputControlContext* input_control_context = (volatile xHCIInputControlContext*)(base + 0 * context_size);
+	volatile xHCISlotContext* slot_context = (volatile xHCISlotContext*)(base + 1 * context_size);
 
-	input_control_context->add_context_flags = (1 << 1) | (1 << 0);
+	input_control_context->add_context_flags = (1 << 1) | (1 << 2);
 
 	slot_context->route = device->info->route >> 4;
 	slot_context->root_hub_port_number = device->info->route & 0x0F;
@@ -418,8 +427,8 @@ void xhci_init_control_endpoint(USBDevice* device)
 	endpoint0_context->max_primary_streams = 0;
 	endpoint0_context->error_count = 3;
 
-	volatile uint32_t dcbaa_reg = ((uint32_t*) device->controller->dcbaa_region->phys)[device->info->slot_id];
-	dcbaa_reg = device->output_context->phys;
+	uint32_t* dcbaa = (uint32_t*)device->controller->dcbaa_region->phys;
+	dcbaa[device->info->slot_id] = device->output_context->phys;
 
 	for(int i = 0; i < 2; i++)
 	{
@@ -430,16 +439,145 @@ void xhci_init_control_endpoint(USBDevice* device)
 		address_device.address_device_command.slot_id = device->info->slot_id;
 
 		xhci_send_command(&address_device);
+
+		volatile uint8_t slot_state = ((volatile xHCISlotContext*)device->output_context->phys + 1 * context_size)->slot_state;
 	}
 
-
+	xhci_update_packet_size(device);
 }
 
 void xhci_update_packet_size(USBDevice* device)
 {
-	uint8_t buffer[8];
+	uint8_t buffer[8] = {0};
 
 	USBRequestDescriptor request = {DEVICE_TO_HOST | STANDART | DEVICE, GET_DESCRIPTOR, DEVICE_DESCRIPTOR << 8, 0, 8};
+	xhci_send_request(device, &request, buffer);
+	printf("DEVICE_DESCRIPTOR");
+}
+
+uint32_t xhci_send_request(USBDevice* device, USBRequestDescriptor* request, uint8_t* buffer)
+{
+	uint8_t transfer_type = 0;
+
+	if(request->length == 0) transfer_type = 0;
+	else if(request->request_type & DEVICE_TO_HOST) transfer_type = 3;
+	else transfer_type = 2;
+
+	int status_stage_dir = !((request->length > 0) && (request->request_type & DEVICE_TO_HOST));
+	volatile xHCIEndpoint* endpoint = (volatile xHCIEndpoint*) &device->endpoints[0];
+	volatile xHCITRB* transfer = (volatile xHCITRB*) endpoint->transfer_ring->phys;
+
+	{
+		volatile xHCITRB* trb = (volatile xHCITRB*) &transfer[endpoint->enqueue_index];
+		memset(trb, 0, sizeof(xHCITRB));
+		trb->setup_stage.trb_type = SETUP_STAGE;
+		trb->setup_stage.transfer_type = transfer_type;
+		trb->setup_stage.trb_transfer_length = 8;
+		trb->setup_stage.interrupt_on_completion = 0;
+		trb->setup_stage.immediate_data = 1;
+		trb->setup_stage.cycle_bit = endpoint->cycle;
+		trb->setup_stage.b_request_type = request->request_type;
+		trb->setup_stage.b_request = request->request;
+		trb->setup_stage.w_value = request->value;
+		trb->setup_stage.w_index = request->index;
+		trb->setup_stage.w_length = request->length;
+	
+		xhci_advance_endpoint_enqueue(endpoint, false);
+	}
+
+	if(request->length)
+	{
+		volatile xHCITRB* trb = (volatile xHCITRB*) &transfer[endpoint->enqueue_index];
+		memset(trb, 0, sizeof(xHCITRB));
+
+		trb->data_stage.trb_type = DATA_STAGE;
+		trb->data_stage.direction = !!(request->request_type & DEVICE_TO_HOST);
+		trb->data_stage.trb_transfer_length = request->length;
+		trb->data_stage.td_size = 0;
+		trb->data_stage.chain_bit = 0;
+		trb->data_stage.interrupt_on_completion = 0;
+		trb->data_stage.interrupt_on_short_packet = 0;
+		trb->data_stage.immediate_data = 0;
+		trb->data_stage.data_buffer_pointer = (uint32_t) buffer;
+		trb->data_stage.cycle_bit = 0;
+
+		xhci_advance_endpoint_enqueue(endpoint, false);
+	}
+
+	{
+		volatile xHCITRB* trb = (volatile xHCITRB*) &transfer[endpoint->enqueue_index];
+		memset(trb, 0, sizeof(xHCITRB));
+
+		trb->status_stage.trb_type = STATUS_STAGE;
+		trb->status_stage.direction = status_stage_dir;
+		trb->status_stage.chain_bit = 0;
+		trb->status_stage.interrupt_on_completion = 1;
+		trb->status_stage.cycle_bit = endpoint->cycle;
+
+		xhci_advance_endpoint_enqueue(endpoint, false);
+	}
+
+	volatile xHCITRB* completion_trb = (volatile xHCITRB*) &endpoint->completion_trb;
+	completion_trb->raw.dw0 = 0;
+	completion_trb->raw.dw1 = 0;
+	completion_trb->raw.dw2 = 0;
+	completion_trb->raw.dw3 = 0;
+
+	endpoint->transfer_count = request->length;
+
+volatile xHCITRB* trb = (volatile xHCITRB*)device->endpoints[0].transfer_ring->phys;
+printf("TRB0 type: ");
+print_hex(trb->setup_stage.trb_type);
+printf("CYCLE: ");
+print_hex(trb->setup_stage.cycle_bit);
+printf("\n");
+
+	*xhci_doorbell_reg(device->info->slot_id) = 1;
+
+	printf("AA");
+
+	for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
+
+	uint32_t timeout = g_ms_since_init + 1000;
+	volatile uint32_t* dw2 = &completion_trb->raw.dw2;
+	while((*dw2 >> 24) == 0)
+	{
+		if(g_ms_since_init > timeout)
+		{
+			printf("TIMEOUT\n");
+			return 0;
+		}
+	}
+
+	endpoint->dequeue_index = endpoint->enqueue_index;
+
+	if(completion_trb->transfer_event.completion_code != 1)
+	{
+		printf("USB COMPLETION ERROR ");
+		print_hex(completion_trb->transfer_event.completion_code);
+		printf("\n");
+		return 0;
+	}
+
+	return endpoint->transfer_count;
+}
+
+void xhci_advance_endpoint_enqueue(volatile xHCIEndpoint* endpoint, int chain)
+{
+	endpoint->enqueue_index++;
+	if(endpoint->enqueue_index < TRANSFER_RING_TRB_COUNT - 1) return;
+
+	volatile xHCITRB* trb = (volatile xHCITRB*) &((volatile xHCITRB*) (endpoint->transfer_ring->phys))[endpoint->enqueue_index];
+	trb->link_trb.trb_type = LINK;
+	trb->link_trb.ring_segment_pointer = endpoint->transfer_ring->phys;
+	trb->link_trb.interrupt_target = 0;
+	trb->link_trb.cycle_bit = endpoint->cycle;
+	trb->link_trb.toggle_cycle = 1;
+	trb->link_trb.chain_bit = chain;
+	trb->link_trb.interrupt_on_completion = 0;
+
+	endpoint->enqueue_index = 0;
+	endpoint->cycle = !endpoint->cycle;
 }
 
 void xhci_handle_interrupt()
@@ -543,17 +681,14 @@ void xhci_event_poll_task()
 			continue;
 		}
 
+		printf("EVENT: ");
+
 		switch(trb->trb_type)
 		{
-			case TRANSFER_EVENT:
-			{
-				break;
-			}
-
 			case COMMAND_COMPLETION_EVENT:
 			{
+				printf("COMP\n");
 				const uint32_t trb_index = (trb->command_completion_event.command_trb_pointer - xhci_controller.command_ring_region->phys) / sizeof(xHCITRB);
-
 				volatile xHCITRB* completion_trb = (volatile xHCITRB*) &xhci_controller.command_completions[trb_index];
 				completion_trb->raw.dw0 = trb->raw.dw0;
 				completion_trb->raw.dw1 = trb->raw.dw1;

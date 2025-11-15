@@ -318,7 +318,7 @@ typedef struct
 			uint32_t trb_type : 6;
 			uint32_t direction : 1;
 			uint32_t rsvd6 : 15;
-		} status_range;
+		} status_stage;
 
 		struct
 		{
@@ -549,6 +549,9 @@ typedef enum : uint32_t
 
 typedef enum
 {
+	SETUP_STAGE = 2,
+	DATA_STAGE = 3,
+	STATUS_STAGE = 4,
 	LINK = 6,
 	ENABLE_SLOT_COMMAND = 9,
 	ADDRESS_DEVICE_COMMAND = 11,
@@ -560,7 +563,7 @@ typedef enum
 	HOST_CONTROLLER_EVENT = 37,
 	DEVICE_NOTIFICATION_EVENT = 38,
 	NF_INDEX_WRAP_EVENT = 39
-} xHCITRBCommandType;
+} xHCITRBType;
 
 
 typedef enum
