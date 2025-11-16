@@ -62,6 +62,12 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	vesa_map(g_kernel_pd);
 	clear_screen();
 
+	printf("<GRUB> VESA resolution set to ");
+	print_uint32_t(g_vesa_info_block.fb_width);
+	printf("x");
+	print_uint32_t(g_vesa_info_block.fb_height);
+	printf("\n");
+
 	printf("<Mercury> Loading Mercury kernel... \n");
 	
 	printf("<Mercury> kernel_start is mapped to 0x");

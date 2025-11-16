@@ -82,8 +82,8 @@ void tasks_init()
 	g_current_task = NULL_PTR;
 
 	create_task(idle_task, false);
-	create_task(idle_task, true);
-	create_task(idle_task2, false);
+	//create_task(idle_task, true);
+	//create_task(idle_task2, false);
 	create_task(test_task, false);
 }
 
