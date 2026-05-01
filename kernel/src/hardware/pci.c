@@ -1,4 +1,3 @@
-#include "hardware/usb/usb.h"
 #include <hardware/pci.h>
 #include <memory/heap.h>
 #include <memory/paging.h>
@@ -136,20 +135,6 @@ void pci_init_devices()
 
 		switch(device->class_id)
 		{
-			case 0xC:
-				switch(device->subclass_id)
-				{
-					case 0x3:
-						printf("<PCI> Initializing USB Controller\n");
-						usb_init_controller(device);
-						break;
-
-					default:
-						break;
-				}
-
-				break;
-
 			default:
 				break;
 		}

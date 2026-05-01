@@ -1,5 +1,4 @@
-#include "hardware/usb/usb.h"
-#include "multiboot.h"
+#include <multiboot.h>
 #include <syscalls.h>
 #include <fd.h>
 #include <vesa.h>
@@ -136,10 +135,7 @@ void v_kernel_start()
 	pci_enumerate_devices();
 
 	pit_set_schedule(true);
-
-	printf("<USB> Initializing USB\n");
-	usb_init();
-
+	
 	printf("<PCI> Initializing PCI devices\n");
 	pci_init_devices();
 
