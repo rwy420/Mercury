@@ -2,7 +2,7 @@
 #include <vesa.h>
 
 static uint16_t x = 0, y = 0;
-extern VesaInfoBlock g_vesa_info_block;
+extern VesaInfo g_vesa_info;
 
 int syscall_printf(void* buffer, size_t length)
 {
@@ -30,13 +30,13 @@ void printf_color(string str, uint32_t fg, uint32_t bg)
 				x += 0x8;
 		}
 
-		if(x >= g_vesa_info_block.fb_width - 0x10)
+		if(x >= g_vesa_info.fb_width - 0x10)
 		{
 			y += 0xE;
 			x = 0;
 		}
 
-		if(y >= g_vesa_info_block.fb_height - 0x20)
+		if(y >= g_vesa_info.fb_height - 0x20)
 		{
 			clear_screen();
 		}

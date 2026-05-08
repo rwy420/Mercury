@@ -25,7 +25,7 @@ typedef struct
 {
 	uint32_t fb;
 	uint32_t fb_width, fb_height;
-} __attribute__((packed)) VesaInfoBlock;
+} __attribute__((packed)) VesaInfo;
 
 void vesa_init();
 void vesa_put_pixel(int x, int y, uint32_t color);

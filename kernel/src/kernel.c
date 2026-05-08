@@ -34,7 +34,7 @@ uint32_t kernel_start_address;
 uint32_t kernel_end_address;
 uint32_t mem_manager_end;
 
-VesaInfoBlock g_vesa_info_block;
+VesaInfo g_vesa_info;
 
 extern PageDirectory* g_kernel_pd;
 
@@ -44,9 +44,9 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 {
 	multiboot_info_t* mb = (multiboot_info_t*) multiboot;
 
-	g_vesa_info_block.fb = mb->framebuffer_addr;
-	g_vesa_info_block.fb_height = mb->framebuffer_height;
-	g_vesa_info_block.fb_width = mb->framebuffer_width;
+	g_vesa_info.fb = mb->framebuffer_addr;
+	g_vesa_info.fb_height = mb->framebuffer_height;
+	g_vesa_info.fb_width = mb->framebuffer_width;
    
 	if(!paging_init()); //TODO error handling
 										
@@ -62,9 +62,9 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	clear_screen();
 
 	printf("<GRUB> VESA resolution set to ");
-	print_uint32_t(g_vesa_info_block.fb_width);
+	print_uint32_t(g_vesa_info.fb_width);
 	printf("x");
-	print_uint32_t(g_vesa_info_block.fb_height);
+	print_uint32_t(g_vesa_info.fb_height);
 	printf("\n");
 
 	printf("<Mercury> Loading Mercury kernel... \n");

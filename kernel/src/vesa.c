@@ -4,18 +4,18 @@
 #include <memory/common.h>
 #include <memory/paging.h>
 
-extern VesaInfoBlock g_vesa_info_block;
+extern VesaInfo g_vesa_info;
 
 uint32_t* vesa_fb;
 
 void vesa_init()
 {
-	vesa_fb = (uint32_t*) g_vesa_info_block.fb;
+	vesa_fb = (uint32_t*) g_vesa_info.fb;
 }
 
 void vesa_put_pixel(int x, int y, uint32_t color)
 {
-	vesa_fb[y * g_vesa_info_block.fb_width + y] = color;
+	vesa_fb[y * g_vesa_info.fb_width + y] = color;
 }
 
 void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg)
@@ -30,7 +30,7 @@ void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg)
 		{
             int pixel_x = x + col;
             int pixel_y = y + row;
-            int index = pixel_y * g_vesa_info_block.fb_width + pixel_x;
+            int index = pixel_y * g_vesa_info.fb_width + pixel_x;
 
             if (bits & (1 << (7 - col))) vesa_fb[index] = fg;
             else vesa_fb[index] = bg;
@@ -40,14 +40,14 @@ void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg)
 
 void vesa_clear()
 {
-	memset(vesa_fb, 0x0, g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 4);
+	memset(vesa_fb, 0x0, g_vesa_info.fb_height * g_vesa_info.fb_width * 4);
 }
 
 void vesa_map(PageDirectory* pd)
 {
-	for(int i = 0; i  < g_vesa_info_block.fb_height * g_vesa_info_block.fb_width * 4; i += PAGE_SIZE)
+	for(int i = 0; i  < g_vesa_info.fb_height * g_vesa_info.fb_width * 4; i += PAGE_SIZE)
 	{
-		void* address = (void*) (g_vesa_info_block.fb + i);
+		void* address = (void*) (g_vesa_info.fb + i);
 		map_page_pd(pd, address, address);
 	}
 }
