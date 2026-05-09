@@ -21,6 +21,7 @@
 #include <memory/common.h>
 #include <memory/paging.h>
 #include <memory/frames.h>
+#include <fs/disk.h>
 
 #define ATA
 
@@ -137,6 +138,8 @@ void v_kernel_start()
 	
 	printf("<PCI> Initializing PCI devices\n");
 	pci_init_devices();
+
+	if(!read_mbr()) printf_color("<Mercury> Could not read the MBR\n", COLOR_RED, COLOR_BLACK);
 
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
