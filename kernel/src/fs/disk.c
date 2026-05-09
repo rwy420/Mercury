@@ -1,7 +1,9 @@
 #include <fs/disk.h>
+#include <fs/fat/bpb.h>
 #include <common/screen.h>
 #include <driver/ata/ata.h>
 #include <memory/heap.h>
+#include <vesa.h>
 
 int read_mbr()
 {
@@ -26,6 +28,11 @@ int read_mbr()
 		printf("   Size: ");
 		print_uint32_t((entry->num_sectors * 512) / 1024 / 1024);
 		printf("MB\n");
+
+		if(entry->type == 0x0C)
+		{
+			if(!fat_read_bpb(entry->lba_start)) printf_color("<FAT> Could not read the FAT BPB\n", COLOR_RED, COLOR_BLACK);
+		}
 	}
 
 	return true;
