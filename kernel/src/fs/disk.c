@@ -12,5 +12,21 @@ int read_mbr()
 
 	if(mbr->signature != 0xAA55) return false;
 
+	for(uint8_t i = 0; i < 3; i++) 
+	{
+		PartitionTableEntry* entry = &mbr->partition_table_entries[i];
+		if(entry->type == 0) break;
+
+		printf("<MBR> Disk partition ");
+		print_uint8_t(i);
+		printf(":\n");
+		printf("   Type: ");
+		print_uint8_t(entry->type);
+		printf("\n");
+		printf("   Size: ");
+		print_uint32_t((entry->num_sectors * 512) / 1024 / 1024);
+		printf("MB\n");
+	}
+
 	return true;
 }

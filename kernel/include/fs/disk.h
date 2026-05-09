@@ -6,11 +6,11 @@
 typedef struct
 {
 	uint8_t attributes;
-	uint8_t chs_address_start[3];
+	uint32_t chs_address_start : 24;
 	uint8_t type;
-	uint8_t chs_address_end[3];
-	uint8_t lba_start[4];
-	uint8_t num_sectors[4];
+	uint32_t chs_address_end : 24;
+	uint32_t lba_start;
+	uint32_t num_sectors;
 } __attribute__((packed)) PartitionTableEntry;
 
 typedef struct
