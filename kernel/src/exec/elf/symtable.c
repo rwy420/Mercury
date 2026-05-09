@@ -4,7 +4,6 @@
 #include <common/screen.h>
 #include <memory/heap.h>
 #include <hardware/port.h>
-#include <fs/fat16/fat16.h>
 
 Symbol* symtable;
 uint32_t symbol_idx;
@@ -34,11 +33,6 @@ void symtable_init()
 	register_symbol("memmove", memmove);
 	//k_qslibc/qs_elf.h
 	register_symbol("image_load", image_load);
-	//k_qslibc/qs_fat16.h
-	register_symbol("fat16_open", fat16_open);
-	register_symbol("fat16_close", fat16_close);
-	register_symbol("fat16_read", fat16_read);
-	register_symbol("fat16_ls", fat16_ls);
 }
 
 void register_symbol(string name, void* address)

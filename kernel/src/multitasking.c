@@ -10,7 +10,6 @@
 #include <memory/paging.h>
 #include <common/screen.h>
 #include <exec/elf/elf_loader.h>
-#include <fs/fat16/fat16.h>
 #include <vesa.h>
 
 Task* task_list = NULL_PTR;

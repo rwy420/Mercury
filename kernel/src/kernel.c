@@ -21,7 +21,6 @@
 #include <memory/common.h>
 #include <memory/paging.h>
 #include <memory/frames.h>
-#include <fs/fat16/fat16.h>
 
 #define ATA
 
@@ -138,13 +137,6 @@ void v_kernel_start()
 	
 	printf("<PCI> Initializing PCI devices\n");
 	pci_init_devices();
-
-	/*storage_dev_t* fat_dev = kmalloc(sizeof(storage_dev_t));
-	fat_dev->read = _read;
-	fat_dev->read_byte = _read_byte;
-	fat_dev->seek = _seek;
-	fat_dev->write = _write;
-	fat16_init(fat_dev , 0);*/
 
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();

@@ -1,8 +1,7 @@
-#include <shell.h>
+/*#include <shell.h>
 #include <common/screen.h>
 #include <memory/common.h>
 #include <memory/heap.h>
-#include <fs/fat16/fat16.h>
 #include <exec/elf/elf_loader.h>
 
 char input_buffer[0xFF];
@@ -109,4 +108,4 @@ static char* get_argument(char* command, int idx)
 	}
 
 	return (char*) '\0';
-}
+}*/

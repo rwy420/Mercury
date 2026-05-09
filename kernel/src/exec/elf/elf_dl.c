@@ -1,6 +1,5 @@
 #include <exec/elf/elf_dl.h>
 #include <exec/elf/elf.h>
-#include <fs/fat16/fat16.h>
 #include <common/screen.h>
 #include <memory/common.h>
 #include <memory/heap.h>
@@ -15,7 +14,7 @@ void dl_init()
 
 int dlopen(char* path)
 {
-	int fd = fat16_open(path, 'r');
+	return 0;/*int fd = fat16_open(path, 'r');
 	uint32_t size = fat16_size("/LIB/LIBC.SO");
 	uint8_t* buffer = kmalloc(size);
 	fat16_read(fd, buffer, size);
@@ -30,14 +29,14 @@ int dlopen(char* path)
 	dynamic_libraries[dl].shdr = shdr;
 	dynamic_libraries[dl].shnum = 20;
 
-	return dl;
+	return dl;*/ 
 }
 
 void dlclose(int dl)
 {
-	kfree(dynamic_libraries[dl].buffer);
+	/*kfree(dynamic_libraries[dl].buffer);
 	fat16_close(dynamic_libraries[dl].fd);
-	dl_count--;
+	dl_count--;*/
 }
 
 void* dlsym(int dl, char* sym)

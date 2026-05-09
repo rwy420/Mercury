@@ -1,7 +1,6 @@
 #include <fd.h>
 #include <memory/common.h>
 #include <common/screen.h>
-#include <fs/fat16/fat16.h>
 
 FileDescriptor g_file_descriptors[0xFF];
 int fd_count;
@@ -78,13 +77,13 @@ int syscall_open(CPUState* cpu)
 	int flags = cpu->ecx;
 	char mode = cpu->edx;
 
-	return fat16_open(path, mode);
+	return 0; //fat16_open(path, mode);
 }
 
 int syscall_close(CPUState* cpu)
 {
 	uint32_t fd = cpu->ebx;
-	fat16_close(fd);
+	//fat16_close(fd);
 
 	return cpu->eax;
 }
