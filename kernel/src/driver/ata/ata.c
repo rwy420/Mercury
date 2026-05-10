@@ -1,6 +1,7 @@
 #include <driver/ata/ata.h>
 #include <hardware/port.h>
 #include <common/screen.h>
+#include <memory/common.h>
 
 #define DATA_PORT(base) base + 0 // 16 Bit / w Port
 #define ERROR_PORT(base) base +  1 // 8 Bit / b Port
@@ -55,7 +56,7 @@ int identify_disk(Disk* disk)
 	return true;
 }
 
-int read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
+int read28_sector(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
 {
 	if(sector & 0xF0000000) return false;
 
@@ -90,7 +91,7 @@ int read28_disk(Disk* disk, uint32_t sector, uint8_t* buffer, int length)
 	return true;
 }
 
-int write28_disk(Disk* disk, uint32_t sector, uint8_t* data, int length)
+int write28_sector(Disk* disk, uint32_t sector, uint8_t* data, int length)
 {
 	if(sector & 0xF0000000) 
 	{
@@ -140,13 +141,74 @@ int flush_disk(Disk* disk)
 	return true;
 }
 
-int read28(uint32_t sector, uint8_t* buffer, int length)
+int read28_disk(Disk* disk, uint32_t sector, uint16_t sector_offset, uint8_t* buffer, int length)
 {
-	return read28_disk(g_default_disk, sector, buffer, length);
+	uint8_t temp[sector_bytes];
+	uint8_t* result = buffer;
+
+	while(length > 0)
+	{
+		uint32_t bytes_rep = sector_bytes - sector_offset;
+
+		if(bytes_rep > length) bytes_rep = length; 
+
+		if(!read28_sector(disk, sector, temp, sector_bytes)) return false;
+
+		memcpy(result, temp + sector_offset, bytes_rep);
+
+		result += bytes_rep;
+		length -= bytes_rep;
+
+		sector++;
+		sector_offset = 0;
+	}
+
+	return true;
 }
-int write28(uint32_t sector, uint8_t* data, int length)
+
+int write28_disk(Disk* disk, uint32_t sector, uint16_t sector_offset, uint8_t* data, int length)
 {
-	return write28_disk(g_default_disk, sector, data, length);
+	uint8_t temp [sector_bytes];
+	uint8_t* in = data;
+
+	while(length > 0)
+	{
+		uint32_t bytes_rep = sector_bytes - sector_offset;
+
+		if(bytes_rep > length) bytes_rep = length;
+
+		int full_sector_write = (sector_offset == 0 && bytes_rep == sector_bytes);
+
+		if(!full_sector_write)
+		{
+			if(!read28_sector(disk, sector, temp, sector_bytes)) return false;
+		}
+		else
+		{
+			if(!read28_sector(disk, sector, temp, sector_bytes)) return false;
+
+			memcpy(temp + sector_offset, in, bytes_rep);
+
+			if(!write28_sector(disk, sector, temp, sector_bytes)) return false;
+		}
+
+		in += bytes_rep;
+		length -= bytes_rep;
+
+		sector++;
+		sector_offset = 0;
+	}
+
+	return true;
+}
+
+int read28(uint32_t sector, uint16_t sector_offset, uint8_t* buffer, int length)
+{
+	return read28_disk(g_default_disk, sector, sector_offset, buffer, length);
+}
+int write28(uint32_t sector, uint16_t sector_offset, uint8_t* data, int length)
+{
+	return write28_disk(g_default_disk, sector, sector_offset, data, length);
 }
 
 int flush()

@@ -8,7 +8,7 @@
 int read_mbr()
 {
 	uint8_t* mbr_buffer = kmalloc(512);
-	read28(0, mbr_buffer, 512);
+	read28(0, 0, mbr_buffer, 512);
 
 	MBR* mbr = (MBR*) mbr_buffer;
 
