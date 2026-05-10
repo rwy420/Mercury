@@ -38,7 +38,7 @@ FATDirectoryEntry* fat_path_to_dir_entry(uint32_t root_cluster, char* path)
 				if(entry->attributes == 0x00) break;
 				if(entry->attributes != 0x0F) continue; //TODO: LFN
 
-
+				
 			}
 
 			current_sub_idx = 0;

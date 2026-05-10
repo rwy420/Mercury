@@ -22,18 +22,3 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 
 	return true;
 }
-
-uint32_t cluster_to_lba(uint32_t cluster)
-{ 
-	return g_volume.data_start + (cluster - 2) * g_volume.bpb.num_sectors_per_cluster;
-}
-
-uint32_t fat_dir_entry_to_cluster(FATDirectoryEntry* entry)
-{
-	uint32_t result;
-
-	result = (result & 0xFFFF0000) | entry->first_cluster_lo;
-	result = (result & 0x0000FFFF) | ((uint32_t) entry->first_cluster_hi << 16);
-
-	return result;
-}

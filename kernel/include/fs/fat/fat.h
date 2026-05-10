@@ -31,4 +31,7 @@ typedef struct
 	uint16_t hi2_w[2];
 } __attribute__((packed)) FATDirectoryEntryLFN;
 
+uint32_t cluster_to_lba(uint32_t cluster);
+uint32_t fat_dir_entry_to_cluster(FATDirectoryEntry* entry);
+
 #endif
