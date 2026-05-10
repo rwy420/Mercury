@@ -19,4 +19,16 @@ typedef struct
 	uint32_t size;
 } __attribute__((packed)) FATDirectoryEntry;
 
+typedef struct
+{
+	uint8_t order;
+	uint16_t lo5_w[5];
+	uint8_t attribute;
+	uint8_t type;
+	uint8_t checksum;
+	uint16_t mi6_w[6];
+	uint16_t zero;
+	uint16_t hi2_w[2];
+} __attribute__((packed)) FATDirectoryEntryLFN;
+
 #endif
