@@ -17,19 +17,6 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	volume.root_cluster = ebpb->root_dir_cluster;
 	volume.sectors_per_cluster = bpb->num_sectors_per_cluster;
 
-	uint32_t root_cluster_lba = cluster_to_lba(volume.root_cluster);
-	uint8_t* root_buffer = kmalloc(volume.sectors_per_cluster * 512);
-
-	read28(root_cluster_lba, 0, root_buffer, volume.sectors_per_cluster * 512);
-
-	for(int i = 0; i < 8; i++)
-	{
-		FATDirectoryEntry* entry = (FATDirectoryEntry*) (root_buffer + i * sizeof(FATDirectoryEntry));
-		entry->name[8] = '\0';
-		printf((char*) entry->name);
-		printf("\n");
-	}
-
 	return true;
 }
 
