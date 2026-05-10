@@ -17,4 +17,6 @@ typedef struct
 
 int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
 
+uint32_t cluster_to_lba(uint32_t cluster);
+
 #endif

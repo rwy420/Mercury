@@ -15,7 +15,7 @@ typedef struct
 
 typedef struct
 {
-	uint8_t bootstrap[440];
+	uint8_t boot_code[440];
 	uint32_t uid;
 	uint16_t reserved;
 	PartitionTableEntry partition_table_entries[4];
