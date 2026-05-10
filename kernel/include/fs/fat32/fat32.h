@@ -1,6 +1,7 @@
 #ifndef __MERCURY__FS__FAT32__FAT32_H
 #define __MERCURY__FS__FAT32__FAT32_H
 
+#include <fs/fat/fat.h>
 #include <fs/disk.h>
 #include <fs/fat/bpb.h>
 
@@ -18,5 +19,6 @@ typedef struct
 int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
 
 uint32_t cluster_to_lba(uint32_t cluster);
+uint32_t fat_dir_entry_to_cluster(FATDirectoryEntry* entry);
 
 #endif
