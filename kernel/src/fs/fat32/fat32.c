@@ -18,7 +18,8 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	g_volume.root_cluster = ebpb->root_dir_cluster;
 	g_volume.sectors_per_cluster = bpb->num_sectors_per_cluster;
 
-	fat_path_to_dir_entry(g_volume.root_cluster, "/BOOT/TEST/KERNEL.ELF");
+	FATDirectoryEntry* entry = fat_path_to_dir_entry(g_volume.root_cluster, "/BOOT/KERNEL.ELF");
+	printf(entry->name);
 
 	return true;
 }

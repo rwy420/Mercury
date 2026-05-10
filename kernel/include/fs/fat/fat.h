@@ -33,5 +33,6 @@ typedef struct
 
 uint32_t cluster_to_lba(uint32_t cluster);
 uint32_t fat_dir_entry_to_cluster(FATDirectoryEntry* entry);
+int string_to_83_name(char* name_83, char* path_name);
 
 #endif
