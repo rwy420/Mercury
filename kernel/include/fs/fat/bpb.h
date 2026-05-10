@@ -2,6 +2,7 @@
 #define __MERCURY__FS__FAT__BPB_H
 
 #include <common/types.h>
+#include <fs/disk.h>
 
 typedef struct
 {
@@ -21,6 +22,6 @@ typedef struct
 	uint32_t num_large_sectors;
 } __attribute__((packed)) BPB;
 
-int fat_read_bpb(uint32_t sector);
+int fat_read_bpb(PartitionTableEntry* partition);
 
 #endif

@@ -22,8 +22,8 @@ int read_mbr()
 		printf("<MBR> Disk partition ");
 		print_uint8_t(i);
 		printf(":\n");
-		printf("   Type: ");
-		print_uint8_t(entry->type);
+		printf("   Type: 0x");
+		print_hex(entry->type);
 		printf("\n");
 		printf("   Size: ");
 		print_uint32_t((entry->num_sectors * 512) / 1024 / 1024);
@@ -31,7 +31,7 @@ int read_mbr()
 
 		if(entry->type == 0x0C)
 		{
-			if(!fat_read_bpb(entry->lba_start)) printf_color("<FAT> Could not read the FAT BPB\n", COLOR_RED, COLOR_BLACK);
+			if(!fat_read_bpb(entry)) printf_color("<FAT> Could not read the FAT BPB\n", COLOR_RED, COLOR_BLACK);
 		}
 	}
 
