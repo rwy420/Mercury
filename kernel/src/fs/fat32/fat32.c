@@ -4,7 +4,6 @@
 #include <fs/fat/fat.h>
 #include <driver/ata/ata.h>
 #include <fs/fat32/fat32_dir.h>
-#include <fd.h>
 
 FAT32Volume g_volume;
 
@@ -22,25 +21,36 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	return true;
 }
 
-uint32_t fat32_open(char* path)
+int fat32_open(FileDescriptor* fd, char* path)
 {
 	FATDirectoryEntry* entry = fat_path_to_dir_entry(g_volume.root_cluster, path);
-	if(entry == 0) return 0;
+	if(entry == 0) return 1;
 
 	FAT32File* file = kmalloc(sizeof(FAT32File));
 	file->entry = entry;
 
-	FileDescriptor* fd = create_fd();
-	
 	fd->type = FD_FAT32_FILE;
 	fd->object = file;
 
 	fd->read = fat32_read;
+	fd->write = fat32_write;
+	fd->close = fat32_close;	
 
-	return fd->index;
+	return 0;
 }
 
-int fat32_read(void* buffer, size_t length)
+int fat32_read(void* file_object, void* buffer, size_t length)
 {
 
+}
+
+int fat32_write(void* file_object, void* buffer, size_t length)
+{
+
+}
+
+int fat32_close(void* file_object)
+{
+	kfree(file_object);
+	return 0;
 }

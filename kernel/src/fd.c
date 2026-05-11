@@ -3,7 +3,6 @@
 #include <common/screen.h>
 
 FileDescriptor g_file_descriptors[0xFF];
-int fd_count;
 
 FileDescriptor* stdin;
 FileDescriptor* stdout;
@@ -13,32 +12,33 @@ void fd_init()
 	stdin = &g_file_descriptors[0];
 	stdout = &g_file_descriptors[1];
 
-	stdin->index = 0;
-	stdout->index = 1;
+	stdin->id = 0;
+	stdout->id = 1;
 
-	stdout->write = syscall_printf;
+	memset(g_file_descriptors, 0, sizeof(g_file_descriptors));
 
-	fd_count = 2;
+	//stdout->write = syscall_printf;
 }
 
 FileDescriptor* create_fd()
 {
 	for(int i = 0; i < 0xFF; i++)
 	{
-		if(g_file_descriptors[i].index == 0x100) 
+		if(g_file_descriptors[i].attributes == 0x00)
 		{
-			g_file_descriptors[i].index = i;
+			g_file_descriptors[i].attributes = 0x01;
+			g_file_descriptors[i].id = i;
 			return &g_file_descriptors[i];
 		}
 	}
 
-	return NULL_PTR;
+	return 0;
 }
 
 void close_fd(int fd)
 {
 	memset(&g_file_descriptors[fd], 0, sizeof(FileDescriptor));
-	g_file_descriptors[fd].index = 0x100;
+	g_file_descriptors[fd].attributes = 0x01;
 }
 
 int syscall_read(CPUState* cpu)
@@ -50,7 +50,7 @@ int syscall_read(CPUState* cpu)
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
 	if(fd->read != NULL_PTR) 
 	{
-		fd->read(buffer, length);
+		fd->read(fd->object, buffer, length);
 	}
 
 	return cpu->eax;
@@ -65,7 +65,7 @@ int syscall_write(CPUState* cpu)
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
 	if(fd->write != NULL_PTR) 
 	{
-		fd->write(buffer, length);
+		fd->write(fd->object, buffer, length);
 	}
 
 	return cpu->eax;

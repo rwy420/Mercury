@@ -4,6 +4,7 @@
 #include <fs/fat/fat.h>
 #include <fs/disk.h>
 #include <fs/fat/bpb.h>
+#include <fd.h>
 
 typedef struct
 {
@@ -22,9 +23,10 @@ typedef struct
 } FAT32File;
 
 int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
-uint32_t fat32_open(char* path);
-int fat32_read(void* buffer, size_t length);
-int fat32_write(void* buffer, size_t length);
-int fat32_close();
+
+int fat32_open(FileDescriptor* fd, char* path);
+int fat32_read(void* file_object, void* buffer, size_t length);
+int fat32_write(void* file_object, void* buffer, size_t length);
+int fat32_close(void* file_object);
 
 #endif

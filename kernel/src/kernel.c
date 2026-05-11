@@ -22,6 +22,7 @@
 #include <memory/paging.h>
 #include <memory/frames.h>
 #include <fs/disk.h>
+#include <fs/fs.h>
 
 #define ATA
 
@@ -139,12 +140,15 @@ void v_kernel_start()
 
 	if(!read_mbr()) printf_color("<Mercury> Could not read the MBR\n", COLOR_RED, COLOR_BLACK);
 	
-	pit_set_schedule(true);
+	//pit_set_schedule(true);
 
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
+
+	uint32_t kernel = fs_open("/BOOT/KERNEL.ELF");
+	print_uint32_t(kernel);
 
 	while(1);
 }

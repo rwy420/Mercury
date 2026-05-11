@@ -19,13 +19,14 @@ typedef enum
 
 typedef struct
 {
-	int index;
+	uint32_t id;
+	uint8_t attributes;
 	FILE_DESCRIPTOR_TYPE type;
 	void* object;
 	int seek;
-	int (*read)(void* buffer, size_t length);
-	int (*write)(void* buffer, size_t length);
-	int (*close)();
+	int (*read)(void* object, void* buffer, size_t length);
+	int (*write)(void* object, void* buffer, size_t length);
+	int (*close)(void* object);
 } FileDescriptor;
 
 void fd_init();
