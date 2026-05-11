@@ -21,6 +21,19 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	return true;
 }
 
+uint32_t fat_get_next_cluster(uint32_t cluster)
+{
+    uint32_t fat_offset = cluster * 4;
+    uint32_t fat_sector = g_volume.fat_start + (fat_offset / 512);
+    uint32_t entry_offset = fat_offset % 512;
+    
+    uint8_t* sector_buffer = kmalloc(512);
+    read28(fat_sector, 0, sector_buffer, 512);
+    
+    uint32_t next = *(uint32_t*)(sector_buffer + entry_offset) & 0x0FFFFFFF;
+    return next;
+}
+
 int fat32_open(FileDescriptor* fd, char* path)
 {
 	FATDirectoryEntry* entry = fat_path_to_dir_entry(g_volume.root_cluster, path);

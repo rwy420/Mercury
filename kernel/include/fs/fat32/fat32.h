@@ -23,6 +23,7 @@ typedef struct
 } FAT32File;
 
 int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
+uint32_t fat_get_next_cluster(uint32_t cluster);
 
 int fat32_open(FileDescriptor* fd, char* path);
 int fat32_read(void* file_object, void* buffer, size_t length);
