@@ -6,7 +6,7 @@
 
 typedef enum
 {
-	FD_FILE,
+	FD_FAT32_FILE,
 	FD_DEVICE
 } FILE_DESCRIPTOR_TYPE;
 

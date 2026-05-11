@@ -16,6 +16,15 @@ typedef struct
 	uint32_t sectors_per_cluster;
 } FAT32Volume;
 
+typedef struct
+{
+	FATDirectoryEntry* entry;
+} FAT32File;
+
 int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
+uint32_t fat32_open(char* path);
+int fat32_read(void* buffer, size_t length);
+int fat32_write(void* buffer, size_t length);
+int fat32_close();
 
 #endif

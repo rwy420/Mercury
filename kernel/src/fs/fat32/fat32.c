@@ -4,6 +4,7 @@
 #include <fs/fat/fat.h>
 #include <driver/ata/ata.h>
 #include <fs/fat32/fat32_dir.h>
+#include <fd.h>
 
 FAT32Volume g_volume;
 
@@ -18,8 +19,28 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	g_volume.root_cluster = ebpb->root_dir_cluster;
 	g_volume.sectors_per_cluster = bpb->num_sectors_per_cluster;
 
-	FATDirectoryEntry* entry = fat_path_to_dir_entry(g_volume.root_cluster, "/BOOT/KERNEL.ELF");
-	printf(entry->name);
-
 	return true;
+}
+
+uint32_t fat32_open(char* path)
+{
+	FATDirectoryEntry* entry = fat_path_to_dir_entry(g_volume.root_cluster, path);
+	if(entry == 0) return 0;
+
+	FAT32File* file = kmalloc(sizeof(FAT32File));
+	file->entry = entry;
+
+	FileDescriptor* fd = create_fd();
+	
+	fd->type = FD_FAT32_FILE;
+	fd->object = file;
+
+	fd->read = fat32_read;
+
+	return fd->index;
+}
+
+int fat32_read(void* buffer, size_t length)
+{
+
 }
