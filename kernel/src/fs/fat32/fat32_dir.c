@@ -15,28 +15,29 @@ FATDirectoryEntry* fat_path_to_dir_entry(uint32_t root_cluster, char* path)
 	uint32_t current_cluster = root_cluster;
 	FATDirectoryEntry* result;
 
-	uint32_t path_idx = 0;
-	uint8_t current_sub[12];
-	uint8_t current_sub_idx = 0;
-	int done = 0;
 	int found = 0;
+	char* start = path;
 
-	memset(current_sub, 0, 11);
-	current_sub[11] = '\0';
+	if(*start == '/') start++;
 
-	while(!done)
+	while(*start)
 	{
-		char current = path[path_idx];
-		done = path[path_idx + 1] == '\0';
+		char* end = start;
 
-		if(current == '/' || done)
+		while(*end && *end != '/')
 		{
-			if(done) current_sub[current_sub_idx++] = current;
+			end++;
+		}
+
+		char saved = *end;
+		*end = '\0';
 
 			read28(cluster_to_lba(current_cluster), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
 
 			for(int i = 0; i < (g_volume.sectors_per_cluster * 512) / sizeof(FATDirectoryEntry); i++)
 			{
+				result = 0;
+
 				FATDirectoryEntry* entry = (FATDirectoryEntry*) (cluster_buffer + i * sizeof(FATDirectoryEntry));
 				if(entry->name[0] == 0x00) break;
 				if(entry->name[0] == 0xE5) break;
@@ -45,39 +46,26 @@ FATDirectoryEntry* fat_path_to_dir_entry(uint32_t root_cluster, char* path)
 				char current_sub_83[12];
 				current_sub_83[11] = '\0';
 				
-				string_to_83_name(current_sub_83, current_sub);
+				string_to_83_name(current_sub_83, start);
 	
 				if(!memcmp(current_sub_83, entry->name, 11))
 				{
 					current_cluster = fat_dir_entry_to_cluster(entry);
-					/*printf("MATCH: '");
-					printf(current_sub_83);
-					printf("':'");
-					printf(entry->name);
-					printf("'\n\n");*/
-
-					if(done)
-					{
-						found = 1;
-						result = entry;
-					}
+					result = entry;
+					break;
 				}
 			}
 
-			current_sub_idx = 0;
-			memset(current_sub, 0, 11);
-		}
-		else
-		{
-			current_sub[current_sub_idx++] = current;
-		}
+		*end = saved;
 
-		path_idx++;
+		start = end;
+
+		while(*start == '/') start++;
 	}
 
 	kfree(cluster_buffer);
 
-	if(!found)
+	if(result == 0)
 	{
 		printf_color("<FAT32> Could not find '", COLOR_RED, COLOR_BLACK);
 		printf_color(path, COLOR_RED, COLOR_BLACK);
