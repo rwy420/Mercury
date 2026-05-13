@@ -4,6 +4,7 @@
 #include <fs/fat/fat.h>
 #include <driver/ata/ata.h>
 #include <fs/fat32/fat32_dir.h>
+#include <memory/common.h>
 
 FAT32Volume g_volume;
 
@@ -52,12 +53,46 @@ int fat32_open(FileDescriptor* fd, char* path)
 	return 0;
 }
 
-int fat32_read(void* file_object, void* buffer, size_t length)
+int fat32_read(void* file_object, void* buffer, uint32_t offset, size_t length)
 {
+	FATDirectoryEntry* dir_entry = ((FAT32File*) file_object)->entry;
+	uint32_t current_cluster = fat_dir_entry_to_cluster(dir_entry);
+	uint32_t sector_offset = offset / 512;
+	uint32_t sector_offset_start = offset % 512;
+	uint32_t first_sector = cluster_to_lba(current_cluster) + sector_offset;
+	uint32_t bytes_read = 0;
+	uint32_t sectors_current_cluster = 0;
 
+	uint8_t sector_buffer[512];
+
+	for(uint32_t i = 0; i < (dir_entry->size / 512) + 1; i++)
+	{
+		uint32_t bytes_to_read = 512 - sector_offset_start;
+		if(bytes_to_read > length) bytes_to_read = length;
+
+		uint32_t sector = cluster_to_lba(current_cluster) + sectors_current_cluster;
+		//read28(sector, sector_offset_start, sector_buffer, bytes_to_read);
+		
+		sector_offset_start = 0;
+		bytes_read += bytes_to_read;
+		length -= bytes_to_read;
+		sectors_current_cluster++;
+
+		//memcpy(buffer, sector_buffer, bytes_to_read);
+
+		if(sectors_current_cluster == g_volume.sectors_per_cluster) current_cluster = fat_get_next_cluster(current_cluster);
+	}
+
+	printf("The file is ");
+	print_uint32_t(dir_entry->size);
+	printf(" bytes big and I just read ");
+	print_uint32_t(bytes_read);
+	printf("\n");
+
+	return 0;
 }
 
-int fat32_write(void* file_object, void* buffer, size_t length)
+int fat32_write(void* file_object, void* buffer, uint32_t offset, size_t length)
 {
 
 }

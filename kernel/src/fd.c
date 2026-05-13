@@ -50,7 +50,7 @@ int syscall_read(CPUState* cpu)
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
 	if(fd->read != NULL_PTR) 
 	{
-		fd->read(fd->object, buffer, length);
+		fd->read(fd->object, buffer, fd->offset, length);
 	}
 
 	return cpu->eax;
@@ -65,7 +65,7 @@ int syscall_write(CPUState* cpu)
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
 	if(fd->write != NULL_PTR) 
 	{
-		fd->write(fd->object, buffer, length);
+		fd->write(fd->object, buffer, fd->offset, length);
 	}
 
 	return cpu->eax;
@@ -102,7 +102,7 @@ int syscall_lseek(CPUState* cpu)
 			seek = offset;
 			break;
 		case SEEK_CUR:
-			seek = fd->seek + offset;
+			seek = fd->offset + offset;
 			break;
 		case SEEK_END: //TODO
 			break;
@@ -110,6 +110,6 @@ int syscall_lseek(CPUState* cpu)
 			break;
 	}
 
-	fd->seek = seek;
+	fd->offset = seek;
 	return cpu->eax;
 }

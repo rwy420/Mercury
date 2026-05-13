@@ -23,9 +23,9 @@ typedef struct
 	uint8_t attributes;
 	FILE_DESCRIPTOR_TYPE type;
 	void* object;
-	int seek;
-	int (*read)(void* object, void* buffer, size_t length);
-	int (*write)(void* object, void* buffer, size_t length);
+	uint32_t offset;
+	int (*read)(void* object, void* buffer, uint32_t offset, size_t length);
+	int (*write)(void* object, void* buffer, uint32_t offset, size_t length);
 	int (*close)(void* object);
 } FileDescriptor;
 
