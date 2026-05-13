@@ -81,9 +81,9 @@ void tasks_init()
 	g_current_task = NULL_PTR;
 
 	create_task(idle_task, false);
-	//create_task(idle_task, true);
-	//create_task(idle_task2, false);
-	create_task(test_task, false);
+	create_task(idle_task, true);
+	create_task(idle_task2, false);
+	//create_task(test_task, false);
 }
 
 Task* create_task(void(*entry)(), int kernel)
@@ -171,7 +171,7 @@ void schedule(CPUState* cpu)
 		return;
 	}
 
-	g_current_task->eip = cpu->eip;
+	/*g_current_task->eip = cpu->eip;
 	g_current_task->esp = cpu->esp;
 	
 	g_current_task->ebp = cpu->ebp;
@@ -181,7 +181,7 @@ void schedule(CPUState* cpu)
 	g_current_task->edx = cpu->edx;
 
 	g_current_task->esi = cpu->esi;
-	g_current_task->edi = cpu->edi;
+	g_current_task->edi = cpu->edi;*/
 
 	Task* start = g_current_task;
 

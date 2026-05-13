@@ -44,16 +44,15 @@ common_interrupt_handler:
 
 	call interrupt_handler
 
-	add esp, 4 ; Instead of pop'ing eax
+	pop eax
 	pop ebx
 	pop ecx
 	pop edx
 	pop esi
 	pop edi
 	pop ebp
-	pop esp
 
-	add esp, 12
+	add esp, 16
 
 	iret
 
