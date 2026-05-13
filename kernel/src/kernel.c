@@ -147,10 +147,15 @@ void v_kernel_start()
 
 	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
 
-	uint8_t* kernel_buffer = kmalloc(4000);
-	uint32_t kernel = fs_open("/BOOT/KERNEL.ELF");
-	fs_read(kernel, kernel_buffer, 1076);
-	fs_read(kernel, kernel_buffer, 759);
+	uint8_t* kernel_buffer = kmalloc(14712);
+	memset(kernel_buffer, 0, 14712);
+	uint32_t kernel = fs_open("/BIN/MAIN.ELF");
+	fs_read(kernel, kernel_buffer, 14712);
+
+	void(*entry)(void) = image_load(kernel_buffer, 14712, 1);
+	entry();
+
+	for(int i = 10000; i < 10000 + 0x200; i++) print_hex(kernel_buffer[i]);
 
 	while(1);
 }

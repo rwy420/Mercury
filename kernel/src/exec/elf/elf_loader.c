@@ -78,7 +78,7 @@ void* image_load(char* elf_start, unsigned int size, int debug)
     void* entry;
     int i = 0;
     uint8_t* exec;
-	int dl = dlopen("/LIB/LIBC.SO");
+	//int dl = dlopen("/LIB/LIBC.SO");
 
     hdr = (Elf32_Ehdr*) elf_start;
 
@@ -123,13 +123,13 @@ void* image_load(char* elf_start, unsigned int size, int debug)
     Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
     char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
     
-    for (i = 0; i < hdr->e_shnum; ++i)
+    /*for (i = 0; i < hdr->e_shnum; ++i)
     {
         if (shdr[i].sh_type == SHT_REL)
         {
             relocate(shdr + i, global_syms, global_strings, elf_start, exec, dl);
         }
-    }
+    }*/
 
     int symbol_table_index = find_symbol_table(hdr, shdr);
     entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);

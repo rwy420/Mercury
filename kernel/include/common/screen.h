@@ -4,7 +4,7 @@
 #include <common/types.h>
 #include <hardware/interrupts.h>
 
-int syscall_printf(void* buffer, size_t length);
+int syscall_printf(void* object, void* buffer, uint32_t offset, size_t length);
 
 void printf_color(string str, uint32_t fg, uint32_t bg);
 void printf(string str);

@@ -4,7 +4,7 @@
 static uint16_t x = 0, y = 0;
 extern VesaInfo g_vesa_info;
 
-int syscall_printf(void* buffer, size_t length)
+int syscall_printf(void* object, void* buffer, uint32_t offset, size_t length)
 {
 	printf((string) buffer);
 	return 0;

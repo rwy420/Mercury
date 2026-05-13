@@ -17,7 +17,7 @@ void fd_init()
 
 	memset(g_file_descriptors, 0, sizeof(g_file_descriptors));
 
-	//stdout->write = syscall_printf;
+	stdout->write = syscall_printf;
 }
 
 FileDescriptor* create_fd()
