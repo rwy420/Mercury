@@ -30,6 +30,4 @@ Task* create_task(void(*entry)(), int kernel);
 void kill_task(uint8_t id);
 uint32_t schedule(uint32_t esp);
 
-void restore_and_switch();
-
 #endif
