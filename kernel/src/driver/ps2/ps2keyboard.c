@@ -5,7 +5,6 @@
 #include <memory/heap.h>
 #include <hardware/interrupts.h>
 #include <common/screen.h>
-#include <shell.h>
 
 int shift;
 

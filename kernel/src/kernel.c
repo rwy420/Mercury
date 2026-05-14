@@ -2,7 +2,6 @@
 #include <syscalls.h>
 #include <fd.h>
 #include <vesa.h>
-#include <shell.h>
 #include <process.h>
 #include <multitasking.h>
 #include <common/screen.h>

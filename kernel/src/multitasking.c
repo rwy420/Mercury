@@ -1,7 +1,6 @@
-#include "common/types.h"
-#include "memory/frames.h"
+#include <common/types.h>
+#include <memory/frames.h>
 #include <multitasking.h>
-#include <shell.h>
 #include <hardware/interrupts.h>
 #include <hardware/pit.h>
 #include <memory/common.h>
