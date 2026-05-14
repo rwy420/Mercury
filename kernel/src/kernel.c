@@ -83,6 +83,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 
 void v_kernel_start()
 {
+	asm volatile("add $0xC0000000, %ESP");
 	segments_install_gdt();
 	install_idt();
 	pit_init(250);

@@ -70,12 +70,6 @@ void install_idt()
 uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 {
 	CPUState* cpu_state = (CPUState*) esp;
-
-	//print_hex32(cpu_state->esp);
-	//printf(" ");
-	
-	
-	
 	
 	if(interrupt == 0x20) 
 	{
