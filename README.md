@@ -1,6 +1,6 @@
 # Mercury
 
-Mercury is a WIP x86-32 kernel. \
+Mercury is a WIP x86-32 kernel.
 
 ## Building and booting
 To build the kernel and create a bootable image: `make grub`
@@ -11,7 +11,7 @@ To run the kernel: `make qemu`
 - Multitasking
 
 ## TODO
-- [X] FAT32 R/W
+- [ ] FAT32 R/W
 - [ ] VFS 
 - [ ] Ring 3 / Usermode
 - [ ] Improved multitasking
