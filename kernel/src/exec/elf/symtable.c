@@ -12,27 +12,6 @@ void symtable_init()
 {
 	symtable = kmalloc(sizeof(Symbol) * MAX_SYMBOLS);
 	symbol_idx = 0;
-
-	//k_qslibc/qs_io.h
-	register_symbol("inb", inb);
-	register_symbol("outb", outb);
-	register_symbol("outb_slow", outb_slow);
-	register_symbol("inw", inw);
-	register_symbol("outw", outw);
-	register_symbol("inl", inl);
-	register_symbol("outl", outl);
-	//k_qslibc/qs_log.h
-	register_symbol("kprintf", printf);
-	register_symbol("kscreen_clear", clear_screen);
-	//k_qslibc/qs_mem.h
-	register_symbol("kmalloc", kmalloc);
-	register_symbol("kfree", kfree);
-	register_symbol("kmalloc_aligned", kmalloc_aligned);
-	register_symbol("kfree_aligned", kfree_aligned);
-	register_symbol("memset", memset);
-	register_symbol("memmove", memmove);
-	//k_qslibc/qs_elf.h
-	register_symbol("image_load", image_load);
 }
 
 void register_symbol(string name, void* address)
