@@ -1,3 +1,4 @@
+#include "hardware/pit.h"
 #include <common/types.h>
 #include <memory/gdt.h>
 #include <memory/common.h>
@@ -5,6 +6,9 @@
 #include <hardware/pic.h>
 #include <common/screen.h>
 #include <syscalls.h>
+#include <multitasking.h>
+
+extern Task* g_current_task;
 
 isr_t interrupt_handers[256];
 
@@ -63,19 +67,25 @@ void install_idt()
 	asm volatile("lidt %0; sti;" : : "m" (idt));	
 }
 
-int interrupt_handler(CPUState cpu_state, uint32_t interrupt)
+uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 {
-	// Only syscalls should return values
-	if(interrupt == 0x80)
+	CPUState* cpu_state = (CPUState*) esp;
+
+	//print_hex32(cpu_state->esp);
+	//printf(" ");
+	
+	
+	
+	
+	if(interrupt == 0x20) 
 	{
-		int syscall_return = syscall(&cpu_state);
-		
-		return syscall_return;
+		g_current_task->esp = esp;
+		esp = pit_handle_interrupt(esp);
 	}
 
 	if(interrupt_handers[interrupt] != 0x00)
 	{
-		interrupt_handers[interrupt](&cpu_state);
+		interrupt_handers[interrupt](cpu_state);
 	}
 
 	if(hardware_interrupt_offset <= interrupt && interrupt < hardware_interrupt_offset + 16)
@@ -83,5 +93,5 @@ int interrupt_handler(CPUState cpu_state, uint32_t interrupt)
 		pic_confirm(interrupt);
 	}
 
-	return cpu_state.eax;
-}
+	return esp;
+};

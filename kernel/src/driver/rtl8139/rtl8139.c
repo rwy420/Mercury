@@ -29,7 +29,8 @@ static void rtl8139_reset()
     outb(COMMAND_PORT(port_base), 0x10);
     while((inb(COMMAND_PORT(port_base)) & 0x10) != 0);
 }
-static void rtl8139_handle_interrupt()
+
+void rtl8139_handle_interrupt()
 {
     printf("Got Interrupt\n");
     

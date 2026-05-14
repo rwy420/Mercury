@@ -26,7 +26,6 @@ void segments_install_gdt()
 	g_gdt.size = (sizeof(GDTEntry) * 6) - 1;
 
 	memset(&g_tss, 0, sizeof(TSS));
-	g_tss.ss0 = KERNEL_DATA_SEGMENT;
 
 	gdt_set_entry(0, 0, 0, 0, 0);
 	gdt_set_entry(1, 0, 0xFFFFF, 0x9A, 0xCF);
@@ -35,13 +34,11 @@ void segments_install_gdt()
 	gdt_set_entry(4, 0, 0xFFFFF, 0xF2, 0xCF);
 	gdt_set_entry(5, (uint32_t) &g_tss, sizeof(TSS), 0x89, 0x40);
 
+	g_tss.ss0 = 0x10;
+	g_tss.esp0 = 0xC0090000;
+
 	segments_load_gdt(g_gdt);
 	segments_load_registers();
 
-	g_tss.esp0 = 0x90000;
-	g_tss.ss0 = 0x10;
-
-	g_tss.cs = 0x08;
-	g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x10;
 	asm("ltr %%ax" :: "a" ((uint16_t) TSS_SEGMENT));
 }

@@ -57,14 +57,18 @@ typedef struct
 	uint32_t esi;
 	uint32_t edi;
 	uint32_t ebp;
-	uint32_t esp;
+
+	//uint32_t error_code;
 	uint32_t eip;
-	uint32_t error_code;
+	uint32_t cs;
+	uint32_t eflags;
+	uint32_t esp;
+	uint32_t ss;
 } __attribute__((packed)) CPUState;
 
 typedef void (*isr_t)(CPUState* cpu);
 
 void register_interrupt_handler(uint8_t n, isr_t handler);
-int interrupt_handler(CPUState cpu_state, uint32_t interrupt);
+uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp);
 
 #endif 

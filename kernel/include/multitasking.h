@@ -17,9 +17,7 @@ typedef enum
 typedef struct Task
 {
 	uint8_t id;
-	uint32_t esp, eip;
-	uint32_t ebp, eax, ebx, ecx, edx;
-	uint32_t esi, edi;
+	uint32_t esp;
 	uint32_t cr3;
 	uint32_t flags;
 	int kernel;
@@ -30,7 +28,7 @@ typedef struct Task
 void tasks_init();
 Task* create_task(void(*entry)(), int kernel);
 void kill_task(uint8_t id);
-void schedule(CPUState* cpu);
+uint32_t schedule(uint32_t esp);
 
 void restore_and_switch();
 

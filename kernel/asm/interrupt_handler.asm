@@ -3,13 +3,8 @@ extern interrupt_handler
 %macro interrupt 1
 global handle_irq_%1
 handle_irq_%1:
-	push dword %1
-	push dword 0
-
-	mov [0x20000], eax
-	mov eax, [esp + 8]
-	push eax	
-	mov eax, [0x20000]
+	mov dword [interrupt_number], %1
+	;push dword 0
 
 	jmp common_interrupt_handler
 %endmacro
@@ -17,23 +12,11 @@ handle_irq_%1:
 %macro error_interrupt 1
 global handle_irq_%1
 handle_irq_%1:
-	push dword %1
-	
-	mov [0x20000], eax
-	mov eax, [esp + 4]
-	push eax	
-	mov eax, [0x20000]
-
-	mov [0x20000], eax
-	mov eax, [esp + 12]
-	push eax	
-	mov eax, [0x20000]
-
+	mov [interrupt_number], %1	
 	jmp common_interrupt_handler
 %endmacro
 
 common_interrupt_handler:
-	push esp
 	push ebp
 	push edi
 	push esi
@@ -42,7 +25,11 @@ common_interrupt_handler:
 	push ebx
 	push eax
 
+	push esp
+	push dword [interrupt_number]
+
 	call interrupt_handler
+	mov esp, eax
 
 	pop eax
 	pop ebx
@@ -51,9 +38,7 @@ common_interrupt_handler:
 	pop esi
 	pop edi
 	pop ebp
-
-	add esp, 16
-
+	
 	iret
 
 ; Exceptions
@@ -80,3 +65,6 @@ interrupt 41
 interrupt 43
 interrupt 49
 interrupt 128
+
+section .data
+interrupt_number db 0

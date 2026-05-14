@@ -53,22 +53,10 @@ void test_task()
 
 void idle_task()
 {
-	static uint32_t counter = 0;
+	uint32_t counter = 100;
 	while(1)
 	{
 		printf("Task 1 ");
-		print_hex32(counter++);
-		printf("\n");
-		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
-	}
-}
-
-void idle_task2()
-{
-	static uint32_t counter = 0;
-	while(1)
-	{
-		printf("Task 2 ");
 		print_hex32(counter++);
 		printf("\n");
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
@@ -80,13 +68,13 @@ void tasks_init()
 	task_list = NULL_PTR;
 	g_current_task = NULL_PTR;
 
-	create_task(idle_task, false);
+	create_task(dummy_task, true);
 	create_task(idle_task, true);
-	create_task(idle_task2, false);
-	//create_task(test_task, false);
+	//create_task(idle_task2, true);
+	//create_task(idle_task3, false);
 }
 
-Task* create_task(void(*entry)(), int kernel)
+Task* create_task(void entry(), int kernel)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
 
@@ -94,10 +82,10 @@ Task* create_task(void(*entry)(), int kernel)
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 	
-	void* stack_frame = alloc_frames(4);
-	for(uint32_t i = (uint32_t) stack_frame; i < (uint32_t) stack_frame + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page((void*) i, (void*) i);
-	memset(stack_frame, 0x0, 0x4000);
-	uint32_t esp = ((uint32_t) stack_frame) + 0x3000;
+	void* stack = alloc_frames(4);
+	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page((void*) i, (void*) i);
+	memset(stack, 0x0, 0x4000);
+	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + 0x4000 - sizeof(CPUState));
 	
 	if(!kernel)
 	{
@@ -111,14 +99,22 @@ Task* create_task(void(*entry)(), int kernel)
 
 	for(int i = 0; i < 4; i++)
 	{
-		void* address = (void*) ((uint32_t) stack_frame) + i * FRAME_SIZE;
+		void* address = (void*) ((uint32_t) stack) + i * FRAME_SIZE;
 		map_page(address, address);
 		if(!kernel) map_page_pd((PageDirectory*) task->cr3, address, address);
 	}
 
 	task->kernel = kernel;
-	task->esp = esp;
-	task->eip = (uint32_t) entry;
+	task->esp = (uint32_t) cpu_state;
+
+	cpu_state->ebp = task->esp;
+
+	cpu_state->eip = (uint32_t) entry;
+	cpu_state->cs = 0x08;
+	cpu_state->eflags = 0x202;
+	cpu_state->esp = ((uint32_t) cpu_state);
+	cpu_state->ss = 0x10;
+		
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -158,30 +154,18 @@ void kill_task(uint8_t id)
 	}
 }
 
-void schedule(CPUState* cpu) 
+uint32_t schedule(uint32_t esp) 
 {
+	CPUState* cpu = (CPUState*) esp;
 	set_pd(g_kernel_pd);
 
 	pic_confirm(0x20);
 
-
 	if(g_current_task == NULL_PTR)
 	{
 		g_current_task = task_list;
-		return;
+		return esp;
 	}
-
-	/*g_current_task->eip = cpu->eip;
-	g_current_task->esp = cpu->esp;
-	
-	g_current_task->ebp = cpu->ebp;
-	g_current_task->eax = cpu->eax;
-	g_current_task->ebx = cpu->ebx;
-	g_current_task->ecx = cpu->ecx;
-	g_current_task->edx = cpu->edx;
-
-	g_current_task->esi = cpu->esi;
-	g_current_task->edi = cpu->edi;*/
 
 	Task* start = g_current_task;
 
@@ -191,14 +175,11 @@ void schedule(CPUState* cpu)
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
-
-			g_tss.cs = 0x18;
-			g_tss.ss = g_tss.ds = g_tss.es = g_tss.fs = g_tss.gs = 0x20;
 			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
-			restore_and_switch();
-
-			break;
+			return (uint32_t) g_current_task->esp;
 		}
 
 	} while(g_current_task != start);
+
+	return esp;
 }

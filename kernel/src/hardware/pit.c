@@ -3,7 +3,7 @@
 #include <common/screen.h>
 
 volatile uint32_t g_ms_since_init;
-uint32_t pit_hz;
+uint32_t pit_hz = 0;
 int pit_schedule;
 
 void pit_init(uint32_t hz)
@@ -17,14 +17,15 @@ void pit_init(uint32_t hz)
     outb(0x40, divisor >> 8);
 
 	pit_schedule = 0;
-	register_interrupt_handler(0x20, pit_handle_interrupt);
 }
 
-void pit_handle_interrupt(CPUState* cpu)
+uint32_t pit_handle_interrupt(uint32_t esp)
 {
 	g_ms_since_init += 1000 / pit_hz;
 
-	if(pit_schedule) schedule(cpu);
+	if(pit_schedule) return schedule(esp);
+
+	return esp;
 }
 
 void pit_set_schedule(int enable)
