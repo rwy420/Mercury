@@ -24,6 +24,7 @@
 #include <fs/fs.h>
 
 #define ATA
+#define STARTTEXT
 
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
@@ -145,7 +146,11 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
-	
+	//printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
+#ifdef STARTTEXT
+	clear_screen();
+	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
+#endif
+
 	while(1);
 }
