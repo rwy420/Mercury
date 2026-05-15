@@ -58,7 +58,7 @@ typedef struct
 	uint32_t edi;
 	uint32_t ebp;
 
-	//uint32_t error_code;
+	uint32_t error_code;
 	uint32_t eip;
 	uint32_t cs;
 	uint32_t eflags;

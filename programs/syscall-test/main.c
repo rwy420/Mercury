@@ -1,9 +1,5 @@
-char msg[] = "Hello world from ELF32 in FAT32";
-unsigned int len = sizeof(msg) - 1;
 
-
-
-int main()
+void printf_sys(char* str, int length)
 {
 	asm volatile(
 		"mov $4, %%eax\n"
@@ -12,10 +8,33 @@ int main()
 		"mov %1, %%edx\n"
 		"int $0x80\n"
 		:
-		: "r"(msg), "r"(len)
+		: "r"(str), "r"(length)
 		: "eax", "ebx", "ecx", "edx"
 	);
+}
 
+void printhex(unsigned char h)
+{
+	char* foo = "00";
+	char* hex = "0123456789ABCDEF";
+	foo[0] = hex[(h >> 4) & 0xF];
+	foo[1] = hex[h & 0xF];
+	printf_sys(foo, 2);
+}
+
+
+
+int main()
+{
+	static unsigned char count = 0;
+	while(1)
+	{
+		printf_sys("User task: ", 10);
+		printhex(count++);
+		printf_sys("\n", 1);
+		for(volatile unsigned long i = 0; i < 1000000; i++) for(volatile unsigned long i = 0; i < 1000; i++);
+	}
+	
 	asm volatile(
 		"mov $1, %%eax\n"
 		"mov $1, %%ebx\n"
@@ -25,3 +44,4 @@ int main()
 		: "eax", "edi"
 	);
 }
+

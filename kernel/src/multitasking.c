@@ -109,11 +109,22 @@ Task* create_task(void entry(), int kernel)
 	cpu_state->ebp = task->esp;
 
 	cpu_state->eip = (uint32_t) entry;
-	cpu_state->cs = 0x08;
-	cpu_state->eflags = 0x202;
-	cpu_state->esp = ((uint32_t) cpu_state);
-	cpu_state->ss = 0x10;
-		
+	
+	if(kernel)
+	{
+		cpu_state->cs = 0x08;
+		cpu_state->eflags = 0x202;
+		cpu_state->esp = ((uint32_t) cpu_state);
+		cpu_state->ss = 0x10;
+	}
+	else
+	{
+		cpu_state->cs = 0x1B;
+		cpu_state->eflags = 0x202;
+		cpu_state->esp = ((uint32_t) cpu_state);
+		cpu_state->ss = 0x23;
+		task->kernel_esp = 0xC0090000;
+	}
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -174,7 +185,8 @@ uint32_t schedule(uint32_t esp)
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
-			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
+			g_tss.esp0 = g_current_task->kernel_esp;
+			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));	
 			return (uint32_t) g_current_task->esp;
 		}
 

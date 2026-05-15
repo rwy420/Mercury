@@ -9,13 +9,10 @@ FileDescriptor* stdout;
 
 void fd_init()
 {
-	stdin = &g_file_descriptors[0];
-	stdout = &g_file_descriptors[1];
-
-	stdin->id = 0;
-	stdout->id = 1;
-
 	memset(g_file_descriptors, 0, sizeof(g_file_descriptors));
+	
+	stdin = create_fd();
+	stdout = create_fd();
 
 	stdout->write = syscall_printf;
 }

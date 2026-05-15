@@ -24,7 +24,7 @@
 #include <fs/fs.h>
 
 #define ATA
-#define STARTTEXT
+//#define STARTTEXT
 
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
@@ -98,7 +98,8 @@ void v_kernel_start()
 	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
 	printf("<Mercury> Syscalls registered\n");
 
-	register_interrupt_handler(14, (isr_t) handle_page_fault);
+	register_interrupt_handler(0x0E, (isr_t) handle_page_fault);
+	register_interrupt_handler(0x80, (isr_t) syscall);
 
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
@@ -146,11 +147,19 @@ void v_kernel_start()
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	//printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
+	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
 #ifdef STARTTEXT
 	clear_screen();
 	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
 #endif
+	
+	uint32_t test = fs_open("/BIN/MAIN.ELF");
+	uint8_t* buffer = kmalloc(14740);
+	fs_read(test, buffer, 14740);
+	void (*entry0)() = image_load(buffer, 14740, false);
+	kfree(buffer);
+
+	create_task(entry0, 1);
 
 	while(1);
 }

@@ -169,15 +169,12 @@ void handle_page_fault(CPUState* cpu)
 	printf("Page fault at address: 0x");
 	print_hex32(address);
 	printf(" error: ");
-	//print_hex32(cpu->error_code);
+	print_hex32(cpu->error_code);
 	printf("\n");
 
-	print_hex32(cpu->eip);
-	printf("\n");
-
-	//if(!(cpu->error_code & 0x1)) printf(" - Not present\n");
-	//if(cpu->error_code & 0x2) printf(" - Write\n");
-	//if(cpu->error_code & 0x4) printf(" - User\n");
-	//if(cpu->error_code & 0x8) printf(" - Reserved bit voilation\n");
-	//if(cpu->error_code & 0x10) printf(" - Instruction fetched\n");
+	if(!(cpu->error_code & 0x1)) printf(" - Not present\n");
+	if(cpu->error_code & 0x2) printf(" - Write\n");
+	if(cpu->error_code & 0x4) printf(" - User\n");
+	if(cpu->error_code & 0x8) printf(" - Reserved bit voilation\n");
+	if(cpu->error_code & 0x10) printf(" - Instruction fetched\n");
 }

@@ -18,6 +18,7 @@ typedef struct Task
 {
 	uint8_t id;
 	uint32_t esp;
+	uint32_t kernel_esp;
 	uint32_t cr3;
 	uint32_t flags;
 	int kernel;

@@ -3,7 +3,11 @@
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/heap.h>
+#include <memory/frames.h>
+#include <memory/paging.h>
 #include <exec/elf/symtable.h>
+
+extern PageDirectory* g_kernel_pd;
 
 void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst, int dl)
 {
@@ -88,7 +92,14 @@ void* image_load(char* elf_start, unsigned int size, int debug)
         return 0;
     }
 
-    exec = kmalloc(size);
+	uint32_t num_frames = ((size + FRAME_SIZE) / FRAME_SIZE) + 1;
+    exec = alloc_frames(num_frames);
+
+	for(int i = 0; i < num_frames; i++)
+	{
+		void* frame = (exec + i * 0x1000);
+		map_page_pd_flags(g_kernel_pd, frame, frame, PTE_PRESENT | PTE_RW | PTE_USER);
+	}
 
     if (!exec)
     {

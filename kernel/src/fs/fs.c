@@ -1,6 +1,7 @@
 #include <fs/fs.h>
 #include <fd.h>
 #include <fs/fat32/fat32.h>
+#include <common/screen.h>
 
 extern FileDescriptor g_file_descriptors[];
 

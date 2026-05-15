@@ -4,7 +4,7 @@ extern interrupt_handler
 global handle_irq_%1
 handle_irq_%1:
 	mov dword [interrupt_number], %1
-	;push dword 0
+	push dword 0
 
 	jmp common_interrupt_handler
 %endmacro
@@ -13,6 +13,7 @@ handle_irq_%1:
 global handle_irq_%1
 handle_irq_%1:
 	mov [interrupt_number], %1	
+	push dword %1
 	jmp common_interrupt_handler
 %endmacro
 
@@ -38,7 +39,9 @@ common_interrupt_handler:
 	pop esi
 	pop edi
 	pop ebp
-	
+
+	add esp, 4
+
 	iret
 
 ; Exceptions

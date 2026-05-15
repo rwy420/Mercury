@@ -70,10 +70,11 @@ void install_idt()
 uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 {
 	CPUState* cpu_state = (CPUState*) esp;
-	
+
 	if(interrupt == 0x20) 
 	{
-		g_current_task->esp = esp;
+		if(cpu_state->ss != 0x23) g_current_task->esp = esp;
+
 		esp = pit_handle_interrupt(esp);
 	}
 

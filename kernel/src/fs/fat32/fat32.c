@@ -81,27 +81,11 @@ int fat32_read(void* file_object, void* buffer, uint32_t offset, size_t length)
 			sectors_current_cluster = 0;
 		}
 
-printf("sector: ");
-print_uint32_t(sector);
-printf(" cluster: ");
-print_uint32_t(current_cluster);
-printf(" sectors_current_cluster: ");
-print_uint32_t(sectors_current_cluster);
-printf("\n");
-
 		sector_offset_start = 0;
 		bytes_read += bytes_to_read;
 		length -= bytes_to_read;
 		sectors_current_cluster++;	
 	}
-
-	printf("The file is ");
-	print_uint32_t(dir_entry->size);
-	printf(" bytes big and I just read ");
-	print_uint32_t(bytes_read);
-	printf(" (");
-	printf((char*) dir_entry->name);
-	printf("\n");
 
 	return 0;
 }
