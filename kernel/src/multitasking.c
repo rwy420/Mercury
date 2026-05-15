@@ -62,6 +62,18 @@ void idle_task()
 	}
 }
 
+void idle_task2()
+{
+	uint32_t counter = 100;
+	while(1)
+	{
+		printf("Task 2 ");
+		print_hex32(counter++);
+		printf("\n");
+		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
+	}
+}
+
 void tasks_init()
 {
 	task_list = NULL_PTR;
@@ -190,8 +202,7 @@ uint32_t schedule(uint32_t esp)
 		g_current_task = g_current_task->next ? g_current_task->next : task_list;
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
-		{
-			if(g_current_task->kernel_esp != 0x00) asm("xchg %BX, %BX"); 
+		{ 
 			if(g_current_task->kernel_esp != 0x00)
 			{
 				asm volatile("mov $0x23, %AX");
@@ -202,7 +213,7 @@ uint32_t schedule(uint32_t esp)
 			}
 
 			g_tss.esp0 = g_current_task->kernel_esp;
-			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));	
+			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
 			return (uint32_t) g_current_task->esp;
 		}
 

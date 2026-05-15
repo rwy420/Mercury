@@ -69,13 +69,12 @@ void install_idt()
 
 uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 {
-	CPUState* cpu_state = (CPUState*) esp;
+	CPUState* cpu_state = (CPUState*) esp;		
+
+	g_current_task->esp = esp;
 
 	if(interrupt == 0x20) 
 	{
-		if(cpu_state->ss != 0x23) g_current_task->esp = esp;
-
-
 		esp = pit_handle_interrupt(esp);
 	}
 
@@ -93,12 +92,14 @@ uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 	{
 		if(g_current_task->flags == 0)
 		{
-			asm volatile("mov $0x23, %AX");
-			asm volatile("mov %AX, %DS");
-			asm volatile("mov %AX, %ES");
-			asm volatile("mov %AX, %FS");
-			asm volatile("mov %AX, %GS");
-			asm volatile("xchg %BX, %BX");
+		    asm volatile(
+				"mov $0x23, %%ax\n"
+				"mov %%ax, %%ds\n"
+				"mov %%ax, %%es\n"
+				"mov %%ax, %%fs\n"
+				"mov %%ax, %%gs\n"
+				::: "ax"
+			);
 		}
 	}
 

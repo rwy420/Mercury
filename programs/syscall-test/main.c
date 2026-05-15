@@ -30,9 +30,9 @@ int main()
 	static unsigned char count = 0;
 	while(1)
 	{
-		printf_sys("User task: ", 10);
+		printf_sys("User task: ", 12);
 		printhex(count++);
-		printf_sys("\n", 1);
+		printf_sys("\n", 2);
 		for(volatile unsigned long i = 0; i < 1000000; i++) for(volatile unsigned long i = 0; i < 1000; i++);
 	}
 	
