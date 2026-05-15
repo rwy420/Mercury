@@ -82,7 +82,8 @@ Task* create_task(void entry(), int kernel)
 	memset(task, 0, sizeof(Task));	
 	
 	void* stack = alloc_frames(4);
-	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page((void*) i, (void*) i);
+	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i,
+			PTE_PRESENT | PTE_RW | PTE_USER);
 	memset(stack, 0x0, 0x4000);
 	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + 0x4000 - sizeof(CPUState));
 	
@@ -100,7 +101,7 @@ Task* create_task(void entry(), int kernel)
 	{
 		void* address = (void*) ((uint32_t) stack) + i * FRAME_SIZE;
 		map_page(address, address);
-		if(!kernel) map_page_pd((PageDirectory*) task->cr3, address, address);
+		if(!kernel) map_page_pd_flags((PageDirectory*) task->cr3, address, address, PTE_PRESENT | PTE_RW | PTE_USER);
 	}
 
 	task->kernel = kernel;
@@ -123,7 +124,12 @@ Task* create_task(void entry(), int kernel)
 		cpu_state->eflags = 0x202;
 		cpu_state->esp = ((uint32_t) cpu_state);
 		cpu_state->ss = 0x23;
-		task->kernel_esp = 0xC0090000;
+		
+		void* kernel_stack = alloc_frames(4);
+		for(int i = 0; i < 4; i++) map_page_pd_flags((PageDirectory*) task->cr3, (void*) (kernel_stack + i * FRAME_SIZE), 
+				(void*) (kernel_stack + i * FRAME_SIZE), PTE_PRESENT | PTE_RW);
+
+		task->kernel_esp = (uint32_t) kernel_stack + 0x4000;
 	}
 
 	task->id = next_id++;
@@ -185,6 +191,8 @@ uint32_t schedule(uint32_t esp)
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
+			if(g_current_task->kernel_esp != 0x00) asm("xchg %BX, %BX"); 
+
 			g_tss.esp0 = g_current_task->kernel_esp;
 			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));	
 			return (uint32_t) g_current_task->esp;

@@ -30,7 +30,7 @@ void interrupts_init_descriptor(int32_t index, uint32_t address)
 	idt_descriptors[index].segment_selector = 0x08;
 	idt_descriptors[index].reserved = 0x00;
 
-	idt_descriptors[index].type_attribute = 0x8E;
+	idt_descriptors[index].type_attribute = 0xEE;
 }
 
 void install_idt()
@@ -74,6 +74,7 @@ uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 	if(interrupt == 0x20) 
 	{
 		if(cpu_state->ss != 0x23) g_current_task->esp = esp;
+
 
 		esp = pit_handle_interrupt(esp);
 	}

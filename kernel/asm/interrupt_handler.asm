@@ -44,7 +44,6 @@ common_interrupt_handler:
 
 	iret
 
-; Exceptions
 interrupt 00
 interrupt 01
 interrupt 02
@@ -56,11 +55,11 @@ interrupt 07
 interrupt 08
 interrupt 09
 interrupt 10
-interrupt 11
-interrupt 12
-interrupt 13
+error_interrupt 11
+error_interrupt 12
+error_interrupt 13
 error_interrupt 14	
-interrupt 15
+error_interrupt 15
 ; Non-exception interrups
 interrupt 32
 interrupt 33

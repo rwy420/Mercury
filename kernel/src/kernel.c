@@ -22,6 +22,7 @@
 #include <memory/frames.h>
 #include <fs/disk.h>
 #include <fs/fs.h>
+#include <faults.h>
 
 #define ATA
 //#define STARTTEXT
@@ -87,7 +88,7 @@ void v_kernel_start()
 	segments_install_gdt();
 	install_idt();
 	pit_init(250);
-
+	
 	fd_init();
 
 	register_syscall_handler(0x01, (syscall_t) syscall_exit);
@@ -99,8 +100,9 @@ void v_kernel_start()
 	printf("<Mercury> Syscalls registered\n");
 
 	register_interrupt_handler(0x0E, (isr_t) handle_page_fault);
+	register_interrupt_handler(0x0C, (isr_t) handle_stack_fault);
+	register_interrupt_handler(0x0D, (isr_t) handle_general_protection_fault);
 	register_interrupt_handler(0x80, (isr_t) syscall);
-
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
@@ -159,7 +161,7 @@ void v_kernel_start()
 	void (*entry0)() = image_load(buffer, 14740, false);
 	kfree(buffer);
 
-	create_task(entry0, 1);
+	create_task(entry0, 0);
 
 	while(1);
 }
