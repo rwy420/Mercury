@@ -8,7 +8,7 @@ To run the kernel: `make qemu`
 
 ## Features
 - ELF32 Executable / DL loading
-- Multitasking
+- Userspace Multitasking
 
 ## TODO
 - [ ] FAT32 R/W
