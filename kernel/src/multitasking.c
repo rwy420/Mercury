@@ -104,7 +104,7 @@ Task* create_task(void entry(), int kernel)
 		if(!kernel) map_page_pd_flags((PageDirectory*) task->cr3, address, address, PTE_PRESENT | PTE_RW | PTE_USER);
 	}
 
-	task->kernel = kernel;
+	task->flags = kernel;
 	task->esp = (uint32_t) cpu_state;
 
 	cpu_state->ebp = task->esp;
@@ -192,6 +192,14 @@ uint32_t schedule(uint32_t esp)
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{
 			if(g_current_task->kernel_esp != 0x00) asm("xchg %BX, %BX"); 
+			if(g_current_task->kernel_esp != 0x00)
+			{
+				asm volatile("mov $0x23, %AX");
+				asm volatile("mov %AX, %DS");
+				asm volatile("mov %AX, %ES");
+				asm volatile("mov %AX, %FS");
+				asm volatile("mov %AX, %GS");
+			}
 
 			g_tss.esp0 = g_current_task->kernel_esp;
 			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));	

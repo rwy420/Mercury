@@ -21,7 +21,6 @@ typedef struct Task
 	uint32_t kernel_esp;
 	uint32_t cr3;
 	uint32_t flags;
-	int kernel;
 	TASK_STATE state;
 	struct Task* next;
 } __attribute__((packed)) Task;

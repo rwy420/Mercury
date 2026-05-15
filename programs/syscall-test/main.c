@@ -1,6 +1,7 @@
 
 void printf_sys(char* str, int length)
 {
+	asm volatile("xchg %BX, %BX");
 	asm volatile(
 		"mov $4, %%eax\n"
 		"mov $1, %%ebx\n"
