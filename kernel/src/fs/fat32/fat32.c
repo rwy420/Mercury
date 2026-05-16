@@ -7,7 +7,7 @@
 #include <memory/common.h>
 #include <fs/vfs/vfs.h>
 
-VFSNodeOps g_fat32_ops = 
+VFSNodeOps fat32_ops = 
 {
 	.lookup = fat32_lookup,
 	.open = fat32_open,

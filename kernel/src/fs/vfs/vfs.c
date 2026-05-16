@@ -3,6 +3,7 @@
 #include <common/screen.h>
 #include <vesa.h>
 #include <memory/heap.h>
+#include <fs/rootfs/rootfs.h>
 
 extern FileDescriptor g_file_descriptors[];
 VFSNode* root_vfs_node;
@@ -10,6 +11,10 @@ VFSNode* root_vfs_node;
 int vfs_init()
 {
 	root_vfs_node = kmalloc(sizeof(VFSNode));
+	VFSMount* root_mount = rootfs_mount();
+	root_vfs_node = &root_mount->root;
+
+	printf("<VFS> VFS Initialized");
 
 	return 0;
 }
