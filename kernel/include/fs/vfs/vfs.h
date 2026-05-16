@@ -4,13 +4,13 @@
 #include <common/types.h>
 
 struct VFSNodeOps;
-struct VFSMountPoint;
+struct VFSMount;
 
 typedef struct
 {
 	void* fs_object;
 	struct VFSNodeOps* ops;
-	struct VFSMountPoint* mounted;
+	struct VFSMount* mounted;
 	uint32_t type;
 } VFSNode;
 
@@ -29,11 +29,11 @@ typedef struct
 	VFSNodeOps* ops;
 } FileSystem;
 
-typedef struct VFSMountPoint
+typedef struct VFSMount
 {
 	FileSystem* fs;
 	VFSNode root;
-} VFSMountPoint;
+} VFSMount;
 
 int vfs_init();
 VFSNode* vfs_resolve(char* path);

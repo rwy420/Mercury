@@ -2,13 +2,16 @@
 #include <fd.h>
 #include <common/screen.h>
 #include <vesa.h>
+#include <memory/heap.h>
 
 extern FileDescriptor g_file_descriptors[];
 VFSNode* root_vfs_node;
 
 int vfs_init()
 {
+	root_vfs_node = kmalloc(sizeof(VFSNode));
 
+	return 0;
 }
 
 VFSNode* vfs_resolve(char* path)

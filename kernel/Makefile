@@ -6,7 +6,7 @@ ASPARAMS = --32
 NASMPARAMS = -felf32
 LDPARAMS = -melf_i386
 
-SRC_DIRS := asm src src/common src/exec/elf src/exec src/fs src/fs/vfs src/fs/fat src/fs/fat32 src/hardware src/memory src/net src/driver \
+SRC_DIRS := asm src src/common src/exec/elf src/exec src/fs src/fs/vfs src/fs/rootfs src/fs/fat src/fs/fat32 src/hardware src/memory src/net src/driver \
 			src/driver/am79c973 src/driver/ata src/driver/ps2 src/driver/rtl8139 src/driver/sata src/driver/vga
 BUILD_DIR := build
 
