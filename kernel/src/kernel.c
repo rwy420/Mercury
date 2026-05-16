@@ -21,8 +21,8 @@
 #include <memory/paging.h>
 #include <memory/frames.h>
 #include <fs/disk.h>
-#include <fs/fs.h>
 #include <faults.h>
+#include <fs/vfs/vfs.h>
 
 #define ATA
 //#define STARTTEXT
@@ -155,13 +155,13 @@ void v_kernel_start()
 	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
 #endif
 	
-	uint32_t test = fs_open("/BIN/MAIN.ELF");
+	uint32_t test = vfs_open("/BIN/MAIN.ELF");
 	uint8_t* buffer = kmalloc(14740);
-	fs_read(test, buffer, 14740);
-	void (*entry0)() = image_load(buffer, 14740, false);
-	kfree(buffer);
+	//vfs_read(test, buffer, 14740);
+	//void (*entry0)() = image_load(buffer, 14740, false);
+	//kfree(buffer);
 
-	create_task(entry0, 0);
+	//create_task(entry0, 0);
 
 	while(1);
 }

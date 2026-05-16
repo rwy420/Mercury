@@ -3,6 +3,7 @@
 
 #include <hardware/interrupts.h>
 #include <common/types.h>
+#include <fs/vfs/vfs.h>
 
 typedef enum
 {
@@ -22,11 +23,8 @@ typedef struct
 	uint32_t id;
 	uint8_t attributes;
 	FILE_DESCRIPTOR_TYPE type;
-	void* object;
 	uint32_t offset;
-	int (*read)(void* object, void* buffer, uint32_t offset, size_t length);
-	int (*write)(void* object, void* buffer, uint32_t offset, size_t length);
-	int (*close)(void* object);
+	VFSNode* node;
 } FileDescriptor;
 
 void fd_init();

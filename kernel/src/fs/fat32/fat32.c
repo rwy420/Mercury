@@ -5,6 +5,16 @@
 #include <driver/ata/ata.h>
 #include <fs/fat32/fat32_dir.h>
 #include <memory/common.h>
+#include <fs/vfs/vfs.h>
+
+VFSNodeOps g_fat32_ops = 
+{
+	.lookup = fat32_lookup,
+	.open = fat32_open,
+	.read = fat32_read,
+	.write = fat32_write,
+	.close = fat32_close
+};
 
 FAT32Volume g_volume;
 
@@ -35,27 +45,14 @@ uint32_t fat_get_next_cluster(uint32_t cluster)
     return next;
 }
 
-int fat32_open(FileDescriptor* fd, char* path)
+int fat32_open(VFSNode* node)
 {
-	FATDirectoryEntry* entry = fat_path_to_dir_entry(g_volume.root_cluster, path);
-	if(entry == 0) return 1;
-
-	FAT32File* file = kmalloc(sizeof(FAT32File));
-	file->entry = entry;
-
-	fd->type = FD_FAT32_FILE;
-	fd->object = file;
-
-	fd->read = fat32_read;
-	fd->write = fat32_write;
-	fd->close = fat32_close;	
-
 	return 0;
 }
 
-int fat32_read(void* file_object, void* buffer, uint32_t offset, size_t length)
+int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 {
-	FATDirectoryEntry* dir_entry = ((FAT32File*) file_object)->entry;
+	FATDirectoryEntry* dir_entry = ((FAT32File*) node->fs_object)->entry;
 	uint32_t dir_entry_sector_size = (dir_entry->size + 511) / 512;
 	uint32_t current_cluster = fat_dir_entry_to_cluster(dir_entry);
 	uint32_t sector_offset = offset / 512;
@@ -90,13 +87,12 @@ int fat32_read(void* file_object, void* buffer, uint32_t offset, size_t length)
 	return 0;
 }
 
-int fat32_write(void* file_object, void* buffer, uint32_t offset, size_t length)
+int fat32_write(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 {
 
 }
 
-int fat32_close(void* file_object)
+int fat32_close(VFSNode* node)
 {
-	kfree(file_object);
 	return 0;
 }

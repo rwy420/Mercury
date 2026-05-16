@@ -1,6 +1,7 @@
 #include <fd.h>
 #include <memory/common.h>
 #include <common/screen.h>
+#include <memory/heap.h>
 
 FileDescriptor g_file_descriptors[0xFF];
 
@@ -14,7 +15,7 @@ void fd_init()
 	stdin = create_fd();
 	stdout = create_fd();
 
-	stdout->write = syscall_printf;
+	stdout->node->ops->write = syscall_printf;
 }
 
 FileDescriptor* create_fd()
@@ -25,6 +26,7 @@ FileDescriptor* create_fd()
 		{
 			g_file_descriptors[i].attributes = 0x01;
 			g_file_descriptors[i].id = i;
+			g_file_descriptors[i].node = kmalloc(sizeof(VFSNode));
 			return &g_file_descriptors[i];
 		}
 	}
@@ -45,9 +47,9 @@ int syscall_read(CPUState* cpu)
 	size_t length = cpu->edx;
 
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
-	if(fd->read != NULL_PTR) 
+	if(fd->node->ops->read != NULL_PTR) 
 	{
-		fd->read(fd->object, buffer, fd->offset, length);
+		fd->node->ops->read(fd->node->fs_object, buffer, fd->offset, length);
 	}
 
 	return cpu->eax;
@@ -60,9 +62,9 @@ int syscall_write(CPUState* cpu)
 	size_t length = cpu->edx;
 
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
-	if(fd->write != NULL_PTR) 
+	if(fd->node->ops->write != NULL_PTR) 
 	{
-		fd->write(fd->object, buffer, fd->offset, length);
+		fd->node->ops->write(fd->node->fs_object, buffer, fd->offset, length);
 	}
 
 	return cpu->eax;
@@ -80,7 +82,6 @@ int syscall_open(CPUState* cpu)
 int syscall_close(CPUState* cpu)
 {
 	uint32_t fd = cpu->ebx;
-	//fat16_close(fd);
 
 	return cpu->eax;
 }
