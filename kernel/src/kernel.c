@@ -142,6 +142,7 @@ void v_kernel_start()
 	printf("<PCI> Initializing PCI devices\n");
 	pci_init_devices();
 
+	vfs_init();
 	if(!read_mbr()) printf_color("<Mercury> Could not read the MBR\n", COLOR_RED, COLOR_BLACK);
 	
 	pit_set_schedule(true);

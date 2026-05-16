@@ -18,11 +18,13 @@ VFSMount* rootfs_mount()
 {
 	RootFSNode* rootfs_root_dir = kmalloc(sizeof(RootFSNode));
 	memset(rootfs_root_dir, 0, sizeof(RootFSNode));
+
 	VFSMount* mount = kmalloc(sizeof(VFSMount));
 	VFSNode* root_node = &mount->root;
 
 	root_node->fs_object = rootfs_root_dir;
 	root_node->ops = &rootfs_ops;
+	root_node->fs_object = rootfs_root_dir;
 
 	mount->fs = &rootfs;
 
@@ -35,10 +37,9 @@ void* rootfs_lookup(VFSNode* dir, char* name)
 
 	for(int i = 0; i < 32; i++)
 	{
-		RootFSNode* child = rootfs_root_dir->children[i];
-		if(child != 0x00)
+		if(rootfs_root_dir->children[i] != 0x00)
 		{
-			if(memcmp(name, child->name, 32) == 0) return child;
+			if(memcmp(name, rootfs_root_dir->children[i]->name, 32) == 0) return rootfs_root_dir->children[i];
 		}
 	}
 

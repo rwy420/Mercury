@@ -14,7 +14,7 @@ int vfs_init()
 	VFSMount* root_mount = rootfs_mount();
 	root_vfs_node = &root_mount->root;
 
-	printf("<VFS> VFS Initialized");
+	printf("<VFS> VFS Initialized\n");
 
 	return 0;
 }
