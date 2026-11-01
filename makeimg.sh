@@ -30,6 +30,8 @@ sudo mkdir -p $MNT/boot/grub
 sudo cp $KERNEL $MNT/boot/kernel.elf
 sudo cp $GRUBCFG $MNT/boot/grub/grub.cfg
 
+tar --format=ustar --owner=0 --group=0 -cf $MNT/boot/initrd.tar -C ./root .
+
 sudo umount $MNT
 sudo losetup -d $LOOP
 
