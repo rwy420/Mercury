@@ -23,6 +23,14 @@ typedef struct
 	char filename_prefix[155];
 } UStarNode;
 
+typedef struct
+{
+	char name[100];
+	uint32_t size;
+	void* data;
+} USTarFile;
 
+USTarFile* ustar_dump_archive(void* archive);
+uint32_t oct_to_bin(char* str, int size);
 
 #endif

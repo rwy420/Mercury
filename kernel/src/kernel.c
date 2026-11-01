@@ -23,6 +23,7 @@
 #include <fs/disk.h>
 #include <faults.h>
 #include <fs/vfs/vfs.h>
+#include <fs/initrd.h>
 
 #define ATA
 //#define STARTTEXT
@@ -144,6 +145,7 @@ void v_kernel_start()
 	pci_init_devices();
 
 	vfs_init();
+	load_initrd();
 	if(!read_mbr()) printf_color("<Mercury> Could not read the MBR\n", COLOR_RED, COLOR_BLACK);
 	
 	pit_set_schedule(true);
