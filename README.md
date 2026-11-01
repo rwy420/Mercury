@@ -6,10 +6,6 @@ Mercury is a WIP x86-32 kernel.
 To build the kernel and create a bootable image: `make grub`
 To run the kernel: `make qemu`
 
-## Features
-- ELF32 Executable / DL loading
-- Userspace Multitasking
-
 ## TODO
 - [ ] FAT32 R/W
 - [ ] VFS
@@ -19,4 +15,5 @@ To run the kernel: `make qemu`
 - [ ] Supporting multiple cores
 - [ ] Init process
 - [ ] Syscalls
+- [ ] Improve ELF32 features
 - [ ] libc
