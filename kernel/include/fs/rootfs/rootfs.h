@@ -3,10 +3,13 @@
 
 #include <fs/vfs/vfs.h>
 
+#define ROOTFS_MAX_CHILDREN 32
+
 typedef struct RootFSNode
 {
 	char name[32];
-	struct RootFSNode* children[32];
+	uint8_t attributes;
+	struct RootFSNode* children[ROOTFS_MAX_CHILDREN];
 } RootFSNode;
 
 VFSMount* rootfs_mount();

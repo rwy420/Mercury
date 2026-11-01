@@ -1,7 +1,9 @@
-#include "fs/vfs/vfs.h"
+#include "common/types.h"
+#include <fs/vfs/vfs.h>
 #include <fs/rootfs/rootfs.h>
 #include <memory/heap.h>
 #include <memory/common.h>
+#include <common/screen.h>
 
 VFSNodeOps rootfs_ops =
 {
@@ -37,10 +39,9 @@ void* rootfs_lookup(VFSNode* dir, char* name)
 
 	for(int i = 0; i < 32; i++)
 	{
-		if(rootfs_root_dir->children[i] != 0x00)
-		{
-			if(memcmp(name, rootfs_root_dir->children[i]->name, 32) == 0) return rootfs_root_dir->children[i];
-		}
+		RootFSNode* current = rootfs_root_dir->children[i];
+
+		//if(current->attributes != 0x0) printf("a");
 	}
 
 	return 0;
@@ -50,16 +51,11 @@ void* rootfs_create_dir(VFSNode* parent, char* name)
 {
 	RootFSNode* rootfs_root_dir = (RootFSNode*) parent->fs_object;
 
-	for(int i = 0; i < 32; i++)
+	for(int i = 0; i < ROOTFS_MAX_CHILDREN; i++)
 	{
 		RootFSNode* child = rootfs_root_dir->children[i];
 		
-		if(child == 0x00)
-		{
-			child = (RootFSNode*) kmalloc(sizeof(RootFSNode));
-
-			return child;
-		}
+		print_hex32((uint32_t) child);
 	}
 
 	return 0;

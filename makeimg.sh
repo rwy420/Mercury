@@ -29,9 +29,6 @@ sudo grub-install --target=i386-pc --boot-directory=$MNT/boot --modules="normal 
 sudo mkdir -p $MNT/boot/grub
 sudo cp $KERNEL $MNT/boot/kernel.elf
 sudo cp $GRUBCFG $MNT/boot/grub/grub.cfg
-sudo mkdir -p $MNT/bin 
-echo "This is a file in the FAT32 root directory" > $MNT/README
-sudo cp ./programs/syscall-test/main.elf $MNT/bin/main.elf
 
 sudo umount $MNT
 sudo losetup -d $LOOP
