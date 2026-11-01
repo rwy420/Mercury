@@ -37,6 +37,7 @@ uint32_t kernel_end_address;
 uint32_t mem_manager_end;
 
 VesaInfo g_vesa_info;
+multiboot_module_t* multiboot_modules;
 
 extern PageDirectory* g_kernel_pd;
 
@@ -67,7 +68,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	print_uint32_t(g_vesa_info.fb_height);
 	printf("\n");
 
-	mb_init_modules();
+	multiboot_modules = mb_init_modules();
 
 	printf("<Mercury> Loading Mercury kernel... \n");
 	

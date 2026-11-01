@@ -17,19 +17,16 @@ void mb_get_vesa(VesaInfo* vesa_info)
 	vesa_info->fb_width = mb->framebuffer_width;
 }
 
-void mb_init_modules()
+multiboot_module_t* mb_init_modules()
 {
 	printf("<GRUB> Loaded ");
 	print_uint32_t(mb->mods_count);
 	printf(" module(s)\n");
 
-	multiboot_module_t* mod;
-	uint32_t mod_idx = 0;
-	for(mod_idx = 0, mod = (multiboot_module_t*) mb->mods_addr; mod_idx < mb->mods_count; mod_idx++, mod++)
-	{
-		print_hex32(mod->mod_start);
-		printf(" ");
-		print_hex32(mod->mod_end);
-		printf("\n");
-	}
+	return (multiboot_module_t*) mb->mods_addr;
+}
+
+uint8_t mb_module_count()
+{
+	return mb->mods_count;
 }
