@@ -21,16 +21,16 @@ typedef struct
 	uint8_t dev_major_number[8];
 	uint8_t dev_minor_number[8];
 	char filename_prefix[155];
-} UStarNode;
+} USTARNode;
 
 typedef struct
 {
 	char name[100];
 	uint32_t size;
 	void* data;
-} USTarFile;
+} USTARFile;
 
-USTarFile* ustar_dump_archive(void* archive);
+USTARFile* ustar_dump_archive(void* archive);
 uint32_t oct_to_bin(char* str, int size);
 
 #endif
