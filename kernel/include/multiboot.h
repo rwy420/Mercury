@@ -110,5 +110,6 @@ int mb_confirm(uint32_t multiboot, uint32_t magic);
 void mb_get_vesa(VesaInfo* vesa_info);
 multiboot_module_t* mb_init_modules();
 uint8_t mb_module_count();
+multiboot_module_t* mb_get_module(uint8_t idx);
 
 #endif

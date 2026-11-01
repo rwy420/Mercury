@@ -30,3 +30,11 @@ uint8_t mb_module_count()
 {
 	return mb->mods_count;
 }
+
+multiboot_module_t* mb_get_module(uint8_t idx)
+{
+	if(idx >= mb->mods_count) return 0;
+
+	multiboot_module_t* mods = (multiboot_module_t*) mb->mods_addr;
+	return &mods[idx];
+}
