@@ -27,6 +27,17 @@ rebuild: kernel.elf
 	sudo losetup -d $${LOOP}; \
 	echo "Kernel updated in $(IMG)"
 
+update-root:
+	@echo "Mounting and copying new kernel..."
+	LOOP=$$(sudo losetup --find --partscan --show $(IMG)); \
+	PART=$${LOOP}p1; \
+	mkdir -p $(MNT); \
+	sudo mount $${PART} $(MNT); \
+	tar --format=ustar --owner=0 --group=0 -cf $(MNT)/boot/initrd.tar -C ./root .
+	sync; \
+	sudo umount $(MNT); \
+	sudo losetup -d $${LOOP}; \
+	echo "Kernel updated in $(IMG)"
 
 qemu-usb:
 	qemu-system-x86_64 -enable-kvm -cpu host -device qemu-xhci -device usb-storage,drive=disk -drive file=kernel.img,if=none,id=disk,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0 -m 2048M -no-reboot -no-shutdown
