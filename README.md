@@ -12,7 +12,8 @@ To run the kernel: `make qemu`
 
 ## TODO
 - [ ] FAT32 R/W
-- [ ] VFS 
+- [ ] VFS
+- [ ] initrd 
 - [X] Ring 3 / Usermode
 - [ ] Improved multitasking
 - [ ] Supporting multiple cores
