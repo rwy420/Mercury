@@ -1,6 +1,7 @@
 #ifndef __MERCURY__MULTIBOOT_H
 #define __MERCURY__MULTIBOOT_H
 
+#include <vesa.h>
 #include <common/types.h>
 
 #define MULTIBOOT_MEMORY_AVAILABLE        1
@@ -94,5 +95,19 @@ typedef struct {
         } indexed;
     };
 } __attribute__((packed)) multiboot_info_t;
+
+struct  multiboot_mod_list
+{
+	uint32_t mod_start;
+	uint32_t mod_end;
+	uint32_t cmdline;
+	uint32_t pad;
+};
+
+typedef struct multiboot_mod_list multiboot_module_t;
+
+int mb_confirm(uint32_t multiboot, uint32_t magic);
+void mb_get_vesa(VesaInfo* vesa_info);
+void mb_init_modules();
 
 #endif

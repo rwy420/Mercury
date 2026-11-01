@@ -44,11 +44,9 @@ void v_kernel_start();
 
 void kernel_init(uint32_t multiboot, uint32_t magic)
 {
-	multiboot_info_t* mb = (multiboot_info_t*) multiboot;
+	if(!mb_confirm(multiboot, magic));
 
-	g_vesa_info.fb = mb->framebuffer_addr;
-	g_vesa_info.fb_height = mb->framebuffer_height;
-	g_vesa_info.fb_width = mb->framebuffer_width;
+	mb_get_vesa(&g_vesa_info);
    
 	if(!paging_init()); //TODO error handling
 										
@@ -68,6 +66,8 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	printf("x");
 	print_uint32_t(g_vesa_info.fb_height);
 	printf("\n");
+
+	mb_init_modules();
 
 	printf("<Mercury> Loading Mercury kernel... \n");
 	
