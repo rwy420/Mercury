@@ -63,9 +63,14 @@ not_found:
 	return current;
 }
 
-int vfs_mount()
+int vfs_mount_root(VFSNode* node)
 {
+	return 0;
+}
 
+int vfs_mount(VFSNode* node, char* path)
+{
+	return 0;
 }
 
 uint32_t vfs_open(char* path)

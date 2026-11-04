@@ -37,7 +37,8 @@ typedef struct VFSMount
 
 int vfs_init();
 VFSNode* vfs_resolve(char* path);
-int vfs_mount();
+int vfs_mount(VFSNode* node, char* path);
+int vfs_mount_root(VFSNode* node);
 
 uint32_t vfs_open(char* path);
 int vfs_read(uint32_t fd_id, void* buffer, size_t length);
