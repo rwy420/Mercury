@@ -6,7 +6,7 @@ MNT=mnt
 SIZE=512M
 
 KERNEL=kernel/kernel.elf
-GRUBCFG=grub/grub.cfg
+IMG_ROOT=root
 
 sudo umount $MNT || true
 rm -f $IMG
@@ -26,15 +26,14 @@ sudo mount $PART $MNT
 
 sudo grub-install --target=i386-pc --boot-directory=$MNT/boot --modules="normal part_msdos fat multiboot" --no-floppy $LOOP
 
-sudo mkdir -p $MNT/boot/grub
+sudo cp -r $IMG_ROOT/* $MNT
 sudo cp $KERNEL $MNT/boot/kernel.elf
-sudo cp $GRUBCFG $MNT/boot/grub/grub.cfg
 
 #tar --format=ustar --owner=0 --group=0 -cf $MNT/boot/initrd.tar -C ./root .
 
 sudo umount $MNT
 sudo losetup -d $LOOP
 
-sudo chmod -R 777 kernel.img 
+sudo chmod -R 777 $IMG 
 
 echo "GRUB image created successfully!"
