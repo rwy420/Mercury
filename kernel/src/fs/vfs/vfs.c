@@ -5,7 +5,7 @@
 #include <memory/heap.h>
 
 extern FileDescriptor g_file_descriptors[];
-VFSNode root_vfs_node = {0, 0, 0, 0};
+VFSNode* root_vfs_node = 0;
 
 int vfs_init()
 {
@@ -16,7 +16,7 @@ int vfs_init()
 
 VFSNode* vfs_resolve(char* path)
 {
-	if(!root_vfs_node.fs_object) goto not_found;
+	if(!root_vfs_node) goto not_found;
 
 	VFSNode* current = 0;
 
@@ -36,7 +36,7 @@ VFSNode* vfs_resolve(char* path)
 		char saved = *end;
 		*end = '\0';
 
-		VFSNode* next = root_vfs_node.ops->lookup(current, start);
+		VFSNode* next = root_vfs_node->ops->lookup(current, start);
 		if(next == 0) goto not_found;
 
 		if(next->mounted) current = &next->mounted->root;
@@ -65,6 +65,7 @@ not_found:
 
 int vfs_mount_root(VFSNode* node)
 {
+	root_vfs_node = node;
 	return 0;
 }
 
