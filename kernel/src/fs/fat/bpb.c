@@ -3,11 +3,14 @@
 #include <fs/fat32/fat32.h>
 #include <memory/heap.h>
 #include <driver/ata/ata.h>
+#include <memory/common.h>
 
 int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition)
 {
-	bpb_buffer = kmalloc(512);
-	read28(partition->lba_start, 0, (uint8_t*) bpb_buffer, 512);
+	uint8_t* buffer = kmalloc(512);
+	read28(partition->lba_start, 0, (uint8_t*) buffer, 512);
+	memcpy(bpb_buffer, buffer, 512);
+	kfree(buffer);
 
 	BPB* bpb = (BPB*) bpb_buffer;
 	uint8_t* ebpb_buffer = (uint8_t*) bpb_buffer + sizeof(BPB);

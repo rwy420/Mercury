@@ -18,7 +18,7 @@ VFSNodeOps fat32_ops =
 
 FAT32Volume g_volume;
 
-int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
+VFSNode* fat32_mount(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 {
 	g_volume.bpb = *bpb;
 	g_volume.ebpb = *ebpb;
@@ -29,7 +29,19 @@ int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	g_volume.root_cluster = ebpb->root_dir_cluster;
 	g_volume.sectors_per_cluster = bpb->num_sectors_per_cluster;
 
-	return true;
+	VFSNode* result = kmalloc(sizeof(VFSNode));
+	uint8_t* root_entry_buffer = kmalloc(sizeof(FATDirectoryEntry));
+	read28(cluster_to_lba(g_volume.root_cluster), 0, root_entry_buffer, sizeof(FATDirectoryEntry));
+	FATDirectoryEntry* entry = (FATDirectoryEntry*) root_entry_buffer;
+	result->fs_object = entry;
+	result->ops = &fat32_ops;
+	result->mounted = 0;
+	result->type = 0;
+
+	print_hex32(fat_dir_entry_to_cluster(entry));
+	printf("\n");
+
+	return result;
 }
 
 uint32_t fat_get_next_cluster(uint32_t cluster)

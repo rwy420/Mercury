@@ -33,7 +33,7 @@ int read_mbr()
 
 		if(entry->type == 0x0C)
 		{
-			BPB* bpb_buffer;
+			BPB* bpb_buffer = kmalloc(512);
 			int fat_type = fat_read_bpb(bpb_buffer, entry);
 
 			switch(fat_type)
@@ -44,8 +44,10 @@ int read_mbr()
 				case 0:
 					break;
 				case 1:
-					EBPB_FAT32* ebpb = (EBPB_FAT32*) (bpb_buffer + sizeof(BPB));
-					fat32_init(bpb_buffer, ebpb, entry);
+					uint8_t* ebpb_buffer = (uint8_t*) bpb_buffer + sizeof(BPB);
+					EBPB_FAT32* ebpb = (EBPB_FAT32*) ebpb_buffer;
+					VFSNode* fat32_root = fat32_mount(bpb_buffer, ebpb, entry);
+					vfs_mount_root(fat32_root);
 					break;
 			}
 		}

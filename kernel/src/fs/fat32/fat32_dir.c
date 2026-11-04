@@ -23,12 +23,12 @@ void* fat32_lookup(VFSNode* dir, char* name)
 		if(entry->name[0] == 0x00) break;
 		if(entry->name[0] == 0xE5) break;
 		if(entry->attributes == 0x0F) continue; //TODO: LFN
-				
+
 		char current_entry_83[12];
 		current_entry_83[11] = '\0';
 				
 		string_to_83_name(current_entry_83, name);
-	
+
 		if(!memcmp(current_entry_83, entry->name, 11))
 		{
 			result = entry;

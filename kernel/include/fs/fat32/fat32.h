@@ -23,7 +23,7 @@ typedef struct
 	FATDirectoryEntry* entry;
 } FAT32File;
 
-int fat32_init(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
+VFSNode* fat32_mount(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
 uint32_t fat_get_next_cluster(uint32_t cluster);
 
 int fat32_open(VFSNode* node);

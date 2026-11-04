@@ -18,7 +18,7 @@ VFSNode* vfs_resolve(char* path)
 {
 	if(!root_vfs_node) goto not_found;
 
-	VFSNode* current = 0;
+	VFSNode* current = root_vfs_node;
 
 	char* start = path;
 
@@ -36,7 +36,7 @@ VFSNode* vfs_resolve(char* path)
 		char saved = *end;
 		*end = '\0';
 
-		VFSNode* next = root_vfs_node->ops->lookup(current, start);
+		VFSNode* next = current->ops->lookup(current, start);
 		if(next == 0) goto not_found;
 
 		if(next->mounted) current = &next->mounted->root;
