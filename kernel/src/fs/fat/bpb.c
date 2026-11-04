@@ -4,23 +4,19 @@
 #include <memory/heap.h>
 #include <driver/ata/ata.h>
 
-int fat_read_bpb(PartitionTableEntry* partition)
+int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition)
 {
-	uint8_t* bpb_buffer = kmalloc(512);
-	read28(partition->lba_start, 0, bpb_buffer, 512);
+	bpb_buffer = kmalloc(512);
+	read28(partition->lba_start, 0, (uint8_t*) bpb_buffer, 512);
 
 	BPB* bpb = (BPB*) bpb_buffer;
-	uint8_t* ebpb_buffer = bpb_buffer + sizeof(BPB);
+	uint8_t* ebpb_buffer = (uint8_t*) bpb_buffer + sizeof(BPB);
 
-	if(bpb->jmp_short[0] != 0xEB) return false;
+	if(bpb->jmp_short[0] != 0xEB) return -1;
 
 	printf("   <FAT> Has valid BPB\n");
 
-	if(bpb->large_num_sectors != 0)
-	{
-		EBPB_FAT32* ebpb = (EBPB_FAT32*) ebpb_buffer;
-		fat32_init(bpb, ebpb, partition);
-	}
+	if(bpb->large_num_sectors != 0) return 1;
 	
-	return true;
+	return 0;
 }

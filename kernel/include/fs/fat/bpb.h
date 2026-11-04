@@ -41,6 +41,6 @@ typedef struct
 	uint16_t boot_signature;
 } __attribute__((packed)) EBPB_FAT32;
 
-int fat_read_bpb(PartitionTableEntry* partition);
+int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition);
 
 #endif

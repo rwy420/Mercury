@@ -1,5 +1,7 @@
 #include <fs/disk.h>
 #include <fs/fat/bpb.h>
+#include <fs/fat/fat.h>
+#include <fs/fat32/fat32.h>
 #include <common/screen.h>
 #include <driver/ata/ata.h>
 #include <memory/heap.h>
@@ -31,7 +33,21 @@ int read_mbr()
 
 		if(entry->type == 0x0C)
 		{
-			if(!fat_read_bpb(entry)) printf_color("<FAT> Could not read the FAT BPB\n", COLOR_RED, COLOR_BLACK);
+			BPB* bpb_buffer;
+			int fat_type = fat_read_bpb(bpb_buffer, entry);
+
+			switch(fat_type)
+			{
+				case -1:
+					printf_color("<FAT> Could not read the FAT BPB\n", COLOR_RED, COLOR_BLACK);
+					break;
+				case 0:
+					break;
+				case 1:
+					EBPB_FAT32* ebpb = (EBPB_FAT32*) (bpb_buffer + sizeof(BPB));
+					fat32_init(bpb_buffer, ebpb, entry);
+					break;
+			}
 		}
 	}
 
