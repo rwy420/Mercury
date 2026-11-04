@@ -3,17 +3,12 @@
 #include <common/screen.h>
 #include <vesa.h>
 #include <memory/heap.h>
-#include <fs/rootfs/rootfs.h>
 
 extern FileDescriptor g_file_descriptors[];
-VFSNode* root_vfs_node;
+VFSNode root_vfs_node = {0, 0, 0, 0};
 
 int vfs_init()
 {
-	root_vfs_node = kmalloc(sizeof(VFSNode));
-	VFSMount* root_mount = rootfs_mount();
-	root_vfs_node = &root_mount->root;
-
 	printf("<VFS> VFS Initialized\n");
 
 	return 0;
@@ -21,6 +16,8 @@ int vfs_init()
 
 VFSNode* vfs_resolve(char* path)
 {
+	if(!root_vfs_node.fs_object) goto not_found;
+
 	VFSNode* current = 0;
 
 	char* start = path;
@@ -39,7 +36,7 @@ VFSNode* vfs_resolve(char* path)
 		char saved = *end;
 		*end = '\0';
 
-		VFSNode* next = root_vfs_node->ops->lookup(current, start);
+		VFSNode* next = root_vfs_node.ops->lookup(current, start);
 		if(next == 0) goto not_found;
 
 		if(next->mounted) current = &next->mounted->root;
