@@ -14,7 +14,7 @@ extern VFSNodeOps g_fat32_ops;
 VFSNode* fat32_lookup(VFSNode* dir, char* name)
 {
 	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) dir->fs_object;
-	VFSNode* result = kmalloc(sizeof(VFSNode));
+	VFSNode* result = 0;
 	FATDirectoryEntry* result_entry = kmalloc(sizeof(FATDirectoryEntry));
 	uint8_t* cluster_buffer = kmalloc(g_volume.sectors_per_cluster * 512);
 
@@ -34,11 +34,13 @@ VFSNode* fat32_lookup(VFSNode* dir, char* name)
 
 		if(!memcmp(current_entry_83, entry->name, 11))
 		{
+			result = kmalloc(sizeof(VFSNode));
 			memcpy(result_entry, entry, sizeof(FATDirectoryEntry));
 			result->fs_object = result_entry;
 			result->ops = &g_fat32_ops;
 			result->mounted = 0;
 			result->type = 0;
+
 			break;
 		}
 	}

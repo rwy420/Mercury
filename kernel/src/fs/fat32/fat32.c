@@ -62,7 +62,7 @@ int fat32_open(VFSNode* node)
 
 int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 {
-	FATDirectoryEntry* dir_entry = ((FAT32File*) node->fs_object)->entry;
+	FATDirectoryEntry* dir_entry = node->fs_object;
 	uint32_t dir_entry_sector_size = (dir_entry->size + 511) / 512;
 	uint32_t current_cluster = fat_dir_entry_to_cluster(dir_entry);
 	uint32_t sector_offset = offset / 512;

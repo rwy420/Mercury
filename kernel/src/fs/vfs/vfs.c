@@ -1,3 +1,4 @@
+#include "fs/fat/fat.h"
 #include <fs/vfs/vfs.h>
 #include <fd.h>
 #include <common/screen.h>
@@ -19,6 +20,7 @@ VFSNode* vfs_resolve(char* path)
 	if(!root_vfs_node) goto not_found;
 
 	VFSNode* current = root_vfs_node;
+	VFSNode* next = kmalloc(sizeof(VFSNode)); // will also act as result
 
 	char* start = path;
 
@@ -33,14 +35,17 @@ VFSNode* vfs_resolve(char* path)
 			end++;
 		}
 
+		int final = (*end != '/');
+
 		char saved = *end;
 		*end = '\0';
 
-		VFSNode* next = current->ops->lookup(current, start);
+		next = current->ops->lookup(current, start);
 
 		if(next == 0) goto not_found;
-
-		if(next->mounted) current = &next->mounted->root;
+		
+		if(final) return next;
+		else if(next->mounted) current = &next->mounted->root;
 		else current = next;
 
 		*end = saved;
@@ -50,16 +55,12 @@ VFSNode* vfs_resolve(char* path)
 		while(*start == '/') start++;
 	}
 
-	if(current == 0)
-	{
-not_found:
-		printf_color("<VFS> Could not find '", COLOR_RED, COLOR_BLACK);
-		printf_color(path, COLOR_RED, COLOR_BLACK);
-		printf_color("'\n", COLOR_RED, COLOR_BLACK);
-		return 0;
-	}
 
-	return current;
+not_found:
+	printf_color("<VFS> Could not find '", COLOR_RED, COLOR_BLACK);
+	printf_color(path, COLOR_RED, COLOR_BLACK);
+	printf_color("'\n", COLOR_RED, COLOR_BLACK);
+	return 0;
 }
 
 int vfs_mount_root(VFSNode* node)
@@ -76,15 +77,15 @@ int vfs_mount(VFSNode* node, char* path)
 uint32_t vfs_open(char* path)
 {
 	FileDescriptor* fd = create_fd();
-	VFSNode* node = vfs_resolve(path);
+	fd->node = vfs_resolve(path);
 
-	
 	return fd->id;
 }
 
 int vfs_read(uint32_t fd_id, void* buffer, size_t length)
 {
-
+	FileDescriptor* fd = &g_file_descriptors[fd_id];
+	return fd->node->ops->read(fd->node, buffer, fd->offset, length);
 }
 
 int vfs_write(uint32_t fd_id, void* buffer, size_t length)
