@@ -16,7 +16,7 @@ typedef struct
 
 typedef struct VFSNodeOps
 {
-	void* (*lookup)(VFSNode* dir, char* name);
+	VFSNode* (*lookup)(VFSNode* dir, char* name);
 	int (*open)(VFSNode* node);
 	int (*read)(VFSNode* node, void* buffer, size_t size, size_t offset);
 	int (*write)(VFSNode* node, void* buffer, size_t size, size_t offset);

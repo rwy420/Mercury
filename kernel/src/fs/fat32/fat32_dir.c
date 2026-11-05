@@ -1,3 +1,4 @@
+#include "fs/vfs/vfs.h"
 #include <fs/fat/fat.h>
 #include <fs/fat32/fat32.h>
 #include <fs/fat32/fat32_dir.h>
@@ -8,11 +9,13 @@
 #include <vesa.h>
 
 extern FAT32Volume g_volume;
+extern VFSNodeOps g_fat32_ops;
 
-void* fat32_lookup(VFSNode* dir, char* name)
+VFSNode* fat32_lookup(VFSNode* dir, char* name)
 {
 	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) dir->fs_object;
-	FATDirectoryEntry* result = 0;
+	VFSNode* result = kmalloc(sizeof(VFSNode));
+	FATDirectoryEntry* result_entry = kmalloc(sizeof(FATDirectoryEntry));
 	uint8_t* cluster_buffer = kmalloc(g_volume.sectors_per_cluster * 512);
 
 	read28(cluster_to_lba(fat_dir_entry_to_cluster(dir_entry)), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
@@ -31,7 +34,11 @@ void* fat32_lookup(VFSNode* dir, char* name)
 
 		if(!memcmp(current_entry_83, entry->name, 11))
 		{
-			result = entry;
+			memcpy(result_entry, entry, sizeof(FATDirectoryEntry));
+			result->fs_object = result_entry;
+			result->ops = &g_fat32_ops;
+			result->mounted = 0;
+			result->type = 0;
 			break;
 		}
 	}

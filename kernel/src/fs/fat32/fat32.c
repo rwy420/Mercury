@@ -7,7 +7,7 @@
 #include <memory/common.h>
 #include <fs/vfs/vfs.h>
 
-VFSNodeOps fat32_ops = 
+VFSNodeOps g_fat32_ops = 
 {
 	.lookup = fat32_lookup,
 	.open = fat32_open,
@@ -30,16 +30,14 @@ VFSNode* fat32_mount(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	g_volume.sectors_per_cluster = bpb->num_sectors_per_cluster;
 
 	VFSNode* result = kmalloc(sizeof(VFSNode));
-	uint8_t* root_entry_buffer = kmalloc(sizeof(FATDirectoryEntry));
-	read28(cluster_to_lba(g_volume.root_cluster), 0, root_entry_buffer, sizeof(FATDirectoryEntry));
-	FATDirectoryEntry* entry = (FATDirectoryEntry*) root_entry_buffer;
+	FATDirectoryEntry* entry = kmalloc(sizeof(FATDirectoryEntry));
+	memset(entry, 0, sizeof(FATDirectoryEntry));
+	entry->first_cluster_lo = g_volume.root_cluster;
+
 	result->fs_object = entry;
-	result->ops = &fat32_ops;
+	result->ops = &g_fat32_ops;
 	result->mounted = 0;
 	result->type = 0;
-
-	print_hex32(fat_dir_entry_to_cluster(entry));
-	printf("\n");
 
 	return result;
 }
