@@ -48,6 +48,9 @@ VFSNode* vfs_resolve(char* path)
 		else if(next->mounted) current = &next->mounted->root;
 		else current = next;
 
+		kfree(next->fs_object);
+		kfree(next);
+
 		*end = saved;
 
 		start = end;
