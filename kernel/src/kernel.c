@@ -164,7 +164,11 @@ void v_kernel_start()
 	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
 #endif
 	
-	uint32_t test = vfs_open("/BOOT/KERNEL.ELF");
+	uint32_t test = vfs_open("/SBIN/INIT.ELF");
+	char* buffer = kmalloc(13116);
+	vfs_read(test, buffer, 13116);
+	void (*entry0)() = image_load(buffer, 13116, false);
+	create_task(entry0, false);
 
 	while(1);
 }

@@ -10,6 +10,8 @@
 #define EI_MAG2 'L'
 #define EI_MAG3 'F'
 
+#define ET_DYN 3
+
 #define SHT_DYNSYM 0xB
 #define SHT_SYMTAB 0x2
 #define SHT_REL 0x9

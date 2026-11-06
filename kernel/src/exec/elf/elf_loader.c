@@ -46,6 +46,9 @@ int find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
 {
     for (int i = 0; i < hdr->e_shnum; i++)
     {
+			print_uint8_t(shdr[i].sh_type);
+			printf("\n");
+
         if (shdr[i].sh_type == SHT_SYMTAB)
         {
             return i;
@@ -63,23 +66,22 @@ void* find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const c
     
     for (int i = 0; i < shdr_sym->sh_size / sizeof(Elf32_Sym); i += 1)
     {
-        if (strcmp(name, strings + syms[i].st_name) == 0)
+        /*if (strcmp(name, strings + syms[i].st_name) == 0)
         {
             return dst + syms[i].st_value;
-        }
+        }*/
     }
 
     return 0;
 }
 
-void* image_load(char* elf_start, unsigned int size, int debug)
+void* image_load(uint8_t* elf_start, uint32_t size, int debug)
 {
     Elf32_Ehdr* hdr;
     Elf32_Phdr* phdr;
     Elf32_Shdr* shdr;
-    char* start;
-    char* taddr;
-    void* entry;
+    uint8_t* start;
+    uint8_t* taddr;
     int i = 0;
     uint8_t* exec;
 	//int dl = dlopen("/LIB/LIBC.SO");
@@ -124,7 +126,7 @@ void* image_load(char* elf_start, unsigned int size, int debug)
         }
 
         start = elf_start + phdr[i].p_offset;
-        taddr = phdr[i].p_vaddr + exec;
+        taddr = exec + phdr[i].p_vaddr;
         memmove(taddr, start, phdr[i].p_filesz);
     }
 
@@ -133,7 +135,7 @@ void* image_load(char* elf_start, unsigned int size, int debug)
     int global_symbol_table_index = find_global_symbol_table(hdr, shdr);
     Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
     char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
-    
+
     /*for (i = 0; i < hdr->e_shnum; ++i)
     {
         if (shdr[i].sh_type == SHT_REL)
@@ -142,10 +144,15 @@ void* image_load(char* elf_start, unsigned int size, int debug)
         }
     }*/
 
-    int symbol_table_index = find_symbol_table(hdr, shdr);
-    entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);
+	//int symbol_table_index = find_symbol_table(hdr, shdr);
+    //print_hex32(symbol_table_index);
+	//entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);
 
-	if(debug)
+	uint32_t entry = hdr->e_entry;
+	if(hdr->e_type == ET_DYN) entry += (uint32_t) exec;
+
+
+	/*if(debug)
 	{
 		printf("<ELF> ELF32 image at: 0x");
 		print_hex32((uint32_t) elf_start);
@@ -156,7 +163,7 @@ void* image_load(char* elf_start, unsigned int size, int debug)
 		printf("<ELF> ELF32 executable entry at: 0x");
 		print_hex32((uint32_t) entry);
 		printf("\n");
-	}
+	}*/
 
-	return entry;
+	return (void*) entry;
 }

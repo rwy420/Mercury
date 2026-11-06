@@ -5,15 +5,15 @@ global handle_irq_%1
 handle_irq_%1:
 	mov dword [interrupt_number], %1
 	push dword 0
-
 	jmp common_interrupt_handler
 %endmacro
 
 %macro error_interrupt 1
 global handle_irq_%1
 handle_irq_%1:
+	xchg bx, bx
 	mov [interrupt_number], %1	
-	push dword %1
+	;push dword %1
 	jmp common_interrupt_handler
 %endmacro
 
@@ -61,18 +61,18 @@ interrupt 07
 interrupt 08
 interrupt 09
 interrupt 10
-error_interrupt 11
-error_interrupt 12
-error_interrupt 13
-error_interrupt 14	
-error_interrupt 15
-; Non-exception interrups
 interrupt 32
 interrupt 33
 interrupt 41
 interrupt 43
 interrupt 49
 interrupt 128
+
+error_interrupt 11
+error_interrupt 12
+error_interrupt 13
+error_interrupt 14	
+error_interrupt 15
 
 section .data
 interrupt_number db 0
