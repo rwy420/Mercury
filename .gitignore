@@ -15,3 +15,4 @@ bx_enh_dbg.ini
 
 # Other files
 bochslog.txt
+qemu.log
