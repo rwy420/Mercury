@@ -28,8 +28,10 @@
 #define ATA
 //#define STARTTEXT
 
+// Variables from the linker script
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
+
 extern Disk* g_default_disk;
 extern uint32_t g_ms_since_init;
 
@@ -51,7 +53,8 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	mb_get_vesa(&g_vesa_info);
    
 	if(!paging_init()); //TODO error handling
-										
+
+	// Calculate the address of v_kernel_start in the higher half once mapped
 	void(*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
 
 	size_t heap_size = 0x1000000;
@@ -60,6 +63,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	uint32_t heap_max = heap_init(heap_start, heap_size);
 
 	vesa_init();
+	// Identity map the VESA framebuffer
 	vesa_map(g_kernel_pd);
 	clear_screen();
 
@@ -86,6 +90,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 
 void v_kernel_start()
 {
+	// Stack needs to be in higher half too
 	asm volatile("add $0xC0000000, %ESP");
 	segments_install_gdt();
 	install_idt();
