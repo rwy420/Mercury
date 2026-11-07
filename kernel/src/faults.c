@@ -1,13 +1,15 @@
-#include "vm.h"
 #include <faults.h>
 #include <common/screen.h>
 #include <vesa.h>
+#include <multitasking.h>
 
-char c[] = "GENRAL PROTECTION FAUL";
+extern Task* g_current_task;
 
 void handle_general_protection_fault(CPUState* cpu)
 {
-	printf("#GF\n");
+	g_current_task->state = TASK_TERMINATED;
+	printf("GENERAL PROTECTION FAULT (Task terminated)\n");
+	asm("int $0x20"); // yield to stop the execution of the terminated task right here
 }
 
 void handle_stack_fault(CPUState* cpu)

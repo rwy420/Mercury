@@ -1,3 +1,5 @@
+// TODO: Add a reaper task to remove TERMINATED tasks and free their memory
+
 #include <common/types.h>
 #include <memory/frames.h>
 #include <multitasking.h>
