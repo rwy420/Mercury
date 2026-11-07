@@ -110,6 +110,7 @@ void v_kernel_start()
 	register_interrupt_handler(0x0C, (isr_t) handle_stack_fault);
 	register_interrupt_handler(0x0D, (isr_t) handle_general_protection_fault);
 	register_interrupt_handler(0x80, (isr_t) syscall);
+
 #ifdef ATA
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))

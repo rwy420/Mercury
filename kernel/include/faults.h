@@ -5,5 +5,6 @@
 
 void handle_general_protection_fault(CPUState* cpu);
 void handle_stack_fault(CPUState* cpu);
+void handle_page_fault(CPUState* cpu);
 
 #endif

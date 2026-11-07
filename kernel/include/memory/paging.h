@@ -44,7 +44,7 @@ typedef enum
 	PDE_PAGE_SIZE = 0x80,
 	PDE_GLOBAL = 0x100,
 	PDE_PAT = 0x2000,
-	PDE_FRAME = 0x7FFFF000
+	bgPDE_FRAME = 0x7FFFF000
 } PAGE_DIRECTORY_FLAGS;
 
 typedef struct
@@ -71,6 +71,5 @@ void map_page(void* p_address, void* v_address);
 void map_page_pd_flags(PageDirectory* pd, void* p_address, void* v_address, int flags);
 
 int paging_init();
-void handle_page_fault(CPUState* cpu);
 
 #endif 
