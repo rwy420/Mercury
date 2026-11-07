@@ -1,17 +1,19 @@
+#include "vm.h"
 #include <faults.h>
 #include <common/screen.h>
 #include <vesa.h>
 
+char c[] = "GENRAL PROTECTION FAUL";
+
 void handle_general_protection_fault(CPUState* cpu)
 {
-	printf_color("GENERAL PROTECTION FAULT\n", COLOR_RED, COLOR_BLACK);
+	printf("#GF\n");
 }
 
 void handle_stack_fault(CPUState* cpu)
 {
 	printf_color("STACK PROTECTION FAULT\n", COLOR_RED, COLOR_BLACK);
 }
-
 
 void handle_page_fault(CPUState* cpu)
 {

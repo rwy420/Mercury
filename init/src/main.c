@@ -8,5 +8,6 @@ int main()
 	syscall(0x04, 0x01, (unsigned int) hello, sizeof(hello), 0, 0);
 	// Privilege test
 	asm volatile("hlt");
+
 	while(1);
 }

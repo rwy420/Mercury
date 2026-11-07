@@ -35,6 +35,7 @@ common_interrupt_handler:
 	push esp
 	push dword [interrupt_number]
 
+	;cld
 	call interrupt_handler
 	mov esp, eax
 

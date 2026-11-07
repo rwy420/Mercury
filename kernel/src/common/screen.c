@@ -1,3 +1,4 @@
+#include "vm.h"
 #include <common/screen.h>
 #include <vesa.h>
 
@@ -12,6 +13,7 @@ int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 
 void printf_color(string str, uint32_t fg, uint32_t bg)
 {
+	dbg_printf(str);
 	for(int i = 0; str[i] != '\0'; i++)
 	{
 		switch(str[i])
