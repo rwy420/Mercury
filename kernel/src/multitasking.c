@@ -1,5 +1,5 @@
 // TODO: Add a reaper task to remove TERMINATED tasks and free their memory
-
+// TODO: Add proper attributes to tasks
 #include <common/types.h>
 #include <memory/frames.h>
 #include <multitasking.h>
@@ -87,6 +87,7 @@ void tasks_init()
 	//create_task(idle_task3, false);
 }
 
+//TODO: clean this up
 Task* create_task(void entry(), int kernel)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
@@ -95,12 +96,13 @@ Task* create_task(void entry(), int kernel)
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
 	
-	void* stack = alloc_frames(4);
+	void* stack = alloc_frames(4); // 4kB stack, should make this adjustable but default to 4kB
 	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i,
 			PTE_PRESENT | PTE_RW | PTE_USER);
 	memset(stack, 0x0, 0x4000);
-	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + 0x4000 - sizeof(CPUState));
+	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + 0x4000 - sizeof(CPUState)); // Where the task state will be saved
 	
+	// Tasks that don't belong to the kernel will get their own page directory to isolate them from other non-kernel tasks
 	if(!kernel)
 	{
 		PageDirectory* pd = create_kernel_pd();
@@ -124,7 +126,8 @@ Task* create_task(void entry(), int kernel)
 	cpu_state->ebp = task->esp;
 
 	cpu_state->eip = (uint32_t) entry;
-	
+
+	// Flags and segments
 	if(kernel)
 	{
 		cpu_state->cs = 0x08;
@@ -138,7 +141,8 @@ Task* create_task(void entry(), int kernel)
 		cpu_state->eflags = 0x202;
 		cpu_state->esp = ((uint32_t) cpu_state);
 		cpu_state->ss = 0x23;
-		
+
+		// The kernel will use a different stack when called from a non-kernel task
 		void* kernel_stack = alloc_frames(4);
 		for(int i = 0; i < 4; i++) map_page_pd_flags((PageDirectory*) task->cr3, (void*) (kernel_stack + i * FRAME_SIZE), 
 				(void*) (kernel_stack + i * FRAME_SIZE), PTE_PRESENT | PTE_RW);
@@ -186,6 +190,7 @@ void kill_task(uint8_t id)
 
 uint32_t schedule(uint32_t esp) 
 {
+	// The CPUState was pushed onto the stack, right above the address in esp
 	CPUState* cpu = (CPUState*) esp;
 	set_pd(g_kernel_pd);
 
