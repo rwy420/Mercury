@@ -11,7 +11,7 @@ handle_irq_%1:
 %macro error_interrupt 1
 global handle_irq_%1
 handle_irq_%1:
-	mov [interrupt_number], %1	
+	mov dword [interrupt_number], %1	
 	;push dword %1 need to remove this when the cpu pushes the error code already
 	; TODO: make a separate exception interrupt handler macro for exception where the CPU does not push an error code
 	jmp common_interrupt_handler
@@ -76,4 +76,4 @@ error_interrupt 14
 error_interrupt 15
 
 section .data
-interrupt_number db 0
+interrupt_number dd 0
