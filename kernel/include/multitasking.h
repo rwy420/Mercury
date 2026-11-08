@@ -31,7 +31,7 @@ typedef struct Task
 } __attribute__((packed)) Task;
 
 void tasks_init();
-Task* create_task(void(*entry)(), uint32_t flags);
+Task* create_task(void(*entry)(), uint32_t flags, uint32_t stack_size);
 void kill_task(uint8_t id);
 uint32_t schedule(uint32_t esp);
 

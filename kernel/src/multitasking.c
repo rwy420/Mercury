@@ -81,16 +81,14 @@ void tasks_init()
 	task_list = NULL_PTR;
 	g_current_task = NULL_PTR;
 
-	create_task(dummy_task, true);
-	create_task(idle_task, true);
-	//create_task(idle_task2, true);
-	//create_task(idle_task3, false);
+	create_task(dummy_task, TASK_KERNEL, 0);
+	create_task(idle_task, TASK_KERNEL, 0);
 }
 
-//TODO: clean this up
-Task* create_task(void entry(), uint32_t flags)
+Task* create_task(void entry(), uint32_t flags, uint32_t stack_size)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
+	if(stack_size == 0) stack_size = PAGE_SIZE; // Task stack size will default to smallest size, which is the size of one page
 
 	Task* task = (Task*) kmalloc(sizeof(Task));
 	if(!task) return NULL_PTR;
@@ -98,11 +96,12 @@ Task* create_task(void entry(), uint32_t flags)
 
 	task->flags = flags;
 
-	void* stack = alloc_frames(4); // 4kB stack, should make this adjustable but default to 4kB
-	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i,
+	stack_size = ((stack_size + 0xFFF) & ~0xFFF);
+	void* stack = alloc_frames(stack_size / FRAME_SIZE);
+	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + stack_size; i += PAGE_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i,
 			PTE_PRESENT | PTE_RW | PTE_USER);
-	memset(stack, 0x0, 0x4000);
-	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + 0x4000 - sizeof(CPUState)); // Where the task state will be saved
+	memset(stack, 0x0, stack_size);
+	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + stack_size - sizeof(CPUState)); // Where the task state will be saved
 	
 	// Tasks that don't belong to the kernel will get their own page directory to isolate them from other non-kernel tasks
 	if(flags & TASK_KERNEL)
@@ -115,9 +114,9 @@ Task* create_task(void entry(), uint32_t flags)
 		task->cr3 = virtual_to_physical(pd);
 	}
 
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < stack_size / PAGE_SIZE; i++)
 	{
-		void* address = (void*) ((uint32_t) stack) + i * FRAME_SIZE;
+		void* address = (void*) ((uint32_t) stack) + i * PAGE_SIZE;
 		map_page(address, address);
 		if(!(flags & TASK_KERNEL)) map_page_pd_flags((PageDirectory*) task->cr3, address, address, PTE_PRESENT | PTE_RW | PTE_USER);
 	}
