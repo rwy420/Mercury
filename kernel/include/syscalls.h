@@ -6,7 +6,7 @@
 
 typedef int (*syscall_t)(CPUState* cpu);
 
-int syscall(CPUState* cpu);
+void syscall(CPUState* cpu);
 void register_syscall_handler(uint32_t syscall, syscall_t handler);
 
 #endif

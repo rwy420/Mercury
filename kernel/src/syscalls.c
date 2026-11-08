@@ -4,7 +4,7 @@
 
 syscall_t handlers[256];
 
-int syscall(CPUState* cpu)
+void syscall(CPUState* cpu)
 {
 	uint32_t syscall = cpu->eax;
 
@@ -13,10 +13,10 @@ int syscall(CPUState* cpu)
 		printf("Unhandled syscall 0x");
 		print_hex32(syscall);
 		printf("\n");
-		return 0x0;
+		return;
 	}
 
-	return handlers[syscall](cpu);
+	cpu->eax = handlers[syscall](cpu);
 }
 
 void register_syscall_handler(uint32_t syscall, syscall_t handler)
