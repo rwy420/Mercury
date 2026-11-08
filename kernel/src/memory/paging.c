@@ -9,26 +9,6 @@ extern void v_kernel_start();
 PageDirectory* g_current_pd = 0;
 PageDirectory* g_kernel_pd = 0;
 
-void pt_add_flags(uint32_t* pt, uint32_t flags)
-{
-	*pt |= flags;
-}
-
-void pt_delete_flags(uint32_t* pt, uint32_t flags)
-{
-	*pt &= ~flags;
-}
-
-void pd_add_flags(uint32_t* pd, uint32_t flags)
-{
-	*pd |= flags;
-}
-
-void pd_delete_flags(uint32_t* pd, uint32_t flags)
-{
-	*pd &= ~flags;
-}
-
 void set_pd(PageDirectory* pd)
 {
 	g_current_pd = pd;
@@ -126,8 +106,8 @@ int paging_init()
 	for(uint32_t i = 0, frame = 0, virt = 0; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
 	{
 		uint32_t page = 0;
-		SET_ATTRIBUTE(&page, PTE_PRESENT);
-		SET_ATTRIBUTE(&page, PTE_RW);
+		page |= PTE_PRESENT;
+		page |= PTE_RW;
 		SET_FRAME(&page, frame);
 
 		table_3g->entries[PT_INDEX(virt)] = page;
@@ -136,21 +116,21 @@ int paging_init()
 	for(uint32_t i = 0x0, frame = 0x0, virt = 0xC0000000; i < 1024; i++, frame += PAGE_SIZE, virt += PAGE_SIZE)
 	{
 		uint32_t page = 0;
-		SET_ATTRIBUTE(&page, PTE_PRESENT);
-		SET_ATTRIBUTE(&page, PTE_RW);
+		page |= PTE_PRESENT;
+		page |= PTE_RW;
 		SET_FRAME(&page, frame);
 
 		table->entries[PT_INDEX(virt)] = page;
 	}
 
 	uint32_t* entry = &directory->entries[PD_INDEX(0xC0000000)];
-	SET_ATTRIBUTE(entry, PDE_PRESENT);
-	SET_ATTRIBUTE(entry, PDE_RW);
+	*entry |= PDE_PRESENT;
+	*entry |= PDE_RW;
 	SET_FRAME(entry, (uint32_t) table);
 
 	uint32_t* entry2 = &directory->entries[PD_INDEX(0x00000000)];
-	SET_ATTRIBUTE(entry2, PDE_PRESENT);
-	SET_ATTRIBUTE(entry2, PDE_RW);
+	*entry2 |= PDE_PRESENT;
+	*entry2 |= PDE_RW;
 	SET_FRAME(entry2, (uint32_t) table_3g);
 
 	set_pd(directory);
