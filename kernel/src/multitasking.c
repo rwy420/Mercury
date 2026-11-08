@@ -83,7 +83,6 @@ void tasks_init()
 
 	create_task(dummy_task, TASK_KERNEL, 0);
 	create_task(idle_task, TASK_KERNEL, 0);
-	create_task(idle_task2, TASK_KERNEL, 0);
 }
 
 Task* create_task(void entry(), uint32_t flags, uint32_t stack_size)
@@ -189,6 +188,8 @@ void kill_task(uint8_t id)
 	}
 }
 
+// TODO: fix the bug where the first task created won't execute; this is probably because the first time schedule is ran, it likely sets the first 
+// task's state to what the kernel itself was at
 uint32_t schedule(uint32_t esp) 
 {
 	// The CPUState was pushed onto the stack, right above the address in esp
