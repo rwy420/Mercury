@@ -83,6 +83,7 @@ void tasks_init()
 
 	create_task(dummy_task, TASK_KERNEL, 0);
 	create_task(idle_task, TASK_KERNEL, 0);
+	create_task(idle_task2, TASK_KERNEL, 0);
 }
 
 Task* create_task(void entry(), uint32_t flags, uint32_t stack_size)

@@ -1,3 +1,4 @@
+#include "vm.h"
 #include <faults.h>
 #include <common/screen.h>
 #include <vesa.h>
@@ -22,15 +23,19 @@ void handle_page_fault(CPUState* cpu)
 	uint32_t address = 0;
 	__asm__ __volatile__("movl %%CR2, %0" : "=r" (address));
 
-	printf("Page fault at address: 0x");
-	print_hex32(address);
-	printf(" error: ");
-	print_hex32(cpu->error_code);
-	printf("\n");
+	dbg_printf("Page fault at address: 0x");
+	dbg_print_hex32(address);
+	dbg_printf(" error: ");
+	dbg_print_hex32(cpu->error_code);
+	dbg_printf("\n");
 
-	if(!(cpu->error_code & 0x1)) printf(" - Not present\n");
-	if(cpu->error_code & 0x2) printf(" - Write\n");
-	if(cpu->error_code & 0x4) printf(" - User\n");
-	if(cpu->error_code & 0x8) printf(" - Reserved bit voilation\n");
-	if(cpu->error_code & 0x10) printf(" - Instruction fetched\n");
+	if(!(cpu->error_code & 0x1)) dbg_printf(" - Not present\n");
+	if(cpu->error_code & 0x2) dbg_printf(" - Write\n");
+	if(cpu->error_code & 0x4) dbg_printf(" - User\n");
+	if(cpu->error_code & 0x8) dbg_printf(" - Reserved bit voilation\n");
+	if(cpu->error_code & 0x10) dbg_printf(" - Instruction fetched\n");
+
+	g_current_task->state = TASK_TERMINATED;
+	printf("PAGE FAULT (Task terminated)\n");
+	asm("int $0x20");
 }
