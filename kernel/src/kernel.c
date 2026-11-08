@@ -170,7 +170,7 @@ void v_kernel_start()
 	char* buffer = kmalloc(13116);
 	vfs_read(test, buffer, 13116);
 	void (*entry0)() = image_load(buffer, 13116, false);
-	create_task(entry0, false);
+	create_task(entry0, 0);
 
 	while(1);
 }

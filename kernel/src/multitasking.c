@@ -1,5 +1,5 @@
 // TODO: Add a reaper task to remove TERMINATED tasks and free their memory
-// TODO: Add proper attributes to tasks
+
 #include <common/types.h>
 #include <memory/frames.h>
 #include <multitasking.h>
@@ -88,14 +88,16 @@ void tasks_init()
 }
 
 //TODO: clean this up
-Task* create_task(void entry(), int kernel)
+Task* create_task(void entry(), uint32_t flags)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
 
 	Task* task = (Task*) kmalloc(sizeof(Task));
 	if(!task) return NULL_PTR;
 	memset(task, 0, sizeof(Task));	
-	
+
+	task->flags = flags;
+
 	void* stack = alloc_frames(4); // 4kB stack, should make this adjustable but default to 4kB
 	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + 4 * FRAME_SIZE; i += FRAME_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i,
 			PTE_PRESENT | PTE_RW | PTE_USER);
@@ -103,24 +105,23 @@ Task* create_task(void entry(), int kernel)
 	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + 0x4000 - sizeof(CPUState)); // Where the task state will be saved
 	
 	// Tasks that don't belong to the kernel will get their own page directory to isolate them from other non-kernel tasks
-	if(!kernel)
+	if(flags & TASK_KERNEL)
 	{
-		PageDirectory* pd = create_kernel_pd();
-		task->cr3 = virtual_to_physical(pd);
+		task->cr3 = (uint32_t) g_kernel_pd;
 	}
 	else
 	{
-		task->cr3 = (uint32_t) g_kernel_pd;
+		PageDirectory* pd = create_kernel_pd();
+		task->cr3 = virtual_to_physical(pd);
 	}
 
 	for(int i = 0; i < 4; i++)
 	{
 		void* address = (void*) ((uint32_t) stack) + i * FRAME_SIZE;
 		map_page(address, address);
-		if(!kernel) map_page_pd_flags((PageDirectory*) task->cr3, address, address, PTE_PRESENT | PTE_RW | PTE_USER);
+		if(!(flags & TASK_KERNEL)) map_page_pd_flags((PageDirectory*) task->cr3, address, address, PTE_PRESENT | PTE_RW | PTE_USER);
 	}
 
-	task->flags = kernel;
 	task->esp = (uint32_t) cpu_state;
 
 	cpu_state->ebp = task->esp;
@@ -128,7 +129,7 @@ Task* create_task(void entry(), int kernel)
 	cpu_state->eip = (uint32_t) entry;
 
 	// Flags and segments
-	if(kernel)
+	if(flags & TASK_KERNEL)
 	{
 		cpu_state->cs = 0x08;
 		cpu_state->eflags = 0x202;

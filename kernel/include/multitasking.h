@@ -8,6 +8,11 @@
 
 typedef enum
 {
+	TASK_KERNEL = 0x01,
+} TASK_FLAGS;
+
+typedef enum
+{
 	TASK_RUNNING,
 	TASK_WAITING,
 	TASK_READY,
@@ -26,7 +31,7 @@ typedef struct Task
 } __attribute__((packed)) Task;
 
 void tasks_init();
-Task* create_task(void(*entry)(), int kernel);
+Task* create_task(void(*entry)(), uint32_t flags);
 void kill_task(uint8_t id);
 uint32_t schedule(uint32_t esp);
 
