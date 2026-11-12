@@ -1,5 +1,6 @@
 #include <exec/elf32/elf32dynlib.h>
 #include <exec/elf32/elf32.h>
+#include <exec/elf32/elf32loader.h>
 #include <common/screen.h>
 #include <memory/common.h>
 #include <memory/heap.h>
@@ -48,11 +49,11 @@ void* dlsym(int dl, char* sym)
 	Elf32_Shdr* dynsym = NULL_PTR, *dynstr = NULL_PTR;
 	for(int i = 0; i < shnum; i++)
 	{
-		if(strcmp(get_section_name(elf, shdr, i), ".dynsym") == 0)
+		if(strcmp(elf32_get_section_name(elf, shdr, i), ".dynsym") == 0)
 		{
 			dynsym = &shdr[i];
 		}
-		else if(strcmp(get_section_name(elf, shdr, i), ".dynstr") == 0)
+		else if(strcmp(elf32_get_section_name(elf, shdr, i), ".dynstr") == 0)
 		{
 			dynstr = &shdr[i];
 		}

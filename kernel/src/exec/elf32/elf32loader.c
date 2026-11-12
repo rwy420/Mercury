@@ -8,7 +8,7 @@
 
 extern PageDirectory* g_kernel_pd;
 
-void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst, int dl)
+void elf32_relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst, int dl)
 {
     Elf32_Rel* rel = (Elf32_Rel*)(src + shdr->sh_offset);
 
@@ -27,7 +27,7 @@ void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, cons
     }
 }
 
-int find_global_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
+int elf32_find_global_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
 {
     for (int i = 0; i < hdr->e_shnum; i++)
     {
@@ -41,7 +41,7 @@ int find_global_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
     return -1;
 }
 
-int find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
+int elf32_find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
 {
     for (int i = 0; i < hdr->e_shnum; i++)
     {
@@ -58,7 +58,7 @@ int find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
     return -1;
 }
 
-void* find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const char* src, char* dst)
+void* elf32_find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const char* src, char* dst)
 {
     Elf32_Sym* syms = (Elf32_Sym*)(src + shdr_sym->sh_offset);
     const char* strings = src + shdr[shdr_sym->sh_link].sh_offset;
@@ -72,6 +72,21 @@ void* find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const c
     }
 
     return 0;
+}
+
+const char* elf32_get_section_name(const uint8_t* elf, Elf32_Shdr* shdr, int index)
+{
+	Elf32_Ehdr* ehdr = (Elf32_Ehdr*) elf;
+	Elf32_Shdr* shstrtab_shdr = &shdr[ehdr->e_shstrndx];
+
+	const char* shstrtab = (const char*)(elf + shstrtab_shdr->sh_offset);
+
+	return &shstrtab[shdr[index].sh_name];
+}
+
+void* elf32_get_entry(Elf32_Phdr* phdr)
+{
+
 }
 
 void* image_load(uint8_t* elf_start, uint32_t size, int debug)
@@ -131,7 +146,7 @@ void* image_load(uint8_t* elf_start, uint32_t size, int debug)
 
     shdr = (Elf32_Shdr *)(elf_start + hdr->e_shoff);
 
-    int global_symbol_table_index = find_global_symbol_table(hdr, shdr);
+    int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
     Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
     char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
 
