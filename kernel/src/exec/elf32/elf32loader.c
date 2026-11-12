@@ -1,11 +1,10 @@
-#include <exec/elf/elf.h>
-#include <exec/elf/elf_dl.h>
+#include <exec/elf32/elf32.h>
+#include <exec/elf32/elf32dynlib.h>
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/heap.h>
 #include <memory/frames.h>
 #include <memory/paging.h>
-#include <exec/elf/symtable.h>
 
 extern PageDirectory* g_kernel_pd;
 
@@ -20,7 +19,7 @@ void relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, cons
         switch (ELF32_R_TYPE(rel[j].r_info))
         {
             case R_386_JMP_SLOT:
-				*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
+				//*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
             case R_386_GLOB_DAT:
 				*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) dlsym(dl, sym);
                 break;

@@ -10,7 +10,7 @@
 #include <memory/gdt.h>
 #include <memory/paging.h>
 #include <common/screen.h>
-#include <exec/elf/elf_loader.h>
+#include <exec/elf32/elf32loader.h>
 #include <vesa.h>
 
 Task* task_list = NULL_PTR;

@@ -1,4 +1,3 @@
-#include "vm.h"
 #include <multiboot.h>
 #include <syscalls.h>
 #include <fd.h>
@@ -7,8 +6,7 @@
 #include <multitasking.h>
 #include <common/screen.h>
 #include <common/types.h>
-#include <exec/elf/elf_loader.h>
-#include <exec/elf/symtable.h>
+#include <exec/elf32/elf32loader.h>
 #include <memory/gdt.h>
 #include <driver/driver.h>
 #include <driver/vga/vga.h>
@@ -142,7 +140,6 @@ void v_kernel_start()
 	printf(" MB initialized\n");
 
 	tasks_init();
-	symtable_init();
 	init_drivers();
 
 	printf("<PCI> Enumerating PCI devices\n");

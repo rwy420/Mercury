@@ -1,8 +1,8 @@
-#ifndef __MERCURY__EXEC__ELF__ELF_DL_H
-#define __MERCURY__EXEC__ELF__ELF_DL_H
+#ifndef __MERCURY__EXEC__ELF32__ELF32DYNLIB_H
+#define __MERCURY__EXEC__ELF32__ELF32DYNLIB_H
 
 #include <common/types.h>
-#include <exec/elf/elf.h>
+#include <exec/elf32/elf32.h>
 
 typedef struct
 {

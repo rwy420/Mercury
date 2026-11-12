@@ -1,5 +1,5 @@
-#include <exec/elf/elf_dl.h>
-#include <exec/elf/elf.h>
+#include <exec/elf32/elf32dynlib.h>
+#include <exec/elf32/elf32.h>
 #include <common/screen.h>
 #include <memory/common.h>
 #include <memory/heap.h>
