@@ -1,3 +1,5 @@
+#include "exec/elf32/elf32dyn.h"
+#include <exec/elf32/elf32loader.h>
 #include <exec/elf32/elf32.h>
 #include <exec/elf32/elf32dynlib.h>
 #include <memory/common.h>
@@ -8,7 +10,7 @@
 
 extern PageDirectory* g_kernel_pd;
 
-void elf32_relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst, int dl)
+void elf32_relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst)
 {
     Elf32_Rel* rel = (Elf32_Rel*)(src + shdr->sh_offset);
 
@@ -21,7 +23,7 @@ void elf32_relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings
             case R_386_JMP_SLOT:
 				//*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
             case R_386_GLOB_DAT:
-				*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) dlsym(dl, sym);
+				//*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) dlsym(dl, sym);
                 break;
         }
     }
@@ -84,23 +86,19 @@ const char* elf32_get_section_name(const uint8_t* elf, Elf32_Shdr* shdr, int ind
 	return &shstrtab[shdr[index].sh_name];
 }
 
-void* elf32_get_entry(Elf32_Phdr* phdr)
+void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 {
-
+	return (void*) hdr->e_entry + load_info->offset;
 }
 
-void* image_load(uint8_t* elf_start, uint32_t size, int debug)
+void* elf32_load(void* elf_start, uint32_t size)
 {
-    Elf32_Ehdr* hdr;
-    Elf32_Phdr* phdr;
-    Elf32_Shdr* shdr;
-    uint8_t* start;
-    uint8_t* taddr;
-    int i = 0;
-    uint8_t* exec;
-	//int dl = dlopen("/LIB/LIBC.SO");
+	Elf32_Load_Info* load_info = kmalloc(sizeof(Elf32_Load_Info));
+    Elf32_Ehdr* hdr = (Elf32_Ehdr*) elf_start;
+    Elf32_Phdr* phdr = (Elf32_Phdr *)(elf_start + hdr->e_phoff);
+    Elf32_Shdr* shdr = (Elf32_Shdr *)(elf_start + hdr->e_shoff);
 
-    hdr = (Elf32_Ehdr*) elf_start;
+    uint8_t* base;
 
 	if (!is_elf_image(hdr))
     {
@@ -108,47 +106,44 @@ void* image_load(uint8_t* elf_start, uint32_t size, int debug)
         return 0;
     }
 
+	if(!load_info) return 0;
+
 	uint32_t num_frames = ((size + FRAME_SIZE) / FRAME_SIZE) + 1;
-    exec = alloc_frames(num_frames);
+    base = alloc_frames(num_frames);
 
 	for(int i = 0; i < num_frames; i++)
 	{
-		void* frame = (exec + i * 0x1000);
+		void* frame = (base + i * 0x1000);
 		map_page_pd_flags(g_kernel_pd, frame, frame, PTE_PRESENT | PTE_RW | PTE_USER);
 	}
 
-    if (!exec)
+    if (!base)
     {
         printf("<ELF> Error allocating memory\n");
         return 0;
     }
 
-    memset(exec, 0x0, size);
 
-    phdr = (Elf32_Phdr *)(elf_start + hdr->e_phoff);
 
-    for (i = 0; i < hdr->e_phnum; ++i)
-    {
-        if (phdr[i].p_type != PT_LOAD)
-        {
-            continue;
-        }
+    memset(base, 0x0, size);
+	load_info->base = base;
+	load_info->image = elf_start;
 
-        if (!phdr[i].p_filesz)
-        {
-            continue;
-        }
+   	switch(hdr->e_type)
+	{
+		case(ET_EXEC):
+			load_info->offset = 0;
+			break;
+		case (ET_DYN):
+			load_info->offset = (uint32_t) load_info->base;
+			elf32_dyn_load_segments(hdr, phdr, load_info);
+			break;
+	}
 
-        start = elf_start + phdr[i].p_offset;
-        taddr = exec + phdr[i].p_vaddr;
-        memmove(taddr, start, phdr[i].p_filesz);
-    }
 
-    shdr = (Elf32_Shdr *)(elf_start + hdr->e_shoff);
-
-    int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
-    Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
-    char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
+    //int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
+    //Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
+    //char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
 
     /*for (i = 0; i < hdr->e_shnum; ++i)
     {
@@ -162,22 +157,7 @@ void* image_load(uint8_t* elf_start, uint32_t size, int debug)
     //print_hex32(symbol_table_index);
 	//entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);
 
-	uint32_t entry = hdr->e_entry;
-	if(hdr->e_type == ET_DYN) entry += (uint32_t) exec;
+	load_info->entry = elf32_get_entry(hdr, load_info);
 
-
-	/*if(debug)
-	{
-		printf("<ELF> ELF32 image at: 0x");
-		print_hex32((uint32_t) elf_start);
-		printf("\n");
-		printf("<ELF> ELF32 executable buffer at: 0x");
-		print_hex32((uint32_t) exec);
-		printf("\n");
-		printf("<ELF> ELF32 executable entry at: 0x");
-		print_hex32((uint32_t) entry);
-		printf("\n");
-	}*/
-
-	return (void*) entry;
+	return load_info->entry;
 }

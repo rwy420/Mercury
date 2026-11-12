@@ -166,7 +166,7 @@ void v_kernel_start()
 	uint32_t test = vfs_open("/SBIN/INIT.ELF");
 	char* buffer = kmalloc(13116);
 	vfs_read(test, buffer, 13116);
-	void (*entry0)() = image_load(buffer, 13116, false);
+	void (*entry0)() = elf32_load(buffer, 13116);
 	create_task(entry0, 0, 0x1000);
 
 	while(1);
