@@ -19,6 +19,7 @@ int elf32_find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr);
 void* elf32_find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const char* src, char* dst);
 const char* elf32_get_section_name(const uint8_t* elf, Elf32_Shdr* shdr, int index);
 void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info);
+void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
 
 void* elf32_load(void* elf_start, uint32_t size);
 

@@ -91,6 +91,26 @@ void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 	return (void*) hdr->e_entry + load_info->offset;
 }
 
+void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
+{
+	for (int i = 0; i < hdr->e_phnum; ++i)
+	{
+		if (phdr[i].p_type != PT_LOAD)
+	    {
+		    continue;
+	    }
+
+		if (!phdr[i].p_filesz)
+		{
+			continue;
+		}
+
+		void* segment = load_info->image + phdr[i].p_offset;
+		void* addr = (void*) load_info->offset + phdr[i].p_vaddr;
+		memmove(addr, segment, phdr[i].p_filesz);
+	}
+}
+
 void* elf32_load(void* elf_start, uint32_t size)
 {
 	Elf32_Load_Info* load_info = kmalloc(sizeof(Elf32_Load_Info));
@@ -136,10 +156,10 @@ void* elf32_load(void* elf_start, uint32_t size)
 			break;
 		case (ET_DYN):
 			load_info->offset = (uint32_t) load_info->base;
-			elf32_dyn_load_segments(hdr, phdr, load_info);
 			break;
 	}
 
+	elf32_load_segments(hdr, phdr, load_info);
 
     //int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
     //Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
