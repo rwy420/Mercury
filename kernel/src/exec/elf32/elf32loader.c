@@ -16,7 +16,8 @@ void elf32_relocate(Elf32_Shdr* shdr, Elf32_Sym* syms, char* strings, char* src,
     for(int i = 0; i < shdr->sh_size / sizeof(Elf32_Rel); i++)
     {
         const char* sym = strings + syms[ELF32_R_SYM(rel[i].r_info)].st_name;
-		
+		printf(sym);
+
         switch (ELF32_R_TYPE(rel[i].r_info))
         {
             case R_386_JMP_SLOT:
@@ -32,7 +33,7 @@ int elf32_find_global_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
 {
     for (int i = 0; i < hdr->e_shnum; i++)
     {
-        if (shdr[i].sh_type == SHT_DYNSYM)
+        if (shdr[i].sh_type == SHT_SYMTAB)
         {
             return i;
             break;
@@ -46,9 +47,6 @@ int elf32_find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
 {
     for (int i = 0; i < hdr->e_shnum; i++)
     {
-			print_uint8_t(shdr[i].sh_type);
-			printf("\n");
-
         if (shdr[i].sh_type == SHT_SYMTAB)
         {
             return i;
@@ -124,16 +122,19 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 			continue;
 		}
 
+		void* psegment = (void*) virtual_to_physical((void*)(load_info->image + phdr[i].p_offset));
+		void* vaddr = (void*)(load_info->offset + phdr[i].p_vaddr);
+
 		switch(phdr[i].p_type)
 		{
 			case PT_LOAD:
-				void* psegment = (void*) virtual_to_physical((void*)(load_info->image + phdr[i].p_offset));
-				void* vaddr = (void*)(load_info->offset + phdr[i].p_vaddr);
 				set_pd(load_info->pd);
 				memmove(vaddr, psegment, phdr[i].p_filesz);
 				uint32_t zeromem_size = phdr[i].p_memsz - phdr[i].p_filesz;
 				if(zeromem_size > 0) memset((void*) vaddr + phdr[i].p_filesz, 0, zeromem_size);
 				set_pd(g_kernel_pd);
+				break;
+			case PT_DYNAMIC:
 				break;
 			default:
 				break;
@@ -171,21 +172,17 @@ void* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
 
 	elf32_load_segments(hdr, phdr, load_info);
 
-    //int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
-    //Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
-    //char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
+    /*int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
+    Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
+    char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
 
-    /*for (i = 0; i < hdr->e_shnum; ++i)
+    for (int i = 0; i < hdr->e_shnum; ++i)
     {
         if (shdr[i].sh_type == SHT_REL)
         {
-            relocate(shdr + i, global_syms, global_strings, elf_start, exec, dl);
+            elf32_relocate(shdr + i, global_syms, global_strings, elf_start, elf_start);
         }
     }*/
-
-	//int symbol_table_index = find_symbol_table(hdr, shdr);
-    //print_hex32(symbol_table_index);
-	//entry = find_sym("main", shdr, shdr + symbol_table_index, elf_start, exec);
 
 	load_info->entry = elf32_get_entry(hdr, load_info);
 
