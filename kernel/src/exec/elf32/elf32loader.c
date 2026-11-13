@@ -94,9 +94,18 @@ void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 {
 	// Determine total size for allocation
-	uint32_t total_size = phdr[hdr->e_phnum - 1].p_paddr - phdr[0].p_paddr;
-	uint32_t num_frames = ALIGN_UP(total_size, PAGE_SIZE);
-	void* frames = alloc_frames(num_frames); //TODO: error handling if allocation failed
+	uint32_t min_vaddr = 0, max_vaddr = 0;
+
+	for(int i = 0; i < hdr->e_phnum; i++)
+	{
+		if(phdr[i].p_vaddr < min_vaddr) min_vaddr = phdr[i].p_vaddr;
+		else if((phdr[i].p_vaddr + phdr[i].p_memsz) > max_vaddr) max_vaddr = phdr[i].p_vaddr + phdr[i].p_memsz;
+	}
+
+	uint32_t total_size = ALIGN_UP(max_vaddr, FRAME_SIZE) - ALIGN_DOWN(min_vaddr, FRAME_SIZE);
+
+	uint32_t num_frames = ALIGN_UP(total_size, PAGE_SIZE) / PAGE_SIZE;
+	void* frames = alloc_frames(num_frames); //TODO: error handling if allocation faile
 
 	for(int i = 0; i < num_frames; i++)
 	{
