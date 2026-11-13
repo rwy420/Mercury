@@ -20,6 +20,11 @@
 #define PT_LOAD 0x1
 #define PT_DYNAMIC 0x2
 
+#define DT_NULL 0x0
+#define DT_REL 0x11
+#define DT_RELSZ 0x12
+#define DT_RELENT 0x13
+
 #define R_386_GLOB_DAT 0x6
 #define R_386_JMP_SLOT 0x7
 
