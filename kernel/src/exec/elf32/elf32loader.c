@@ -95,19 +95,21 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 {
 	for (int i = 0; i < hdr->e_phnum; ++i)
 	{
-		if (phdr[i].p_type != PT_LOAD)
-	    {
-		    continue;
-	    }
-
 		if (!phdr[i].p_filesz)
 		{
 			continue;
 		}
 
-		void* segment = load_info->image + phdr[i].p_offset;
-		void* addr = (void*) load_info->offset + phdr[i].p_vaddr;
-		memmove(addr, segment, phdr[i].p_filesz);
+		switch(phdr[i].p_type)
+		{
+			case PT_LOAD:
+				void* segment = load_info->image + phdr[i].p_offset;
+				void* addr = (void*) load_info->offset + phdr[i].p_vaddr;
+				memmove(addr, segment, phdr[i].p_filesz);
+				break;
+			default:
+				break;
+		}
 	}
 }
 
