@@ -4,6 +4,6 @@
 #include <exec/elf32/elf32loader.h>
 #include <exec/elf32/elf32.h>
 
-void elf32_dyn_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
+int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
 
 #endif

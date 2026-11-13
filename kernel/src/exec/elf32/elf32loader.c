@@ -1,3 +1,4 @@
+#include "exec/elf32/elf32dyn.h"
 #include <exec/elf32/elf32loader.h>
 #include <exec/elf32/elf32.h>
 #include <exec/elf32/elf32dynlib.h>
@@ -91,6 +92,7 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 				set_pd(g_kernel_pd);
 				break;
 			case PT_DYNAMIC:
+				elf32_handle_ptdynamic(&phdr[i], load_info); //TODO: error handling
 				break;
 			default:
 				break;

@@ -106,7 +106,7 @@ typedef struct
 		Elf32_Word d_val;
 		Elf32_Addr d_ptr;
 	} d_un;
-} __attribute__((packed)) Efl32_Dyn;
+} __attribute__((packed)) Elf32_Dyn;
 
 int is_elf_image(Elf32_Ehdr* hdr);
 
