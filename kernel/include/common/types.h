@@ -1,6 +1,10 @@
 #ifndef __MERCURY__COMMON__TYPES_H
 #define __MERCURY__COMMON__TYPES_H
 
+// TODO: use these everywhere
+#define ALIGN_DOWN(value, alignment) ((value) & ~((alignment) - 1))
+#define ALIGN_UP(value, alignment) (((value) + (alignment) - 1) & ~((alignment) - 1))
+
 #define NULL_PTR ((void*) 0)
 
 typedef char int8_t;
