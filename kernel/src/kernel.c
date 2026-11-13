@@ -152,8 +152,6 @@ void v_kernel_start()
 	//load_initrd();
 	if(!read_mbr()) printf_color("<Mercury> Could not read the MBR\n", COLOR_RED, COLOR_BLACK);
 	
-	pit_set_schedule(true);
-
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
@@ -163,11 +161,11 @@ void v_kernel_start()
 	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
 #endif
 	
-	uint32_t test = vfs_open("/SBIN/INIT.ELF");
-	char* buffer = kmalloc(13116);
-	vfs_read(test, buffer, 13116);
-	void (*entry0)() = elf32_load(buffer, 13116);
-	create_task(entry0, 0, 0x1000);
+	load_process("/SBIN/INIT.ELF", 13110);
+	
+	// Starting scheduling earlier causes problems, might wanna wrap further kernel initialization into another function and make it a task
+	pit_set_schedule(true);
+
 
 	while(1);
 }

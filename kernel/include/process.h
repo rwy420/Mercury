@@ -4,6 +4,6 @@
 #include <hardware/interrupts.h>
 
 void syscall_exit(CPUState* cpu);
-uint32_t create_user_process_pd(void* code);
+int load_process(char* path, uint32_t size);
 
 #endif

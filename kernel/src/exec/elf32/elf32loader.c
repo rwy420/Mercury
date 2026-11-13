@@ -93,6 +93,18 @@ void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 
 void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 {
+	// Determine total size for allocation
+	uint32_t total_size = phdr[hdr->e_phnum - 1].p_paddr - phdr[0].p_paddr;
+	uint32_t num_frames = ALIGN_UP(total_size, PAGE_SIZE);
+	void* frames = alloc_frames(num_frames); //TODO: error handling if allocation failed
+
+	for(int i = 0; i < num_frames; i++)
+	{
+		void* paddr = (void*)(frames + i * FRAME_SIZE);
+		void* vaddr = (void*)(load_info->offset + i * FRAME_SIZE);
+		map_page_pd_flags(load_info->pd, paddr, vaddr, PDE_PRESENT | PDE_RW | PDE_USER);
+	}
+
 	for (int i = 0; i < hdr->e_phnum; ++i)
 	{
 		if (!phdr[i].p_filesz)
@@ -103,9 +115,13 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 		switch(phdr[i].p_type)
 		{
 			case PT_LOAD:
-				void* segment = load_info->image + phdr[i].p_offset;
-				void* addr = (void*) load_info->offset + phdr[i].p_vaddr;
-				memmove(addr, segment, phdr[i].p_filesz);
+				void* psegment = (void*) virtual_to_physical((void*)(load_info->image + phdr[i].p_offset));
+				void* vaddr = (void*)(load_info->offset + phdr[i].p_vaddr);
+				set_pd(load_info->pd);
+				memmove(vaddr, psegment, phdr[i].p_filesz);
+				uint32_t zeromem_size = phdr[i].p_memsz - phdr[i].p_filesz;
+				if(zeromem_size > 0) memset((void*) vaddr + phdr[i].p_filesz, 0, zeromem_size);
+				set_pd(g_kernel_pd);
 				break;
 			default:
 				break;
@@ -113,14 +129,12 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 	}
 }
 
-void* elf32_load(void* elf_start, uint32_t size)
+void* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
 {
 	Elf32_Load_Info* load_info = kmalloc(sizeof(Elf32_Load_Info));
     Elf32_Ehdr* hdr = (Elf32_Ehdr*) elf_start;
-    Elf32_Phdr* phdr = (Elf32_Phdr *)(elf_start + hdr->e_phoff);
-    Elf32_Shdr* shdr = (Elf32_Shdr *)(elf_start + hdr->e_shoff);
-
-    uint8_t* base;
+    Elf32_Phdr* phdr = (Elf32_Phdr*)(elf_start + hdr->e_phoff);
+    Elf32_Shdr* shdr = (Elf32_Shdr*)(elf_start + hdr->e_shoff);
 
 	if (!is_elf_image(hdr))
     {
@@ -130,26 +144,8 @@ void* elf32_load(void* elf_start, uint32_t size)
 
 	if(!load_info) return 0;
 
-	uint32_t num_frames = ((size + FRAME_SIZE) / FRAME_SIZE) + 1;
-    base = alloc_frames(num_frames);
-
-	for(int i = 0; i < num_frames; i++)
-	{
-		void* frame = (base + i * 0x1000);
-		map_page_pd_flags(g_kernel_pd, frame, frame, PTE_PRESENT | PTE_RW | PTE_USER);
-	}
-
-    if (!base)
-    {
-        printf("<ELF> Error allocating memory\n");
-        return 0;
-    }
-
-
-
-    memset(base, 0x0, size);
-	load_info->base = base;
 	load_info->image = elf_start;
+	load_info->pd = pd;
 
    	switch(hdr->e_type)
 	{
@@ -157,7 +153,7 @@ void* elf32_load(void* elf_start, uint32_t size)
 			load_info->offset = 0;
 			break;
 		case (ET_DYN):
-			load_info->offset = (uint32_t) load_info->base;
+			load_info->offset = 0x60000000;
 			break;
 	}
 

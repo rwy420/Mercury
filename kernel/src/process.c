@@ -5,6 +5,7 @@
 #include <memory/heap.h>
 #include <memory/common.h>
 #include <vesa.h>
+#include <exec/elf32/elf32loader.h>
 
 extern Task* g_current_task;
 
@@ -17,16 +18,18 @@ void syscall_exit(CPUState* cpu)
 	asm("int $32");
 }
 
-uint32_t create_user_process_pd(void* code)
+int load_process(char* path, uint32_t size)
 {
-	void* cr3 = kmalloc_aligned(4096, 4096 * 3);
-	PageDirectory* directory = cr3; //malloc(4096 * 3);
-	memset(directory, 0, sizeof(PageDirectory));
-	for(uint32_t i = 0; i < 1024; i++) directory->entries[i] = 0x02;
+	// Load file
+	uint32_t test = vfs_open(path);
+	char* buffer = kmalloc(size);
+	vfs_read(test, buffer, size);
 
-	printf("Created USER CR3 at 0x");
-	print_hex32((uint32_t) cr3);
-	printf("\n");
+	// Create user PD
+	PageDirectory* pd = create_kernel_pd();
 
-	return (uint32_t) cr3;
+	void (*entry0)() = elf32_load(buffer, 13116, pd);
+	//create_task(entry0, 0, 0x1000);
+	
+	return 0;
 }
