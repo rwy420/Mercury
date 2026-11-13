@@ -1,5 +1,6 @@
 // TODO: Add a reaper task to remove TERMINATED tasks and free their memory
 
+#include "memory/paging.h"
 #include <common/types.h>
 #include <memory/frames.h>
 #include <multitasking.h>
@@ -8,7 +9,6 @@
 #include <memory/common.h>
 #include <memory/heap.h>
 #include <memory/gdt.h>
-#include <memory/paging.h>
 #include <common/screen.h>
 #include <exec/elf32/elf32loader.h>
 #include <vesa.h>
@@ -81,11 +81,11 @@ void tasks_init()
 	task_list = NULL_PTR;
 	g_current_task = NULL_PTR;
 
-	create_task(dummy_task, TASK_KERNEL, 0);
-	create_task(idle_task, TASK_KERNEL, 0);
+	create_task(dummy_task, TASK_KERNEL, 0, 0);
+	create_task(idle_task, TASK_KERNEL, 0, 0);
 }
 
-Task* create_task(void entry(), uint32_t flags, uint32_t stack_size)
+Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirectory* pd)
 {
 	if(next_id > MAX_TASKS) return NULL_PTR;
 	if(stack_size == 0) stack_size = PAGE_SIZE; // Task stack size will default to smallest size, which is the size of one page
@@ -104,14 +104,18 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size)
 	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + stack_size - sizeof(CPUState)); // Where the task state will be saved
 	
 	// Tasks that don't belong to the kernel will get their own page directory to isolate them from other non-kernel tasks
-	if(flags & TASK_KERNEL)
+	if(pd == 0 && flags & TASK_KERNEL)
 	{
 		task->cr3 = (uint32_t) g_kernel_pd;
 	}
+	else if(pd == 0 && !(flags & TASK_KERNEL))
+	{
+		printf("<Mercury> Can't create non-kernel task with zero PD\n");
+		return 0;
+	}
 	else
 	{
-		PageDirectory* pd = create_kernel_pd();
-		task->cr3 = virtual_to_physical(pd);
+		task->cr3 = (uint32_t) pd;
 	}
 
 	for(int i = 0; i < stack_size / PAGE_SIZE; i++)

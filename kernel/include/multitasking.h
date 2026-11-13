@@ -3,6 +3,7 @@
 
 #define MAX_TASKS 0xFF
 
+#include <memory/paging.h>
 #include <common/types.h>
 #include <hardware/interrupts.h>
 
@@ -31,7 +32,7 @@ typedef struct Task
 } __attribute__((packed)) Task;
 
 void tasks_init();
-Task* create_task(void(*entry)(), uint32_t flags, uint32_t stack_size);
+Task* create_task(void(*entry)(), uint32_t flags, uint32_t stack_size, PageDirectory* pd);
 void kill_task(uint8_t id);
 uint32_t schedule(uint32_t esp);
 
