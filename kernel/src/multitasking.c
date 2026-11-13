@@ -96,13 +96,6 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 
 	task->flags = flags;
 
-	stack_size = ((stack_size + 0xFFF) & ~0xFFF);
-	void* stack = alloc_frames(stack_size / FRAME_SIZE);
-	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + stack_size; i += PAGE_SIZE) map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i,
-			PTE_PRESENT | PTE_RW | PTE_USER);
-	memset(stack, 0x0, stack_size);
-	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + stack_size - sizeof(CPUState)); // Where the task state will be saved
-	
 	// Tasks that don't belong to the kernel will get their own page directory to isolate them from other non-kernel tasks
 	if(pd == 0 && flags & TASK_KERNEL)
 	{
@@ -118,15 +111,19 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 		task->cr3 = (uint32_t) pd;
 	}
 
-	for(int i = 0; i < stack_size / PAGE_SIZE; i++)
+	stack_size = ALIGN_UP(stack_size, FRAME_SIZE);
+	void* stack = alloc_frames(stack_size / FRAME_SIZE);
+	
+	for(uint32_t i = (uint32_t) stack; i < (uint32_t) stack + stack_size; i += PAGE_SIZE)
 	{
-		void* address = (void*) ((uint32_t) stack) + i * PAGE_SIZE;
-		map_page(address, address);
-		if(!(flags & TASK_KERNEL)) map_page_pd_flags((PageDirectory*) task->cr3, address, address, PTE_PRESENT | PTE_RW | PTE_USER);
+		map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i, PDE_PRESENT | PDE_RW | PDE_USER);
+		map_page_pd_flags((PageDirectory*) task->cr3, (void*) i, (void*) i, PDE_PRESENT | PDE_RW | PDE_USER);
 	}
 
+	memset(stack, 0x0, stack_size);
+	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + stack_size - sizeof(CPUState)); // Where the task state will be saved
+	
 	task->esp = (uint32_t) cpu_state;
-
 	cpu_state->ebp = task->esp;
 
 	cpu_state->eip = (uint32_t) entry;
@@ -148,8 +145,11 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 
 		// The kernel will use a different stack when called from a non-kernel task
 		void* kernel_stack = alloc_frames(4);
-		for(int i = 0; i < 4; i++) map_page_pd_flags((PageDirectory*) task->cr3, (void*) (kernel_stack + i * FRAME_SIZE), 
-				(void*) (kernel_stack + i * FRAME_SIZE), PTE_PRESENT | PTE_RW);
+		for(uint32_t i = (uint32_t) kernel_stack; i < (uint32_t) kernel_stack + 4 * FRAME_SIZE; i += FRAME_SIZE) 
+		{
+			map_page_pd_flags((PageDirectory*) task->cr3, (void*) i, (void*) i, PDE_PRESENT | PDE_RW);
+			map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i, PDE_PRESENT | PDE_RW);
+		}
 
 		task->kernel_esp = (uint32_t) kernel_stack + 0x4000;
 	}

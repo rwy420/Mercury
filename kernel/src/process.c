@@ -26,10 +26,10 @@ int load_process(char* path, uint32_t size)
 	vfs_read(test, buffer, size);
 
 	// Create user PD
-	PageDirectory* pd = create_kernel_pd();
+	PageDirectory* pd = (PageDirectory*) virtual_to_physical(create_kernel_pd());
 
 	void (*entry0)() = elf32_load(buffer, 13116, pd);
-	//create_task(entry0, 0, 0x1000);
+	create_task(entry0, 0, 0x1000, pd);
 	
 	return 0;
 }
