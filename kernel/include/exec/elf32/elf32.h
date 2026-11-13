@@ -3,24 +3,25 @@
 
 #include <common/types.h>
 
-#define ELF_IDENT 16
+#define ELF_IDENT 0x10
 
 #define EI_MAG0 0x7F
 #define EI_MAG1 'E'
 #define EI_MAG2 'L'
 #define EI_MAG3 'F'
 
-#define ET_EXEC 2
-#define ET_DYN 3
+#define ET_EXEC 0x2
+#define ET_DYN 0x3
 
-#define SHT_DYNSYM 0xB
 #define SHT_SYMTAB 0x2
 #define SHT_REL 0x9
+#define SHT_DYNSYM 0xB
 
 #define PT_LOAD 0x1
+#define PT_DYNAMIC 0x2
 
-#define R_386_GLOB_DAT 6
-#define R_386_JMP_SLOT 7
+#define R_386_GLOB_DAT 0x6
+#define R_386_JMP_SLOT 0x7
 
 #define ELF32_R_SYM(INFO)	((INFO) >> 8)
 #define ELF32_R_TYPE(INFO)	((uint8_t)(INFO))
@@ -49,7 +50,8 @@ typedef struct
 	Elf32_Half e_shstrndx;
 } __attribute__((packed)) Elf32_Ehdr;
 
-typedef struct {
+typedef struct
+{
 	Elf32_Word	sh_name;
 	Elf32_Word	sh_type;
 	Elf32_Word	sh_flags;
@@ -62,7 +64,8 @@ typedef struct {
 	Elf32_Word	sh_entsize;
 } __attribute__((packed)) Elf32_Shdr;
 
-typedef struct {
+typedef struct
+{
     uint32_t   p_type;
     Elf32_Off  p_offset;
     Elf32_Addr p_vaddr;
@@ -73,7 +76,8 @@ typedef struct {
 	uint32_t   p_align;
 } __attribute__((packed)) Elf32_Phdr;
 
-typedef struct {
+typedef struct
+{
 	Elf32_Word		st_name;
 	Elf32_Addr		st_value;
 	Elf32_Word		st_size;
@@ -82,10 +86,22 @@ typedef struct {
 	Elf32_Half		st_shndx;
 } __attribute__((packed)) Elf32_Sym;
 
-typedef struct {
+typedef struct
+{
 	Elf32_Addr		r_offset;
 	Elf32_Word		r_info;
 } __attribute__((packed)) Elf32_Rel;
+
+typedef struct
+{
+	Elf32_Sword d_tag;
+
+	union
+	{
+		Elf32_Word d_val;
+		Elf32_Addr d_ptr;
+	} d_un;
+} __attribute__((packed)) Efl32_Dyn;
 
 int is_elf_image(Elf32_Ehdr* hdr);
 
