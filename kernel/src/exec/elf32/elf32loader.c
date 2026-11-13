@@ -94,15 +94,19 @@ void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 {
 	// Determine total size for allocation
-	uint32_t min_vaddr = 0, max_vaddr = 0;
+	uint32_t min_vaddr = 0xFFFFFFFF, max_vaddr = 0;
 
 	for(int i = 0; i < hdr->e_phnum; i++)
 	{
+		if(phdr[i].p_type != PT_LOAD) continue;
 		if(phdr[i].p_vaddr < min_vaddr) min_vaddr = phdr[i].p_vaddr;
 		else if((phdr[i].p_vaddr + phdr[i].p_memsz) > max_vaddr) max_vaddr = phdr[i].p_vaddr + phdr[i].p_memsz;
 	}
 
-	uint32_t total_size = ALIGN_UP(max_vaddr, FRAME_SIZE) - ALIGN_DOWN(min_vaddr, FRAME_SIZE);
+	min_vaddr = ALIGN_DOWN(min_vaddr, FRAME_SIZE);
+	max_vaddr = ALIGN_UP(max_vaddr, FRAME_SIZE);
+
+	uint32_t total_size = max_vaddr - min_vaddr;
 
 	uint32_t num_frames = ALIGN_UP(total_size, PAGE_SIZE) / PAGE_SIZE;
 	void* frames = alloc_frames(num_frames); //TODO: error handling if allocation faile
@@ -110,7 +114,7 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 	for(int i = 0; i < num_frames; i++)
 	{
 		void* paddr = (void*)(frames + i * FRAME_SIZE);
-		void* vaddr = (void*)(load_info->offset + i * FRAME_SIZE);
+		void* vaddr = (void*)(min_vaddr + load_info->offset + i * FRAME_SIZE);
 		map_page_pd_flags(load_info->pd, paddr, vaddr, PDE_PRESENT | PDE_RW | PDE_USER);
 	}
 

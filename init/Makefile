@@ -1,5 +1,5 @@
-GCCPARAMS = -m32 -Iinclude -nostdlib -fpie
-LDPARAMS = -melf_i386 -pie -emain
+GCCPARAMS = -m32 -Iinclude -nostdlib
+LDPARAMS = -melf_i386 -emain
 
 init.elf:
 	mkdir -p build
