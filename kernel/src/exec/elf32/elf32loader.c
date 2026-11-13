@@ -1,4 +1,3 @@
-#include "exec/elf32/elf32dyn.h"
 #include <exec/elf32/elf32loader.h>
 #include <exec/elf32/elf32.h>
 #include <exec/elf32/elf32dynlib.h>
@@ -10,15 +9,15 @@
 
 extern PageDirectory* g_kernel_pd;
 
-void elf32_relocate(Elf32_Shdr* shdr, const Elf32_Sym* syms, const char* strings, const char* src, char* dst)
+void elf32_relocate(Elf32_Shdr* shdr, Elf32_Sym* syms, char* strings, char* src, char* dst)
 {
     Elf32_Rel* rel = (Elf32_Rel*)(src + shdr->sh_offset);
 
-    for(int j = 0; j < shdr->sh_size / sizeof(Elf32_Rel); j += 1)
+    for(int i = 0; i < shdr->sh_size / sizeof(Elf32_Rel); i++)
     {
-        const char* sym = strings + syms[ELF32_R_SYM(rel[j].r_info)].st_name;
+        const char* sym = strings + syms[ELF32_R_SYM(rel[i].r_info)].st_name;
 		
-        switch (ELF32_R_TYPE(rel[j].r_info))
+        switch (ELF32_R_TYPE(rel[i].r_info))
         {
             case R_386_JMP_SLOT:
 				//*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
@@ -60,7 +59,7 @@ int elf32_find_symbol_table(Elf32_Ehdr* hdr, Elf32_Shdr* shdr)
     return -1;
 }
 
-void* elf32_find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, const char* src, char* dst)
+void* elf32_find_sym(char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, char* src, char* dst)
 {
     Elf32_Sym* syms = (Elf32_Sym*)(src + shdr_sym->sh_offset);
     const char* strings = src + shdr[shdr_sym->sh_link].sh_offset;
@@ -76,7 +75,7 @@ void* elf32_find_sym(const char* name, Elf32_Shdr* shdr, Elf32_Shdr* shdr_sym, c
     return 0;
 }
 
-const char* elf32_get_section_name(const uint8_t* elf, Elf32_Shdr* shdr, int index)
+const char* elf32_get_section_name(uint8_t* elf, Elf32_Shdr* shdr, int index)
 {
 	Elf32_Ehdr* ehdr = (Elf32_Ehdr*) elf;
 	Elf32_Shdr* shstrtab_shdr = &shdr[ehdr->e_shstrndx];
