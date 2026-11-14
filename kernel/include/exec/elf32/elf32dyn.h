@@ -5,5 +5,6 @@
 #include <exec/elf32/elf32.h>
 
 int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
+int elf32_ptdynamic_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info);
 
 #endif

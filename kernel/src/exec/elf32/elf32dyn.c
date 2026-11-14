@@ -1,7 +1,6 @@
 #include <memory/paging.h>
 #include <exec/elf32/elf32dyn.h>
 #include <memory/common.h>
-#include <stdio.h>
 
 extern PageDirectory* g_kernel_pd;
 
@@ -33,10 +32,27 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 	}
 
 pt_dynamic_end:
-	set_pd(g_kernel_pd);
-	if(!rel_addr || !rel_size || !rel_entry_size) return -1;
-	if(rel_entry_size != sizeof(Elf32_Rel)) return -1;
-	if(rel_size % rel_entry_size != 0) return -1;
+	if(!rel_addr || !rel_size || !rel_entry_size) goto error;
+	if(rel_entry_size != sizeof(Elf32_Rel)) goto error;
+	if(rel_size % rel_entry_size != 0) goto error;
 
+	Elf32_Rel* relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
+	uint32_t relocation_count = rel_size / rel_entry_size;
+
+	for(uint32_t i = 0; i < relocation_count; i++)
+	{
+		elf32_ptdynamic_relocate(&relocations[i], load_info);
+	}
+
+	set_pd(g_kernel_pd);
+	return 0;
+
+error:
+	set_pd(g_kernel_pd);
+	return -1;
+}
+
+int elf32_ptdynamic_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info)
+{
 	return 0;
 }
