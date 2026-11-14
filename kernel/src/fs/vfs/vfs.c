@@ -105,3 +105,9 @@ int vfs_seek(uint32_t fd_id, uint32_t offset)
 {
 
 }
+
+uint32_t vfs_get_size(uint32_t fd_id)
+{
+	FileDescriptor* fd = &g_file_descriptors[fd_id];
+	return fd->node->ops->get_size(fd->node);
+}

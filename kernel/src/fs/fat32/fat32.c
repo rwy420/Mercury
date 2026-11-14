@@ -13,7 +13,8 @@ VFSNodeOps g_fat32_ops =
 	.open = fat32_open,
 	.read = fat32_read,
 	.write = fat32_write,
-	.close = fat32_close
+	.close = fat32_close,
+	.get_size = fat32_get_size
 };
 
 FAT32Volume g_volume;
@@ -105,4 +106,10 @@ int fat32_write(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 int fat32_close(VFSNode* node)
 {
 	return 0;
+}
+
+uint32_t fat32_get_size(VFSNode* node)
+{
+	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) node->fs_object;
+	return dir_entry->size;
 }

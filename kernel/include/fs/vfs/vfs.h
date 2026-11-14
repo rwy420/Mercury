@@ -21,6 +21,7 @@ typedef struct VFSNodeOps
 	int (*read)(VFSNode* node, void* buffer, size_t size, size_t offset);
 	int (*write)(VFSNode* node, void* buffer, size_t size, size_t offset);
 	int (*close)(VFSNode* node);
+	uint32_t (*get_size)(VFSNode* node);
 } VFSNodeOps;
 
 typedef struct
@@ -45,5 +46,6 @@ int vfs_read(uint32_t fd_id, void* buffer, size_t length);
 int vfs_write(uint32_t fd_id, void* buffer, size_t length);
 int vfs_close(uint32_t fd_id);
 int vfs_seek(uint32_t fd_id, uint32_t offset);
+uint32_t vfs_get_size(uint32_t fd_id);
 
 #endif

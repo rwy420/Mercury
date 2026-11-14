@@ -30,5 +30,6 @@ int fat32_open(VFSNode* node);
 int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length);
 int fat32_write(VFSNode* node, void* buffer, uint32_t offset, size_t length);
 int fat32_close(VFSNode* node);
+uint32_t fat32_get_size(VFSNode* node);
 
 #endif
