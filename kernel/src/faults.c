@@ -39,7 +39,7 @@ void handle_page_fault(CPUState* cpu)
 
 void terminate_or_panic(char* reason, CPUState* cpu)
 {
-	if(g_current_task->kernel_esp != 0)
+	if(!(g_current_task->flags & TASK_KERNEL))
 	{
 		g_current_task->state = TASK_TERMINATED;
 		printf(reason);
