@@ -37,16 +37,15 @@ int process_create(char* path, int argc, char** argv)
 	char* task_stack_8 = (char*) task->esp;
 	uint32_t* task_stack_32 = (uint32_t*) task->esp;
 	task_stack_32[0] = argc;
-	uint32_t stack_idx = sizeof(uint32_t*) + argc * sizeof(void*);
+	uint32_t stack_idx = sizeof(uint32_t*) + argc * sizeof(void*); // The amount of bytes we need to skip before putting the argv data
 
 	for(int i = 0; i < argc; i++)
 	{
 		task_stack_32[1 + i] = (uint32_t) &task_stack_8[stack_idx];
 
-		uint32_t c = 0;
-		while(argv[i][c] != '\0')
+		for(int c = 0; argv[i][c] != '\0'; c++)
 		{
-			task_stack_8[stack_idx++] = argv[i][c++];
+			task_stack_8[stack_idx++] = argv[i][c];
 		}
 
 		stack_idx++;
