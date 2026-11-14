@@ -1,7 +1,6 @@
 #include "exec/elf32/elf32dyn.h"
 #include <exec/elf32/elf32loader.h>
 #include <exec/elf32/elf32.h>
-#include <exec/elf32/elf32dynlib.h>
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/heap.h>
