@@ -35,8 +35,8 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 pt_dynamic_end:
 	set_pd(g_kernel_pd);
 	if(!rel_addr || !rel_size || !rel_entry_size) return -1;
-
-	printf("good");
+	if(rel_entry_size != sizeof(Elf32_Rel)) return -1;
+	if(rel_size % rel_entry_size != 0) return -1;
 
 	return 0;
 }
