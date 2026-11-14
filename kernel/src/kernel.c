@@ -1,4 +1,4 @@
-#include "thread.h"
+#include <thread.h>
 #include <multiboot.h>
 #include <syscalls.h>
 #include <fd.h>

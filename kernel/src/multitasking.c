@@ -1,7 +1,6 @@
 // TODO: Add a reaper task to remove TERMINATED tasks and free their memory
 
-#include "memory/paging.h"
-#include "vm.h"
+#include <memory/paging.h>
 #include <common/types.h>
 #include <memory/frames.h>
 #include <multitasking.h>
