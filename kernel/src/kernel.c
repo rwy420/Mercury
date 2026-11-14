@@ -47,6 +47,10 @@ extern PageDirectory* g_kernel_pd;
 void v_kernel_start();
 void kthread_init();
 
+char* a = "Test";
+char* b = "ARGV";
+char* c = "ABCD1234";
+
 void kernel_init(uint32_t multiboot, uint32_t magic)
 {
 	if(!mb_confirm(multiboot, magic));
@@ -172,9 +176,14 @@ void kthread_init()
 	clear_screen();
 	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
 #endif
+	
+	char** argv = kmalloc(sizeof(char*) * 3); 
+	argv[0] = a;
+	argv[1] = b;
+	argv[2] = c;
 
 	//TODO: This should become execve to replace this task by INIT.ELF
-	process_create("/SBIN/INIT.ELF", 3, 0);
+	process_create("/SBIN/INIT.ELF", 3, argv);
 
 	while(1);
 }

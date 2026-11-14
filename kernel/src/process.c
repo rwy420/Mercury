@@ -1,3 +1,4 @@
+#include "vm.h"
 #include <process.h>
 #include <multitasking.h>
 #include <common/screen.h>
@@ -33,10 +34,27 @@ int process_create(char* path, int argc, char** argv)
 	Task* task = create_task(entry, 0, 0x1000, pd);
 
 	// Set up entry frame
-	uint32_t* task_stack = (uint32_t*) task->esp;
-	task_stack[0] = argc;
+	char* task_stack_8 = (char*) task->esp;
+	uint32_t* task_stack_32 = (uint32_t*) task->esp;
+	task_stack_32[0] = argc;
+	uint32_t stack_idx = 3 + argc * sizeof(void*);
 
-	for(int i = 1; i < argc; i++) task_stack[i] = (uint32_t) argv[i - 1];
+	for(int i = 0; i < argc; i++)
+	{
+		task_stack_32[1 + i] = (uint32_t) &task_stack_8[stack_idx];
+
+		uint32_t c = 0;
+		while(argv[i][c] != '\0')
+		{
+			dbg_print_hex(argv[i][c]);
+			task_stack_8[stack_idx++] = argv[i][c++];
+		}
+
+		//stack_idx++;
+		task_stack_8[stack_idx] = '\0';
+
+		dbg_printf("\n");
+	}
 	
 	return 0;
 }
