@@ -161,7 +161,7 @@ void v_kernel_start()
 	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
 #endif
 	
-	load_process("/SBIN/INIT.ELF");
+	process_create("/SBIN/INIT.ELF", 3, 0);
 	
 	// Starting scheduling earlier causes problems, might wanna wrap further kernel initialization into another function and make it a task
 	pit_set_schedule(true);

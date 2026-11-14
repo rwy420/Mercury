@@ -124,11 +124,7 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + stack_size - sizeof(CPUState)); // Where the task state will be saved
 																							//
 	task->esp = (uint32_t) cpu_state;
-	uint32_t* argc = (uint32_t*) (task->esp);
-	print_hex32((uint32_t )argc);
-	*argc = 0x1;
-	printf("\n");
-
+	cpu_state->esp = ((uint32_t) cpu_state);
 	cpu_state->ebp = task->esp;
 
 	cpu_state->eip = (uint32_t) entry;
@@ -138,14 +134,12 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 	{
 		cpu_state->cs = 0x08;
 		cpu_state->eflags = 0x202;
-		cpu_state->esp = ((uint32_t) cpu_state);
 		cpu_state->ss = 0x10;
 	}
 	else
 	{
 		cpu_state->cs = 0x1B;
 		cpu_state->eflags = 0x202;
-		cpu_state->esp = ((uint32_t) cpu_state);
 		cpu_state->ss = 0x23;
 
 		// The kernel will use a different stack when called from a non-kernel task

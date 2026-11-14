@@ -18,7 +18,7 @@ void syscall_exit(CPUState* cpu)
 	asm("int $32");
 }
 
-int load_process(char* path)
+int process_create(char* path, int argc, char** argv)
 {
 	// Load file
 	uint32_t file = vfs_open(path);
@@ -29,8 +29,12 @@ int load_process(char* path)
 	// Create user PD
 	PageDirectory* pd = (PageDirectory*) virtual_to_physical(create_kernel_pd());
 
-	void (*entry0)() = elf32_load(buffer, file_size, pd);
-	create_task(entry0, 0, 0x1000, pd);
-	
+	void (*entry)() = elf32_load(buffer, file_size, pd);
+	Task* task = create_task(entry, 0, 0x1000, pd);
+
+	// Set up entry frame
+	uint32_t* task_stack = (uint32_t*) task->esp;
+	task_stack[0] = argc;
+
 	return 0;
 }
