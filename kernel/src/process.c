@@ -34,6 +34,7 @@ int process_create(char* path, int argc, char** argv)
 	Task* task = create_task(entry, 0, 0x1000, pd);
 
 	// Set up entry frame
+	// TODO: envp passing
 	char* task_stack_8 = (char*) task->esp;
 	uint32_t* task_stack_32 = (uint32_t*) task->esp;
 	task_stack_32[0] = argc;
