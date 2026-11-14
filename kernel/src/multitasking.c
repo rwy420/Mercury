@@ -224,7 +224,7 @@ uint32_t schedule(uint32_t esp)
 				asm volatile("mov %AX, %GS");
 			}
 
-			g_tss.esp0 = g_current_task->kernel_esp;
+			g_tss.esp0 = g_current_task->kernel_stack_top;
 			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
 			return (uint32_t) g_current_task->kernel_esp;
 		}

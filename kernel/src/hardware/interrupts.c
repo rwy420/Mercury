@@ -88,9 +88,9 @@ uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 		pic_confirm(interrupt);
 	}
 
-	if(cpu_state->ss == 0x23)
-	{
-		if(g_current_task->flags == 0)
+	//if(cpu_state->ss == 0x23)
+	//{
+		if(!(g_current_task->flags & TASK_KERNEL))
 		{
 		    asm volatile(
 				"mov $0x23, %%ax\n"
@@ -101,7 +101,7 @@ uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 				::: "ax"
 			);
 		}
-	}
+	//}
 
 	return esp;
 };
