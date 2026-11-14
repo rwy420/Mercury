@@ -5,7 +5,6 @@ extern main
 
 _start:
 	xor ebp, ebp
-	xchg bx, bx
 	mov eax, [esp]
 	lea ebx, [esp + 4]
 
@@ -13,4 +12,10 @@ _start:
 	push eax
 	call main
 
-	jmp -2
+	; Exit syscall
+	mov ebx, eax
+	mov eax, 1
+	int 0x80
+
+	; Shouldn't get here
+	cd2

@@ -15,7 +15,7 @@ void syscall_exit(CPUState* cpu)
 	printf("Process exited with code ");
 	print_uint32_t(cpu->ebx);
 	printf("\n");
-	kill_task(g_current_task->id);
+	g_current_task->state = TASK_TERMINATED;
 	asm("int $32");
 }
 

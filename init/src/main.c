@@ -15,5 +15,5 @@ int main(int argc, char** argv)
 
 	int val = *ptr;
 
-	while(1);
+	return 69;
 }
