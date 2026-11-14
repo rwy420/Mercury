@@ -58,8 +58,6 @@ common_interrupt_handler:
 	iret
 
 exception_interrupt			06	; Invalid Opcode
-exception_interrupt			11	; Segment Not Present
-exception_interrupt			12	; Stack-Segment fault
 exception_interrupt			13	; General Protection Fault
 exception_interrupt			14	; Page Fault	
 

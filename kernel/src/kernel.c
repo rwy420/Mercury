@@ -112,9 +112,9 @@ void v_kernel_start()
 	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
 	printf("<Mercury> Syscalls registered\n");
 
-	register_interrupt_handler(0x0E, (isr_t) handle_page_fault);
-	register_interrupt_handler(0x0C, (isr_t) handle_stack_fault);
+	register_interrupt_handler(0x06, (isr_t) handle_invalid_opcode);
 	register_interrupt_handler(0x0D, (isr_t) handle_general_protection_fault);
+	register_interrupt_handler(0x0E, (isr_t) handle_page_fault);
 	register_interrupt_handler(0x80, (isr_t) syscall);
 
 #ifdef ATA

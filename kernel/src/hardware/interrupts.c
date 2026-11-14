@@ -38,8 +38,6 @@ void install_idt()
 	memset(interrupt_handers, 0, sizeof(interrupt_handers));
 
 	interrupts_init_descriptor(0x06, (uint32_t) handle_irq_06);
-	interrupts_init_descriptor(0x0B, (uint32_t) handle_irq_11);
-	interrupts_init_descriptor(0x0C, (uint32_t) handle_irq_12);
 	interrupts_init_descriptor(0x0D, (uint32_t) handle_irq_13);
 	interrupts_init_descriptor(0x0E, (uint32_t) handle_irq_14);
 

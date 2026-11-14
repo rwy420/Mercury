@@ -7,21 +7,14 @@
 
 extern Task* g_current_task;
 
-void handle_general_protection_fault(CPUState* cpu)
+void handle_invalid_opcode(CPUState* cpu)
 {
-	if(g_current_task->kernel_esp != 0)
-	{
-		g_current_task->state = TASK_TERMINATED;
-		printf("GENERAL PROTECTION FAULT (Task terminated)\n");
-		asm("int $0x20"); // yield to stop the execution of the terminated task right here
-	}
-
-	panic("GENERAL PROTECTION FAULT", cpu);
+	terminate_or_panic("INVALID OPCODE", cpu);
 }
 
-void handle_stack_fault(CPUState* cpu)
+void handle_general_protection_fault(CPUState* cpu)
 {
-	printf_color("STACK PROTECTION FAULT\n", COLOR_RED, COLOR_BLACK);
+	terminate_or_panic("GENERAL PROTECTION FAULT", cpu);
 }
 
 void handle_page_fault(CPUState* cpu)
@@ -41,12 +34,19 @@ void handle_page_fault(CPUState* cpu)
 	if(cpu->error_code & 0x8) dbg_printf(" - Reserved bit voilation\n");
 	if(cpu->error_code & 0x10) dbg_printf(" - Instruction fetched\n");
 
+	terminate_or_panic("PAGE FAULT", cpu);
+}
+
+void terminate_or_panic(char* reason, CPUState* cpu)
+{
 	if(g_current_task->kernel_esp != 0)
 	{
 		g_current_task->state = TASK_TERMINATED;
-		printf("PAGE FAULT (Task terminated)\n");
-		asm("int $0x20");
+		printf(reason);
+		printf(" (Task terminated)\n");
+		asm("int $0x20"); // yield to stop the execution of the terminated task right here
 	}
 
-	panic("PAGE FAULT", cpu);
+	panic(reason, cpu);
 }
+
