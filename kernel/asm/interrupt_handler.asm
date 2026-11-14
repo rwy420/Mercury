@@ -4,7 +4,7 @@ extern interrupt_handler
 global handle_irq_%1
 handle_irq_%1:
 	mov dword [interrupt_number], %1
-	push dword 0
+	push dword 0 ; error code placeholder
 	jmp common_interrupt_handler
 %endmacro
 
@@ -38,7 +38,7 @@ common_interrupt_handler:
 	mov fs, ax
 	mov gs, ax
 
-	push esp
+	push esp ; CPUState*
 	push dword [interrupt_number]
 
 	;cld
@@ -53,7 +53,7 @@ common_interrupt_handler:
 	pop edi
 	pop ebp
 
-	add esp, 4
+	add esp, 4 ; make up for the error code
 
 	iret
 

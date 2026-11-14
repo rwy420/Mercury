@@ -5,8 +5,8 @@ extern main
 
 _start:
 	xor ebp, ebp
-	mov eax, [esp] ; argc
-	lea ebx, [esp + 4] ; argv
+	mov eax, [esp] ; int argc
+	lea ebx, [esp + 4] ; char** argv
 
 	push ebx
 	push eax

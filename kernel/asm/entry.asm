@@ -16,20 +16,22 @@ align 4
 	dd 0
 	dd 0
 	dd 0
-	dd 1024
-	dd 768
-	dd 32
+	dd 1024		; screen width
+	dd 768		; screen height
+	dd 32		; screen bpp
 
 section .multiboot.text
 extern kernel_init
 global _start:function (_start.end - _start)
 _start:
 	mov esp, 0x8FFF0
-	mov ecx, kernel_init
-	sub ecx, 0xC0000000; 
 
-	push eax
-	push ebx
+	; calculate actual location of kernel_init in physical memory
+	mov ecx, kernel_init
+	sub ecx, 0xC0000000 
+
+	push eax ; uint32_t magic
+	push ebx ; uint32_t multiboot
 	
 	call ecx
 
