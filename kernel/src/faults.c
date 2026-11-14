@@ -8,9 +8,15 @@ extern Task* g_current_task;
 
 void handle_general_protection_fault(CPUState* cpu)
 {
-	g_current_task->state = TASK_TERMINATED;
-	printf("GENERAL PROTECTION FAULT (Task terminated)\n");
-	asm("int $0x20"); // yield to stop the execution of the terminated task right here
+	if(cpu->cs == 0x1B)
+	{
+		g_current_task->state = TASK_TERMINATED;
+		printf("GENERAL PROTECTION FAULT (Task terminated)\n");
+		asm("int $0x20"); // yield to stop the execution of the terminated task right here
+	}
+
+	//TODO: A fault from a kernel thread should cause a kernel panic
+	printf("GENERAL PROTECTION FAULT\n");
 }
 
 void handle_stack_fault(CPUState* cpu)
@@ -35,7 +41,12 @@ void handle_page_fault(CPUState* cpu)
 	if(cpu->error_code & 0x8) dbg_printf(" - Reserved bit voilation\n");
 	if(cpu->error_code & 0x10) dbg_printf(" - Instruction fetched\n");
 
-	g_current_task->state = TASK_TERMINATED;
-	printf("PAGE FAULT (Task terminated)\n");
-	asm("int $0x20");
+	if(cpu->cs == 0x1B)
+	{
+		g_current_task->state = TASK_TERMINATED;
+		printf("PAGE FAULT (Task terminated)\n");
+		asm("int $0x20");
+	}
+
+	printf("PAGE FAULT\n");
 }
