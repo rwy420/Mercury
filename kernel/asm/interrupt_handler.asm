@@ -8,12 +8,18 @@ handle_irq_%1:
 	jmp common_interrupt_handler
 %endmacro
 
-%macro error_interrupt 1
+%macro exception_interrupt 1
 global handle_irq_%1
 handle_irq_%1:
 	mov dword [interrupt_number], %1	
-	;push dword %1 need to remove this when the cpu pushes the error code already
-	; TODO: make a separate exception interrupt handler macro for exception where the CPU does not push an error code
+	jmp common_interrupt_handler
+%endmacro
+
+%macro exception_interrupt_noerr 1
+global handle_irq_%1
+handle_irq_%1:
+	mov dword [interrupt_number], %1	
+	push dword 0
 	jmp common_interrupt_handler
 %endmacro
 
@@ -69,11 +75,12 @@ interrupt 43
 interrupt 49
 interrupt 128
 
-error_interrupt 11
-error_interrupt 12
-error_interrupt 13
-error_interrupt 14	
-error_interrupt 15
+exception_interrupt_noerr	6  ; Invalid Opcode
+exception_interrupt			11 ; Segment Not Present
+exception_interrupt			12 ; Stack-Segment fault
+exception_interrupt			13 ; General Protection Fault
+exception_interrupt			14 ; Page Fault	
+
 
 section .data
 interrupt_number dd 0
