@@ -10,26 +10,6 @@
 
 extern PageDirectory* g_kernel_pd;
 
-void elf32_relocate(Elf32_Shdr* shdr, Elf32_Sym* syms, char* strings, char* src, char* dst)
-{
-    Elf32_Rel* rel = (Elf32_Rel*)(src + shdr->sh_offset);
-
-    for(int i = 0; i < shdr->sh_size / sizeof(Elf32_Rel); i++)
-    {
-        const char* sym = strings + syms[ELF32_R_SYM(rel[i].r_info)].st_name;
-		printf(sym);
-
-        switch (ELF32_R_TYPE(rel[i].r_info))
-        {
-            case R_386_JMP_SLOT:
-				//*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) resolve_symbol(sym);
-            case R_386_GLOB_DAT:
-				//*(Elf32_Word*)(dst + rel[j].r_offset) = (Elf32_Word) dlsym(dl, sym);
-                break;
-        }
-    }
-}
-
 const char* elf32_get_section_name(uint8_t* elf, Elf32_Shdr* shdr, int index)
 {
 	Elf32_Ehdr* ehdr = (Elf32_Ehdr*) elf;
