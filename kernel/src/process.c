@@ -37,7 +37,7 @@ int process_create(char* path, int argc, char** argv)
 	char* task_stack_8 = (char*) task->esp;
 	uint32_t* task_stack_32 = (uint32_t*) task->esp;
 	task_stack_32[0] = argc;
-	uint32_t stack_idx = 3 + argc * sizeof(void*);
+	uint32_t stack_idx = sizeof(uint32_t*) + argc * sizeof(void*);
 
 	for(int i = 0; i < argc; i++)
 	{
@@ -46,14 +46,11 @@ int process_create(char* path, int argc, char** argv)
 		uint32_t c = 0;
 		while(argv[i][c] != '\0')
 		{
-			dbg_print_hex(argv[i][c]);
 			task_stack_8[stack_idx++] = argv[i][c++];
 		}
 
 		stack_idx++;
 		task_stack_8[stack_idx] = '\0';
-
-		dbg_printf("\n");
 	}
 
 	return 0;
