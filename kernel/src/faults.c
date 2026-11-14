@@ -1,4 +1,5 @@
-#include "vm.h"
+#include <panic.h>
+#include <vm.h>
 #include <faults.h>
 #include <common/screen.h>
 #include <vesa.h>
@@ -15,8 +16,7 @@ void handle_general_protection_fault(CPUState* cpu)
 		asm("int $0x20"); // yield to stop the execution of the terminated task right here
 	}
 
-	//TODO: A fault from a kernel thread should cause a kernel panic
-	printf("GENERAL PROTECTION FAULT\n");
+	panic("GENERAL PROTECTION FAULT", cpu);
 }
 
 void handle_stack_fault(CPUState* cpu)
@@ -48,5 +48,5 @@ void handle_page_fault(CPUState* cpu)
 		asm("int $0x20");
 	}
 
-	printf("PAGE FAULT\n");
+	panic("PAGE FAULT", cpu);
 }

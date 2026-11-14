@@ -175,6 +175,6 @@ void kthread_init()
 
 	//TODO: This should become execve to replace this task by INIT.ELF
 	process_create("/SBIN/INIT.ELF", 3, 0);
-	
+
 	while(1);
 }
