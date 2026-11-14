@@ -2,6 +2,7 @@
 *.bin
 *.elf
 *.so
+*.o
 build/
 
 # Images
