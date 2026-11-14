@@ -50,11 +50,11 @@ int process_create(char* path, int argc, char** argv)
 			task_stack_8[stack_idx++] = argv[i][c++];
 		}
 
-		//stack_idx++;
+		stack_idx++;
 		task_stack_8[stack_idx] = '\0';
 
 		dbg_printf("\n");
 	}
-	
+
 	return 0;
 }

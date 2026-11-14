@@ -47,7 +47,7 @@ extern PageDirectory* g_kernel_pd;
 void v_kernel_start();
 void kthread_init();
 
-char* a = "Test";
+char* a = "Testing! This won't overwrite anything now!!";
 char* b = "ARGV";
 char* c = "ABCD1234";
 

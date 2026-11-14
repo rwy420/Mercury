@@ -121,14 +121,21 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 	}
 
 	memset(stack, 0x0, stack_size);
-	CPUState* cpu_state = (CPUState*) (((uint32_t) stack) + stack_size - sizeof(CPUState)); // Where the task state will be saved
-																							//
-	task->esp = (uint32_t) cpu_state;
-	cpu_state->esp = ((uint32_t) cpu_state);
-	cpu_state->ebp = task->esp;
+	
+	void* kernel_stack = alloc_frames(4);
+	for(uint32_t i = (uint32_t) kernel_stack; i < (uint32_t) kernel_stack + 4 * FRAME_SIZE; i += FRAME_SIZE) 
+	{
+		map_page_pd_flags((PageDirectory*) task->cr3, (void*) i, (void*) i, PDE_PRESENT | PDE_RW);
+		map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i, PDE_PRESENT | PDE_RW);
+	}
+	memset(kernel_stack, 0x0, 0x4000);
 
-	cpu_state->eip = (uint32_t) entry;
+	CPUState* cpu_state = (CPUState*) (((uint32_t )kernel_stack) + 0x4000 - sizeof(CPUState)); // Where the task state will be saved
+	task->kernel_stack_top = (uint32_t) cpu_state;
+	task->kernel_esp = task->kernel_stack_top;
 
+	cpu_state->esp = ((uint32_t) stack) + stack_size - 0x20;
+	task->esp = cpu_state->esp;
 	// Flags and segments
 	if(flags & TASK_KERNEL)
 	{
@@ -141,17 +148,10 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 		cpu_state->cs = 0x1B;
 		cpu_state->eflags = 0x202;
 		cpu_state->ss = 0x23;
-
-		// The kernel will use a different stack when called from a non-kernel task
-		void* kernel_stack = alloc_frames(4);
-		for(uint32_t i = (uint32_t) kernel_stack; i < (uint32_t) kernel_stack + 4 * FRAME_SIZE; i += FRAME_SIZE) 
-		{
-			map_page_pd_flags((PageDirectory*) task->cr3, (void*) i, (void*) i, PDE_PRESENT | PDE_RW);
-			map_page_pd_flags(g_kernel_pd, (void*) i, (void*) i, PDE_PRESENT | PDE_RW);
-		}
-
-		task->kernel_esp = (uint32_t) kernel_stack + 0x4000;
 	}
+
+	cpu_state->ebp = 0;
+	cpu_state->eip = (uint32_t) entry;
 
 	task->id = next_id++;
 	task->state = TASK_READY;
@@ -182,7 +182,7 @@ void kill_task(uint8_t id)
 			if(prev) prev->next = current->next;
 			else task_list = current->next;
 
-			kfree((void*) current->esp);
+			//kfree((void*) current->esp);
 			kfree(current);	
 		}
 
@@ -215,7 +215,7 @@ uint32_t schedule(uint32_t esp)
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
 		{ 
-			if(g_current_task->kernel_esp != 0x00)
+			if(!(g_current_task->flags & TASK_KERNEL))
 			{
 				asm volatile("mov $0x23, %AX");
 				asm volatile("mov %AX, %DS");
@@ -226,7 +226,7 @@ uint32_t schedule(uint32_t esp)
 
 			g_tss.esp0 = g_current_task->kernel_esp;
 			__asm__ __volatile__("movl %%EAX, %%CR3" : : "a" (g_current_task->cr3));
-			return (uint32_t) g_current_task->esp;
+			return (uint32_t) g_current_task->kernel_esp;
 		}
 
 	} while(g_current_task != start);
