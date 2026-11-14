@@ -27,6 +27,7 @@
 
 #define R_386_GLOB_DAT 0x6
 #define R_386_JMP_SLOT 0x7
+#define R_386_RELATIVE 0x8
 
 #define ELF32_R_SYM(INFO)	((INFO) >> 8)
 #define ELF32_R_TYPE(INFO)	((uint8_t)(INFO))

@@ -1,3 +1,4 @@
+#include "exec/elf32/elf32.h"
 #include <memory/paging.h>
 #include <exec/elf32/elf32dyn.h>
 #include <memory/common.h>
@@ -54,5 +55,19 @@ error:
 
 int elf32_ptdynamic_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 {
+	uint32_t type = ELF32_R_TYPE(rel->r_info);
+	uint32_t sym = ELF32_R_SYM(rel->r_info);
+
+	switch(type)
+	{
+		case R_386_RELATIVE:
+			if(sym != 0) return -1;
+			
+			uint32_t* target = (uint32_t*) (load_info->offset + rel->r_offset);
+			*target += load_info->offset;
+
+			break;
+	}
+
 	return 0;
 }
