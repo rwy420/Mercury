@@ -18,4 +18,4 @@ _start:
 	int 0x80
 
 	; Shouldn't get here
-	cd2
+	ud2
