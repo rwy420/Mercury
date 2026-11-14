@@ -36,5 +36,7 @@ int process_create(char* path, int argc, char** argv)
 	uint32_t* task_stack = (uint32_t*) task->esp;
 	task_stack[0] = argc;
 
+	for(int i = 1; i < argc; i++) task_stack[i] = (uint32_t) argv[i - 1];
+	
 	return 0;
 }
