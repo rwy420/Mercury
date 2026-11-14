@@ -9,7 +9,7 @@ extern Task* g_current_task;
 
 void handle_general_protection_fault(CPUState* cpu)
 {
-	if(cpu->cs == 0x1B)
+	if(g_current_task->kernel_esp != 0)
 	{
 		g_current_task->state = TASK_TERMINATED;
 		printf("GENERAL PROTECTION FAULT (Task terminated)\n");
@@ -41,7 +41,7 @@ void handle_page_fault(CPUState* cpu)
 	if(cpu->error_code & 0x8) dbg_printf(" - Reserved bit voilation\n");
 	if(cpu->error_code & 0x10) dbg_printf(" - Instruction fetched\n");
 
-	if(cpu->cs == 0x1B)
+	if(g_current_task->kernel_esp != 0)
 	{
 		g_current_task->state = TASK_TERMINATED;
 		printf("PAGE FAULT (Task terminated)\n");
