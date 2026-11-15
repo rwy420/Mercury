@@ -10,12 +10,17 @@
 extern FAT32Volume g_volume;
 extern VFSNodeOps g_fat32_ops;
 
-VFSNode* fat32_lookup(VFSNode* dir, char* name)
+VFSNode* fat32_lookup(VFSNode* dir, char* n/*name*/)
 {
 	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) dir->fs_object;
 	VFSNode* result = 0;
 	FATDirectoryEntry* result_entry = kmalloc(sizeof(FATDirectoryEntry));
 	uint8_t* cluster_buffer = kmalloc(g_volume.sectors_per_cluster * 512);
+
+	// FAT32 does is not case sensitive, therefore we will simply only use uppercase letters
+	char name[strlen(n) + 1];
+	memcpy(name, n, strlen(n) + 1); // Create copy of n and include null terminator
+	to_uppercase(name, strlen(n));
 
 	read28(cluster_to_lba(fat_dir_entry_to_cluster(dir_entry)), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
 
