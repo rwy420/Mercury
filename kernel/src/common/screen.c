@@ -1,4 +1,4 @@
-#include "vm.h"
+#include <printf.h>
 #include <common/screen.h>
 #include <vesa.h>
 
@@ -6,17 +6,8 @@ extern VesaInfo g_vesa_info;
 
 int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 {
-	printf((string) buffer);
+	kprintf((string) buffer);
 	return 0;
-}
-
-void printf(string str)
-{
-	dbg_printf(str);
-	for(int i = 0; str[i] != '\0'; i++)
-	{
-		vesa_putc_inc(str[i]);
-	}
 }
 
 void print_hex(uint8_t h)
@@ -25,7 +16,7 @@ void print_hex(uint8_t h)
 	char* hex = "0123456789ABCDEF";
 	foo[0] = hex[(h >> 4) & 0xF];
 	foo[1] = hex[h & 0xF];
-	printf(foo);
+	kprintf(foo);
 }
 
 void print_hex32(uint32_t h)
@@ -40,14 +31,14 @@ void print_uint8_t(uint8_t value)
 {
 	uint8_t buffer[4];
 	uint8_t_to_string(value, buffer);
-	printf(buffer);
+	kprintf(buffer);
 }
 
 void print_uint32_t(uint32_t value)
 {
 	uint8_t buffer[11];
 	uint32_t_to_string(value, buffer);
-	printf(buffer);
+	kprintf(buffer);
 }
 
 void uint8_t_to_string(uint8_t value, char* buffer)

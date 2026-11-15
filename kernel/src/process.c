@@ -1,20 +1,19 @@
-#include "vm.h"
 #include <process.h>
 #include <multitasking.h>
 #include <common/screen.h>
 #include <memory/paging.h>
 #include <memory/heap.h>
 #include <memory/common.h>
-#include <vesa.h>
+#include <printf.h>
 #include <exec/elf32/elf32loader.h>
 
 extern Task* g_current_task;
 
 void syscall_exit(CPUState* cpu)
 {
-	printf("Process exited with code ");
+	kprintf("Process exited with code ");
 	print_uint32_t(cpu->ebx);
-	printf("\n");
+	kprintf("\n");
 	g_current_task->state = TASK_TERMINATED;
 	asm("int $32");
 }

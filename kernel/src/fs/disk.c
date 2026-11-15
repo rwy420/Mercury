@@ -5,7 +5,7 @@
 #include <common/screen.h>
 #include <driver/ata/ata.h>
 #include <memory/heap.h>
-#include <vesa.h>
+#include <printf.h>
 
 int read_mbr()
 {
@@ -21,15 +21,15 @@ int read_mbr()
 		PartitionTableEntry* entry = &mbr->partition_table_entries[i];
 		if(entry->type == 0) break;
 
-		printf("<MBR> Disk partition ");
+		kprintf("<MBR> Disk partition ");
 		print_uint8_t(i);
-		printf(":\n");
-		printf("   Type: 0x");
+		kprintf(":\n");
+		kprintf("   Type: 0x");
 		print_hex(entry->type);
-		printf("\n");
-		printf("   Size: ");
+		kprintf("\n");
+		kprintf("   Size: ");
 		print_uint32_t((entry->num_sectors * 512) / 1024 / 1024);
-		printf("MB\n");
+		kprintf("MB\n");
 
 		if(entry->type == 0x0C)
 		{
@@ -39,7 +39,7 @@ int read_mbr()
 			switch(fat_type)
 			{
 				case -1:
-					printf("<FAT> Could not read the FAT BPB\n");
+					kprintf("<FAT> Could not read the FAT BPB\n");
 					break;
 				case 0:
 					break;

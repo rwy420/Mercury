@@ -5,7 +5,7 @@
 #include <common/screen.h>
 #include <memory/heap.h>
 #include <memory/frames.h>
-#include <memory/paging.h>
+#include <printf.h>
 
 extern PageDirectory* g_kernel_pd;
 
@@ -104,7 +104,7 @@ void* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
 
 	if (!is_elf_image(hdr))
     {
-        printf("<ELF> Invalid ELF image\n");
+        kprintf("<ELF> Invalid ELF image\n");
         return 0;
     }
 

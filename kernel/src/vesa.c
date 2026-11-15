@@ -1,3 +1,4 @@
+#include <vm.h>
 #include <vesa.h>
 #include <psf1.h>
 #include <memory/common.h>
@@ -39,6 +40,7 @@ void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg)
 
 void vesa_putc_inc(char c)
 {
+	dbg_putc(c);
 	switch(c)
 	{
 		case '\n':

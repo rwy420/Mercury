@@ -4,6 +4,7 @@
 #include <common/screen.h>
 #include <vesa.h>
 #include <multitasking.h>
+#include <printf.h>
 
 extern Task* g_current_task;
 
@@ -42,8 +43,8 @@ void terminate_or_panic(char* reason, CPUState* cpu)
 	if(!(g_current_task->flags & TASK_KERNEL))
 	{
 		g_current_task->state = TASK_TERMINATED;
-		printf(reason);
-		printf(" (Task terminated)\n");
+		kprintf(reason);
+		kprintf(" (Task terminated)\n");
 		asm("int $0x20"); // yield to stop the execution of the terminated task right here
 	}
 

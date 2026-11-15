@@ -1,7 +1,6 @@
-#include "fs/fat/fat.h"
 #include <fs/vfs/vfs.h>
 #include <fd.h>
-#include <common/screen.h>
+#include <printf.h>
 #include <vesa.h>
 #include <memory/heap.h>
 
@@ -10,7 +9,7 @@ VFSNode* root_vfs_node = 0;
 
 int vfs_init()
 {
-	printf("<VFS> VFS Initialized\n");
+	kprintf("<VFS> VFS Initialized\n");
 
 	return 0;
 }
@@ -60,9 +59,9 @@ VFSNode* vfs_resolve(char* path)
 
 
 not_found:
-	printf("<VFS> Could not find '");
-	printf(path);
-	printf("'\n");
+	kprintf("<VFS> Could not find '");
+	kprintf(path);
+	kprintf("'\n");
 	return 0;
 }
 

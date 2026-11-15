@@ -2,6 +2,7 @@
 #include <common/screen.h>
 #include <memory/common.h>
 #include <memory/heap.h>
+#include <printf.h>
 
 Driver drivers[0x40];
 uint8_t driver_index;
@@ -56,16 +57,16 @@ void enable_driver(uint8_t id)
 	driver->enabled = true;
 	driver->enable_handler();
 
-	printf("<Mercury> Driver '");
-	printf(driver->name);
-	printf("' enabled \n");
+	kprintf("<Mercury> Driver '");
+	kprintf(driver->name);
+	kprintf("' enabled \n");
 
 	if(driver->type == ETHERNET && ((EthernetInterface*)(driver->driver_interface))->send)
 	{
 		default_net_interface = driver->driver_interface;
-		printf("<Mercury> Selected '");
-		printf(driver->name);
-		printf("' as default ethernet driver\n");
+		kprintf("<Mercury> Selected '");
+		kprintf(driver->name);
+		kprintf("' as default ethernet driver\n");
 	}
 }
 
@@ -75,9 +76,9 @@ void disbale_driver(uint8_t id)
 	driver->enabled = false;
 	driver->disbale_handler();
 
-	printf("<Mercury> Driver '");
-	printf(driver->name);
-	printf("' disabled \n");
+	kprintf("<Mercury> Driver '");
+	kprintf(driver->name);
+	kprintf("' disabled \n");
 }
 
 void net_send(char* buffer, size_t size)

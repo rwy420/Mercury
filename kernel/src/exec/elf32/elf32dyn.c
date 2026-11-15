@@ -1,9 +1,8 @@
-#include "exec/elf32/elf32.h"
-#include "exec/elf32/elf32dynlib.h"
+#include <exec/elf32/elf32.h>
+#include <exec/elf32/elf32dynlib.h>
 #include <memory/paging.h>
 #include <exec/elf32/elf32dyn.h>
 #include <memory/common.h>
-#include <common/screen.h>
 
 extern PageDirectory* g_kernel_pd;
 

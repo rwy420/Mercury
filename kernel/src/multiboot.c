@@ -1,5 +1,6 @@
 #include <multiboot.h>
 #include <common/screen.h>
+#include <printf.h>
 
 multiboot_info_t* mb;
 
@@ -19,9 +20,9 @@ void mb_get_vesa(VesaInfo* vesa_info)
 
 multiboot_module_t* mb_init_modules()
 {
-	printf("<GRUB> Loaded ");
+	kprintf("<GRUB> Loaded ");
 	print_uint32_t(mb->mods_count);
-	printf(" module(s)\n");
+	kprintf(" module(s)\n");
 
 	return (multiboot_module_t*) mb->mods_addr;
 }

@@ -25,7 +25,7 @@
 #include <faults.h>
 #include <fs/vfs/vfs.h>
 #include <fs/initrd.h>
-
+#include <printf.h>
 #define ATA
 //#define STARTTEXT
 
@@ -73,23 +73,23 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	vesa_map(g_kernel_pd);
 	vesa_clear();
 
-	printf("<GRUB> VESA resolution set to ");
+	kprintf("<GRUB> VESA resolution set to ");
 	print_uint32_t(g_vesa_info.fb_width);
-	printf("x");
+	kprintf("x");
 	print_uint32_t(g_vesa_info.fb_height);
-	printf("\n");
+	kprintf("\n");
 
 	multiboot_modules = mb_init_modules();
 
-	printf("<Mercury> Loading Mercury kernel... \n");
+	kprintf("<Mercury> Loading Mercury kernel... \n");
 	
-	printf("<Mercury> kernel_start is mapped to 0x");
+	kprintf("<Mercury> kernel_start is mapped to 0x");
 	print_hex32((uint32_t) v_kernel);
-	printf("\n<Mercury> Kernel heap of ");
+	kprintf("\n<Mercury> Kernel heap of ");
 	print_uint32_t(heap_size / 0x400 / 0x400);
-	printf(" MB initialized\n<Mercury> Kernel heap mapped up to 0x");
+	kprintf(" MB initialized\n<Mercury> Kernel heap mapped up to 0x");
 	print_hex32(heap_max);
-	printf("\n<Mercury> Switching to higher half\n");
+	kprintf("\n<Mercury> Switching to higher half\n");
 
 	// Switching to the kernel function living in the higher half
 	v_kernel();
@@ -111,7 +111,7 @@ void v_kernel_start()
 	register_syscall_handler(0x05, (syscall_t) syscall_open);
 	register_syscall_handler(0x06, (syscall_t) syscall_close);
 	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
-	printf("<Mercury> Syscalls registered\n");
+	kprintf("<Mercury> Syscalls registered\n");
 
 	register_interrupt_handler(0x06, (isr_t) handle_invalid_opcode);
 	register_interrupt_handler(0x0D, (isr_t) handle_general_protection_fault);
@@ -122,14 +122,14 @@ void v_kernel_start()
 	Disk ata0m = init_disk(0x1F0, true);
 	if(identify_disk(&ata0m))
 	{
-		printf("<Mercury> Selected ata0m as default disk\n");
+		kprintf("<Mercury> Selected ata0m as default disk\n");
 		g_default_disk = &ata0m;
 	}
 
 	Disk ata0s = init_disk(0x1F0, false);
 	if(identify_disk(&ata0s))
 	{
-		printf("<Mercury> Selected ata0s as default disk\n");
+		kprintf("<Mercury> Selected ata0s as default disk\n");
 		g_default_disk = &ata0s;
 	}
 #endif
@@ -143,9 +143,9 @@ void v_kernel_start()
 	uint32_t frame_allocator_start = 0x40000000;
 
 	frame_allocator_init(frame_allocator_start, frame_allocator_size);
-	printf("<Mercury> Frame allocator of ");
+	kprintf("<Mercury> Frame allocator of ");
 	print_uint32_t(frame_allocator_size / 0x400 / 0x400);
-	printf(" MB initialized\n");
+	kprintf(" MB initialized\n");
 
 	tasks_init();
 	// Continuing kernel initialization in a kernel task
@@ -159,23 +159,23 @@ void kthread_init()
 {
 	init_drivers();
 
-	printf("<PCI> Enumerating PCI devices\n");
+	kprintf("<PCI> Enumerating PCI devices\n");
 	pci_enumerate_devices();
 
-	printf("<PCI> Initializing PCI devices\n");
+	kprintf("<PCI> Initializing PCI devices\n");
 	pci_init_devices();
 
 	vfs_init();
 	//load_initrd();
-	if(!read_mbr()) printf("<Mercury> Could not read the MBR\n");
+	if(!read_mbr()) kprintf("<Mercury> Could not read the MBR\n");
 	
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	printf("<Mercury> Startup done\n");
+	kprintf("<Mercury> Startup done\n");
 #ifdef STARTTEXT
 	vesa_clear();
-	printf("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n");
+	kprintf("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n");
 #endif
 	
 	char** argv = kmalloc(sizeof(char*) * 3); 
@@ -184,7 +184,7 @@ void kthread_init()
 	argv[2] = c;
 
 	//TODO: This should become execve to replace this task by INIT.ELF
-	process_create("/SBIN/INIT.ELF", 3, argv);
+	//process_create("/SBIN/INIT.ELF", 3, argv);
 
 	kprintf("Hello from %s\nCool Number: %u\n", "kprintf", 0x400);
 

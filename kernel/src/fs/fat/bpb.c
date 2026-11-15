@@ -1,4 +1,4 @@
-#include <common/screen.h>
+#include <printf.h>
 #include <fs/fat/bpb.h>
 #include <fs/fat32/fat32.h>
 #include <memory/heap.h>
@@ -17,7 +17,7 @@ int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition)
 
 	if(bpb->jmp_short[0] != 0xEB) return -1;
 
-	printf("   <FAT> Has valid BPB\n");
+	kprintf("   <FAT> Has valid BPB\n");
 
 	if(bpb->large_num_sectors != 0) return 1;
 	

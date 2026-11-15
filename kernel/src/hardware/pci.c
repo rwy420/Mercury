@@ -5,6 +5,7 @@
 #include <driver/sata/sata.h>
 #include <driver/driver.h>
 #include <common/screen.h>
+#include <printf.h>
 
 #define DATA_PORT 0xCFC
 #define COMMAND_PORT 0xCF8
@@ -94,13 +95,13 @@ void pci_enumerate_devices()
 				device_descriptor->class_id = pci_get_class_id(bus, device, function);
 				device_descriptor->subclass_id = pci_get_subclass_id(bus, device, function);
 
-				printf("<PCI> Found device at ");
+				kprintf("<PCI> Found device at ");
 				print_hex(bus & 0xFF);
-				printf(".");
+				kprintf(".");
 				print_hex(device & 0xFF);
-				printf(".");
+				kprintf(".");
 				print_hex(function & 0xFF);
-				printf("\n");
+				kprintf("\n");
 
 				for(uint8_t bar_idx = 0; bar_idx < 5; bar_idx++)
 				{
@@ -109,13 +110,13 @@ void pci_enumerate_devices()
 					
 					if(bar->size != 0)
 					{
-						printf("   Memory region ");
+						kprintf("   Memory region ");
 						print_hex(bar_idx);
-						printf(" at 0x");
+						kprintf(" at 0x");
 						print_hex32(bar->address);
-						printf("-");
+						kprintf("-");
 						print_hex32(bar->address + bar->size);
-						printf("\n");
+						kprintf("\n");
 					}
 				}
 

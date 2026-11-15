@@ -26,6 +26,7 @@
 #include <memory/heap.h>
 #include <memory/common.h>
 #include <memory/paging.h>
+#include <printf.h>
 
 HbaMem* g_abar;
 
@@ -44,7 +45,7 @@ HbaPort* probe_port(HbaMem* abar)
 
 			if(type == AHCI_DEV_SATA)
 			{
-				printf("SATA\n");
+				kprintf("SATA\n");
 				result = port;
 				port_rebase(port, i);
 			}
@@ -197,7 +198,7 @@ int sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, u
 	}
 	if (spin == 1000000)
 	{
-		printf("Port is hung\n");
+		kprintf("Port is hung\n");
 		return false;
 	}
 
@@ -209,14 +210,14 @@ int sata_read(HbaPort* port, uint32_t startl, uint32_t starth, uint32_t count, u
 			break;
 		if (port->is & HBA_PxIS_TFES)
 		{
-			printf("Read disk error\n");
+			kprintf("Read disk error\n");
 			return false;
 		}
 	}
 
 	if (port->is & HBA_PxIS_TFES)
 	{
-		printf("Read disk error\n");
+		kprintf("Read disk error\n");
 		return false;
 	}
 

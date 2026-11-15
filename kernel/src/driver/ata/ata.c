@@ -1,6 +1,5 @@
 #include <driver/ata/ata.h>
 #include <hardware/port.h>
-#include <common/screen.h>
 #include <memory/common.h>
 
 #define DATA_PORT(base) base + 0 // 16 Bit / w Port
