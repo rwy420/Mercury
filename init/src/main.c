@@ -1,4 +1,5 @@
 #include <syscall.h>
+#include <stdio.h>
 
 char hello[] = "Hello World from init\n";
 
@@ -8,10 +9,11 @@ int* ptr = &global;
 int main(int argc, char** argv)
 {
 	// write message to stdout
-	syscall(0x04, 0x01, (unsigned int) hello, sizeof(hello), 0, 0);
+	//syscall(0x04, 0x01, (unsigned int) hello, sizeof(hello), 0, 0);
+	write(0x01, hello, sizeof(hello));
 	char* arg1 = argv[0];
 
-	syscall(0x04, 0x01, (unsigned int) arg1, 0, 0, 0);
+	//syscall(0x04, 0x01, (unsigned int) arg1, 0, 0, 0);
 
 	int val = *ptr;
 
