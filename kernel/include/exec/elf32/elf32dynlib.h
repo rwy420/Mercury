@@ -1,0 +1,4 @@
+#ifndef __MERCURY__EXEC__ELF32__ELF32DYNLIB_H
+#define __MERCURY__EXEC__ELF32__ELF32DYNLIB_H
+
+#endif
