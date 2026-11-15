@@ -1,6 +1,5 @@
 #include <fd.h>
 #include <memory/common.h>
-#include <common/screen.h>
 #include <memory/heap.h>
 #include <vesa.h>
 

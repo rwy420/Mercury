@@ -1,6 +1,5 @@
 #include <hardware/pit.h>
 #include <multitasking.h>
-#include <common/screen.h>
 
 volatile uint32_t g_ms_since_init;
 uint32_t pit_hz = 0;

@@ -6,7 +6,6 @@
 #include <vesa.h>
 #include <process.h>
 #include <multitasking.h>
-#include <common/screen.h>
 #include <common/types.h>
 #include <exec/elf32/elf32loader.h>
 #include <memory/gdt.h>

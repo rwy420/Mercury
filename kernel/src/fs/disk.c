@@ -2,7 +2,6 @@
 #include <fs/fat/bpb.h>
 #include <fs/fat/fat.h>
 #include <fs/fat32/fat32.h>
-#include <common/screen.h>
 #include <driver/ata/ata.h>
 #include <memory/heap.h>
 #include <printf.h>
