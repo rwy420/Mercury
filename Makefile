@@ -37,4 +37,4 @@ bochs:
 	bochs -f bochs_config
 
 libc:
-	gcc -m32 -fPIC -shared -o libc.so lib/stdio.c lib/process.c
+	gcc -m32 -fPIC -shared -Wl,-soname,libc.so -nostdlib -o libc.so lib/stdio.c lib/process.c
