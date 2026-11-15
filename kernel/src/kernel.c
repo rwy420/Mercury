@@ -186,7 +186,7 @@ void kthread_init()
 	//TODO: This should become execve to replace this task by INIT.ELF
 	//process_create("/SBIN/INIT.ELF", 3, argv);
 
-	kprintf("Hello from %s\nCool Number: %u\n", "kprintf", 0x400);
+	kprintf("Hello from %s\nCool Number: %i\n", "kprintf", -0x400);
 
 	while(1);
 }

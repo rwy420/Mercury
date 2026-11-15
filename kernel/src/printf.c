@@ -16,6 +16,21 @@ static void emit_string(format_output_t* out, char* str)
 	}
 }
 
+static void emit_unsigned(format_output_t* out, uint32_t value, uint32_t base, int uppercase)
+{
+	char* digits = uppercase ? "0123456789ABCDEF" : "0123456789abcdef";
+	char buffer[32];
+	size_t i = 0;
+
+	do {
+		buffer[i++] = digits[value % base];
+		value /= base;
+	}while (value);
+
+	while(i) emit(out, buffer[--i]);
+}
+
+//TODO: support 64bit values by implementing a custom '__udivmoddi4' for 64bit division
 void format(format_output_t* out, char* fmt, va_list args)
 {
 	while(*fmt)
@@ -57,13 +72,48 @@ void format(format_output_t* out, char* fmt, va_list args)
 
 		switch(*fmt)
 		{
-			case 'c':
+			case 'c': // Character
 				emit(out, (char) va_arg(args, int));
 				break;
 
-			case 's':
+			case 's': // String
 				char* str = va_arg(args, char*);
 				emit_string(out, str ? str : "(null)");
+				break;
+
+			case 'd': //TODO Signed integer type
+			case 'i': // Signed integer
+				int32_t value;
+
+				switch(len)
+				{
+					case LEN_LONG:
+						value = va_arg(args, long);
+						break;
+
+					/*case LEN_LLONG:
+						value = va_arg(args, int64_t);
+						break;*/
+
+					case LEN_SIZE:
+						value = va_arg(args, int32_t);
+						break;
+
+					default:
+						value = va_arg(args, int32_t);
+						break;
+				}
+
+				uint32_t mag;
+
+				if(value < 0)
+				{
+					emit(out, '-');
+					mag = -(uint32_t) value;
+				}
+				else mag = (uint32_t) value;
+
+				emit_unsigned(out, mag, 10, 0);
 				break;
 		}
 
