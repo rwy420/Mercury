@@ -40,6 +40,18 @@ int strcmp(const char *a, const char *b)
     return ((int)(unsigned char)(*a) - (int)(unsigned char)(*b));
 }
 
+size_t strlen(const char* str)
+{
+	size_t len = 0;
+	while(*str)
+	{
+		*str++;
+		len++;
+	}
+
+	return len;
+}
+
 int memcmp(const void* s1, const void* s2, uint32_t size)
 {
 	const uint8_t* p1 = (const uint8_t*) s1;
@@ -93,6 +105,14 @@ void uint32_t_to_string(uint32_t value, char *buffer)
     }
 
     buffer[j] = '\0';
+}
+
+void to_uppercase(char* str, size_t len)
+{
+	for(int i = 0; i < len; i++)
+	{
+		if(str[i] >= 'a' && str[i] <= 'z') str[i] ^= 1 << 5;
+	}
 }
 
 int atomic_compare_exchange(int* ptr, int* expected, int desired) {
