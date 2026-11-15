@@ -30,7 +30,7 @@ void elf32_get_sections(Elf32_Ehdr* ehdr, Elf32_Shdr* shdr, Elf32_Load_Info* loa
 
 		if(!strcmp(name, ".dynstr"))
 		{
-			load_info->dynstr = (char*) shdr[i].sh_offset;
+			load_info->dynstr_off = shdr[i].sh_offset;
 		}
 	}
 }
@@ -110,6 +110,7 @@ void* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
 
 	if(!load_info) return 0;
 
+	memset(load_info, 0, sizeof(Elf32_Load_Info));
 	load_info->image = elf_start;
 	load_info->pd = pd;
 

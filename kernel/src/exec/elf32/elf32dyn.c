@@ -1,4 +1,5 @@
 #include "exec/elf32/elf32.h"
+#include "exec/elf32/elf32dynlib.h"
 #include <memory/paging.h>
 #include <exec/elf32/elf32dyn.h>
 #include <memory/common.h>
@@ -26,6 +27,7 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				break;
 			case DT_STRTAB:
 				load_info->dynstr_off = dyn[i].d_un.d_ptr;
+				break;
 			case DT_REL:
 				rel_addr = dyn[i].d_un.d_ptr;
 				break;
@@ -42,6 +44,8 @@ pt_dynamic_end:
 	if(!rel_addr || !rel_size || !rel_entry_size) goto error;
 	if(rel_entry_size != sizeof(Elf32_Rel)) goto error;
 	if(rel_size % rel_entry_size != 0) goto error;
+
+	for(int i = 0; i < load_info->needed_count; i++) elf32_handle_dtneeded(load_info->needed[i], load_info);
 
 	Elf32_Rel* relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
 	uint32_t relocation_count = rel_size / rel_entry_size;
