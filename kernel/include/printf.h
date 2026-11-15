@@ -11,6 +11,14 @@ typedef struct
 	size_t count;
 } format_output_t;
 
+typedef enum
+{
+	LEN_DEFAULT,
+	LEN_LONG,
+	LEN_LLONG,
+	LEN_SIZE
+} format_length_t;
+
 void format(format_output_t* out, char* fmt, va_list args);
 
 int kvprintf(char* fmt, va_list args);
