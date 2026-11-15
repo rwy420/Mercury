@@ -60,9 +60,9 @@ VFSNode* vfs_resolve(char* path)
 
 
 not_found:
-	printf_color("<VFS> Could not find '", COLOR_RED, COLOR_BLACK);
-	printf_color(path, COLOR_RED, COLOR_BLACK);
-	printf_color("'\n", COLOR_RED, COLOR_BLACK);
+	printf("<VFS> Could not find '");
+	printf(path);
+	printf("'\n");
 	return 0;
 }
 

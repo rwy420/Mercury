@@ -2,7 +2,6 @@
 #include <common/screen.h>
 #include <vesa.h>
 
-static uint16_t x = 0, y = 0;
 extern VesaInfo g_vesa_info;
 
 int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
@@ -11,58 +10,13 @@ int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 	return 0;
 }
 
-void printf_color(string str, uint32_t fg, uint32_t bg)
+void printf(string str)
 {
 	dbg_printf(str);
 	for(int i = 0; str[i] != '\0'; i++)
 	{
-		switch(str[i])
-		{
-			case '\n':
-				y += 0xE;
-				x = 0;
-				break;
-
-			case ' ':
-				x += 0x8;
-				break;
-
-			default:
-				vesa_putc(str[i], x, y, fg, bg);
-				x += 0x8;
-		}
-
-		if(x >= g_vesa_info.fb_width - 0x10)
-		{
-			y += 0xE;
-			x = 0;
-		}
-
-		if(y >= g_vesa_info.fb_height - 0x20)
-		{
-			clear_screen();
-		}
+		vesa_putc_inc(str[i]);
 	}
-}
-
-void printf(string str)
-{
-	printf_color(str, COLOR_WHITE, COLOR_BLACK);
-}
-
-void terminal_move_left()
-{
-	x -= 8;
-	printf(" ");
-	x -= 8;
-}
-
-void clear_screen()
-{
-	vesa_clear();
-
-	x = 0;
-	y = 0;
 }
 
 void print_hex(uint8_t h)

@@ -39,7 +39,7 @@ int read_mbr()
 			switch(fat_type)
 			{
 				case -1:
-					printf_color("<FAT> Could not read the FAT BPB\n", COLOR_RED, COLOR_BLACK);
+					printf("<FAT> Could not read the FAT BPB\n");
 					break;
 				case 0:
 					break;

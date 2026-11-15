@@ -1,3 +1,4 @@
+#include <printf.h>
 #include <thread.h>
 #include <multiboot.h>
 #include <syscalls.h>
@@ -70,7 +71,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	vesa_init();
 	// Identity map the VESA framebuffer
 	vesa_map(g_kernel_pd);
-	clear_screen();
+	vesa_clear();
 
 	printf("<GRUB> VESA resolution set to ");
 	print_uint32_t(g_vesa_info.fb_width);
@@ -166,15 +167,15 @@ void kthread_init()
 
 	vfs_init();
 	//load_initrd();
-	if(!read_mbr()) printf_color("<Mercury> Could not read the MBR\n", COLOR_RED, COLOR_BLACK);
+	if(!read_mbr()) printf("<Mercury> Could not read the MBR\n");
 	
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
 	enable_all_drivers();
 
-	printf_color("<Mercury> Startup done\n", COLOR_GREEN, COLOR_BLACK);
+	printf("<Mercury> Startup done\n");
 #ifdef STARTTEXT
-	clear_screen();
-	printf_color("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n", COLOR_PINK, COLOR_BLACK);
+	vesa_clear();
+	printf("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n");
 #endif
 	
 	char** argv = kmalloc(sizeof(char*) * 3); 
@@ -184,6 +185,8 @@ void kthread_init()
 
 	//TODO: This should become execve to replace this task by INIT.ELF
 	process_create("/SBIN/INIT.ELF", 3, argv);
+
+	kprintf("Hello from %s\nCool Number: %u", "kprintf", 0x400);
 
 	while(1);
 }

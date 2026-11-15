@@ -30,6 +30,7 @@ typedef struct
 void vesa_init();
 void vesa_put_pixel(int x, int y, uint32_t color);
 void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg);
+void vesa_putc_inc(char c);
 void vesa_clear();
 void vesa_map(PageDirectory* pd);
 

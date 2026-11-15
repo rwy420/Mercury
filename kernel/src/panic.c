@@ -5,10 +5,10 @@
 void panic(char* reason, CPUState* cpu)
 {
 	pit_set_schedule(false);
-	clear_screen();
-	printf_color("KERNEL PANIC: ", COLOR_RED, COLOR_BLACK);
-	printf_color(reason, COLOR_RED, COLOR_BLACK);
-	printf_color(" =(\n", COLOR_RED, COLOR_BLACK);
+	vesa_clear();
+	printf("KERNEL PANIC: ");
+	printf(reason);
+	printf(" =(\n");
 
 	if(cpu)
 	{

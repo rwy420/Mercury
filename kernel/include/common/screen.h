@@ -7,10 +7,7 @@
 
 int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length);
 
-void printf_color(string str, uint32_t fg, uint32_t bg);
 void printf(string str);
-void terminal_move_left();
-void clear_screen();
 void print_hex(uint8_t h);
 void print_hex32(uint32_t h);
 

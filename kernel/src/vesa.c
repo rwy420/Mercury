@@ -1,12 +1,11 @@
-#include "common/screen.h"
 #include <vesa.h>
 #include <psf1.h>
 #include <memory/common.h>
 #include <memory/paging.h>
 
 extern VesaInfo g_vesa_info;
-
 uint32_t* vesa_fb;
+static uint16_t x = 0, y = 0;
 
 void vesa_init()
 {
@@ -38,8 +37,40 @@ void vesa_putc(char c, int x, int y, uint32_t fg, uint32_t bg)
     }
 }
 
+void vesa_putc_inc(char c)
+{
+	switch(c)
+	{
+		case '\n':
+			y += 0xE;
+			x = 0;
+			break;
+
+		case ' ':
+			x += 0x8;
+			break;
+
+		default:
+			vesa_putc(c, x, y, COLOR_WHITE, COLOR_BLACK);
+			x += 0x8;
+	}
+
+	if(x >= g_vesa_info.fb_width - 0x10)
+	{
+		y += 0xE;
+		x = 0;
+	}
+
+	if(y >= g_vesa_info.fb_height - 0x20)
+	{
+		vesa_clear();
+	}
+}
+
 void vesa_clear()
 {
+	x = 0;
+	y = 0;
 	memset(vesa_fb, 0x0, g_vesa_info.fb_height * g_vesa_info.fb_width * 4);
 }
 
