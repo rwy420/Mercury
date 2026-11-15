@@ -1,6 +1,5 @@
 #include <driver/sata/sata.h>
 #include <memory/heap.h>
-#include <common/screen.h>
 
 HbaMem* abar;
 

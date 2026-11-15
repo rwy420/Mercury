@@ -1,6 +1,5 @@
 #include <syscalls.h>
 #include <hardware/interrupts.h>
-#include <common/screen.h>
 #include <printf.h>
 
 syscall_t handlers[256];
@@ -11,9 +10,7 @@ void syscall(CPUState* cpu)
 
 	if(handlers[syscall] == NULL_PTR)
 	{
-		kprintf("Unhandled syscall 0x");
-		print_hex32(syscall);
-		kprintf("\n");
+		kprintf("Unhandled syscall 0x%x\n", syscall);
 		return;
 	}
 

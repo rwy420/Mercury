@@ -1,7 +1,6 @@
 #include <panic.h>
 #include <vm.h>
 #include <faults.h>
-#include <common/screen.h>
 #include <vesa.h>
 #include <multitasking.h>
 #include <printf.h>
@@ -43,8 +42,7 @@ void terminate_or_panic(char* reason, CPUState* cpu)
 	if(!(g_current_task->flags & TASK_KERNEL))
 	{
 		g_current_task->state = TASK_TERMINATED;
-		kprintf(reason);
-		kprintf(" (Task terminated)\n");
+		kprintf("%s (Task terminated)\n", reason);
 		asm("int $0x20"); // yield to stop the execution of the terminated task right here
 	}
 

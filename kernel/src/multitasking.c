@@ -9,7 +9,6 @@
 #include <memory/common.h>
 #include <memory/heap.h>
 #include <memory/gdt.h>
-#include <common/screen.h>
 #include <exec/elf32/elf32loader.h>
 #include <printf.h>
 
@@ -58,21 +57,7 @@ void idle_task()
 	uint32_t counter = 100;
 	while(1)
 	{
-		kprintf("Task 1 ");
-		print_hex32(counter++);
-		kprintf("\n");
-		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
-	}
-}
-
-void idle_task2()
-{
-	uint32_t counter = 100;
-	while(1)
-	{
-		kprintf("Task 2 ");
-		print_hex32(counter++);
-		kprintf("\n");
+		kprintf("Task 1 %x\n", counter++);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }

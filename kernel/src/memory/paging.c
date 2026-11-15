@@ -1,7 +1,6 @@
 #include <memory/paging.h>
 #include <memory/heap.h>
 #include <memory/common.h>
-#include <common/screen.h>
 #include <vesa.h>
 
 extern void v_kernel_start();

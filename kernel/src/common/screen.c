@@ -10,37 +10,6 @@ int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 	return 0;
 }
 
-void print_hex(uint8_t h)
-{
-	char* foo = "00";
-	char* hex = "0123456789ABCDEF";
-	foo[0] = hex[(h >> 4) & 0xF];
-	foo[1] = hex[h & 0xF];
-	kprintf(foo);
-}
-
-void print_hex32(uint32_t h)
-{
-	print_hex((h >> 24) & 0xFF);
-	print_hex((h >> 16) & 0xFF);
-	print_hex((h >> 8) & 0xFF);
-	print_hex( h & 0xFF);
-}
-
-void print_uint8_t(uint8_t value)
-{
-	uint8_t buffer[4];
-	uint8_t_to_string(value, buffer);
-	kprintf(buffer);
-}
-
-void print_uint32_t(uint32_t value)
-{
-	uint8_t buffer[11];
-	uint32_t_to_string(value, buffer);
-	kprintf(buffer);
-}
-
 void uint8_t_to_string(uint8_t value, char* buffer)
 {
 	int i = 0;

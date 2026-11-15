@@ -7,11 +7,6 @@
 
 int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length);
 
-void print_hex(uint8_t h);
-void print_hex32(uint32_t h);
-
-void print_uint8_t(uint8_t value);
-void print_uint32_t(uint32_t value);
 void uint8_t_to_string(uint8_t value, char* buffer);
 void uint32_t_to_string(uint32_t value, char* buffer);
 

@@ -4,7 +4,6 @@
 #include <memory/common.h>
 #include <hardware/interrupts.h>
 #include <hardware/pic.h>
-#include <common/screen.h>
 #include <syscalls.h>
 #include <multitasking.h>
 

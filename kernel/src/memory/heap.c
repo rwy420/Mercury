@@ -1,6 +1,5 @@
 #include <memory/paging.h>
 #include <memory/heap.h>
-#include <common/screen.h>
 #include <memory/common.h>
 
 MemoryChunk* first;

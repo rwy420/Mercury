@@ -140,6 +140,58 @@ void format(format_output_t* out, char* fmt, va_list args)
 
 				emit_unsigned(out, uvalue, 10, 0);
 				break;
+
+			case 'x': // Lowercase hex
+				uint32_t xvalue;
+
+				switch(len)
+				{
+					case LEN_LONG:
+						xvalue = va_arg(args, unsigned long);
+						break;
+
+					/*case LEN_LLONG:
+						uvalue = va_arg(args, uint64_t);
+						break;*/
+
+					case LEN_SIZE:
+						xvalue = va_arg(args, uint32_t);
+						break;
+
+					default:
+						xvalue = va_arg(args, uint32_t);
+						break;
+				}
+
+				emit_unsigned(out, xvalue, 16, 0);
+				break;
+
+			case 'X': // Uppercase hex
+				uint32_t Xvalue;
+
+				switch(len)
+				{
+					case LEN_LONG:
+						Xvalue = va_arg(args, unsigned long);
+						break;
+
+					/*case LEN_LLONG:
+						uvalue = va_arg(args, uint64_t);
+						break;*/
+
+					case LEN_SIZE:
+						Xvalue = va_arg(args, uint32_t);
+						break;
+
+					default:
+						Xvalue = va_arg(args, uint32_t);
+						break;
+				}
+
+				emit_unsigned(out, Xvalue, 16, 1);
+				break;
+
+			case 'p': //TODO: pointers
 		}
 
 		if(*fmt) fmt++;

@@ -73,23 +73,15 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	vesa_map(g_kernel_pd);
 	vesa_clear();
 
-	kprintf("<GRUB> VESA resolution set to ");
-	print_uint32_t(g_vesa_info.fb_width);
-	kprintf("x");
-	print_uint32_t(g_vesa_info.fb_height);
-	kprintf("\n");
+	kprintf("<GRUB> VESA resolution set to %ux%u\n", g_vesa_info.fb_width, g_vesa_info.fb_height);
 
 	multiboot_modules = mb_init_modules();
 
 	kprintf("<Mercury> Loading Mercury kernel... \n");
-	
-	kprintf("<Mercury> kernel_start is mapped to 0x");
-	print_hex32((uint32_t) v_kernel);
-	kprintf("\n<Mercury> Kernel heap of ");
-	print_uint32_t(heap_size / 0x400 / 0x400);
-	kprintf(" MB initialized\n<Mercury> Kernel heap mapped up to 0x");
-	print_hex32(heap_max);
-	kprintf("\n<Mercury> Switching to higher half\n");
+	kprintf("<Mercury> kernel_start is mapped to 0x%x\n", (uint32_t) v_kernel);
+	kprintf("<Mercury> Kernel heap of %u MB initialized\n", (uint32_t) heap_size / 0x400 / 0x400);
+	kprintf("<Mercury> Kernel heap mapped up to 0x%x\n", (uint32_t) heap_max);
+	kprintf("<Mercury> Switching to higher half\n");
 
 	// Switching to the kernel function living in the higher half
 	v_kernel();
@@ -143,9 +135,7 @@ void v_kernel_start()
 	uint32_t frame_allocator_start = 0x40000000;
 
 	frame_allocator_init(frame_allocator_start, frame_allocator_size);
-	kprintf("<Mercury> Frame allocator of ");
-	print_uint32_t(frame_allocator_size / 0x400 / 0x400);
-	kprintf(" MB initialized\n");
+	kprintf("<Mercury> Frame allocator of %u MB initialized\n", (uint32_t) frame_allocator_size / 0x400 / 0x400);
 
 	tasks_init();
 	// Continuing kernel initialization in a kernel task
@@ -185,8 +175,6 @@ void kthread_init()
 
 	//TODO: This should become execve to replace this task by INIT.ELF
 	//process_create("/SBIN/INIT.ELF", 3, argv);
-
-	kprintf("Hello from %s\nCool Number: %u\n", "kprintf", -0x400);
 
 	while(1);
 }

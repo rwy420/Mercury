@@ -1,8 +1,7 @@
-#include "fs/vfs/vfs.h"
+#include <fs/vfs/vfs.h>
 #include <fs/fat/fat.h>
 #include <fs/fat32/fat32.h>
 #include <fs/fat32/fat32_dir.h>
-#include <common/screen.h>
 #include <memory/common.h>
 #include <memory/heap.h>
 #include <driver/ata/ata.h>

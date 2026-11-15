@@ -1,6 +1,5 @@
 #include <fs/fat32/fat32.h>
 #include <memory/heap.h>
-#include <common/screen.h>
 #include <fs/fat/fat.h>
 #include <driver/ata/ata.h>
 #include <fs/fat32/fat32_dir.h>

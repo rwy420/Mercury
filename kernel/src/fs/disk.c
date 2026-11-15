@@ -21,15 +21,8 @@ int read_mbr()
 		PartitionTableEntry* entry = &mbr->partition_table_entries[i];
 		if(entry->type == 0) break;
 
-		kprintf("<MBR> Disk partition ");
-		print_uint8_t(i);
-		kprintf(":\n");
-		kprintf("   Type: 0x");
-		print_hex(entry->type);
-		kprintf("\n");
-		kprintf("   Size: ");
-		print_uint32_t((entry->num_sectors * 512) / 1024 / 1024);
-		kprintf("MB\n");
+		kprintf("<MBR> Disk partition %u:\n   Type: 0x%x\n   Size: %u MB\n", (uint32_t) i, (uint32_t) entry->type, (uint32_t) (entry->num_sectors
+					* 512) / 1024 / 1024);
 
 		if(entry->type == 0x0C)
 		{

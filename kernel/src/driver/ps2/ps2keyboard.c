@@ -4,14 +4,14 @@
 #include <driver/ps2/ps2keyboard.h>
 #include <memory/heap.h>
 #include <hardware/interrupts.h>
-#include <common/screen.h>
+#include <printf.h>
 
 int shift;
 
 void handle_interrupt()
 {
 	uint8_t key = inb(DATA_PORT);
-	print_hex(key);
+	kprintf("%u", (uint32_t) key);
 
 	/*if(key == 0x2A || key == 0x36) shift = true;
 	if(key == 0xAA || key == 0xB6) shift = false;

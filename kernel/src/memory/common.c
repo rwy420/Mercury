@@ -1,5 +1,4 @@
 #include <memory/common.h>
-#include <common/screen.h>
 
 void* memset(void* dest, uint8_t val, size_t len) {
     uint8_t* ptr = dest;

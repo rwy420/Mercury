@@ -1,5 +1,4 @@
 #include <memory/gdt.h>
-#include <common/screen.h>
 #include <memory/common.h>
 
 GDTEntry gdt_entries[6];

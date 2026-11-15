@@ -3,8 +3,6 @@
 #include <memory/frames.h>
 #include <memory/paging.h>
 
-#include <common/screen.h>
-
 extern PageDirectory* g_kernel_pd;
 
 DMARegion* dma_create(size_t size)

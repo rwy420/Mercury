@@ -59,9 +59,7 @@ VFSNode* vfs_resolve(char* path)
 
 
 not_found:
-	kprintf("<VFS> Could not find '");
-	kprintf(path);
-	kprintf("'\n");
+	kprintf("<VFS> Could not find '%s'\n", path);
 	return 0;
 }
 

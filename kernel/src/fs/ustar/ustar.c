@@ -1,7 +1,5 @@
 #include <fs/ustar/ustar.h>
 #include <memory/common.h>
-#include <common/screen.h>
-#include <printf.h>
 
 USTARFile* ustar_dump_archive(void* archive)
 {
@@ -11,10 +9,6 @@ USTARFile* ustar_dump_archive(void* archive)
 	while(!memcmp(current->indicator, "ustar", 5))
 	{
 		uint32_t size = oct_to_bin((char*) current->size_in_bytes, 11);
-		kprintf(current->name);
-		kprintf(" ");
-		print_uint32_t(size);
-		kprintf("\n");
 
 		ptr += 512 + ((size + 511) & ~511);
 		current = ptr;
