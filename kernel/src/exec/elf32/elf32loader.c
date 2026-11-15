@@ -1,6 +1,6 @@
-#include "exec/elf32/elf32dyn.h"
 #include <exec/elf32/elf32loader.h>
 #include <exec/elf32/elf32.h>
+#include <exec/elf32/elf32dyn.h>
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/heap.h>
@@ -17,6 +17,22 @@ const char* elf32_get_section_name(uint8_t* elf, Elf32_Shdr* shdr, int index)
 	const char* shstrtab = (const char*)(elf + shstrtab_shdr->sh_offset);
 
 	return &shstrtab[shdr[index].sh_name];
+}
+
+void elf32_get_sections(Elf32_Ehdr* ehdr, Elf32_Shdr* shdr, Elf32_Load_Info* load_info)
+{
+	Elf32_Shdr* shstrtab_shdr = &shdr[ehdr->e_shstrndx];
+	char* shstrtab = (char*) (load_info->image + shstrtab_shdr->sh_offset);
+
+	for(int i = 0; i < ehdr->e_shnum; i++)
+	{
+		char* name = &shstrtab[shdr[i].sh_name];
+
+		if(!strcmp(name, ".dynstr"))
+		{
+			load_info->dynstr = (char*) shdr[i].sh_offset;
+		}
+	}
 }
 
 void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
@@ -107,6 +123,7 @@ void* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
 			break;
 	}
 
+	//elf32_get_sections(hdr, shdr, load_info); Not part of every ELF image, we can get them from PT_DYNAMIC as well
 	elf32_load_segments(hdr, phdr, load_info);
 
     /*int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);

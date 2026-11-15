@@ -12,9 +12,15 @@ typedef struct
 	uint32_t offset;
 	void* end;
 	PageDirectory* pd;
+
+	uint32_t dynstr_off;
+
+	char* needed[16];
+	uint32_t needed_count;
 } Elf32_Load_Info;
 
 const char* elf32_get_section_name(uint8_t* elf, Elf32_Shdr* shdr, int index);
+void elf32_get_sections(Elf32_Ehdr* ehdr, Elf32_Shdr* shdr, Elf32_Load_Info* load_info);
 void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info);
 void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
 

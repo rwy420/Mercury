@@ -2,6 +2,7 @@
 #include <memory/paging.h>
 #include <exec/elf32/elf32dyn.h>
 #include <memory/common.h>
+#include <common/screen.h>
 
 extern PageDirectory* g_kernel_pd;
 
@@ -20,6 +21,11 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				// Doesn't seem to always end at the entry at count, therefore we'll exit after a DT_NULL entry
 				goto pt_dynamic_end;
 				break;
+			case DT_NEEDED:
+				load_info->needed[load_info->needed_count++] = (char*) dyn[i].d_un.d_ptr;
+				break;
+			case DT_STRTAB:
+				load_info->dynstr_off = dyn[i].d_un.d_ptr;
 			case DT_REL:
 				rel_addr = dyn[i].d_un.d_ptr;
 				break;
