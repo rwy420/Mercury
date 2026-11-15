@@ -115,6 +115,31 @@ void format(format_output_t* out, char* fmt, va_list args)
 
 				emit_unsigned(out, mag, 10, 0);
 				break;
+
+			case 'u': // Unsgined integer
+				uint32_t uvalue;
+
+				switch(len)
+				{
+					case LEN_LONG:
+						uvalue = va_arg(args, unsigned long);
+						break;
+
+					/*case LEN_LLONG:
+						uvalue = va_arg(args, uint64_t);
+						break;*/
+
+					case LEN_SIZE:
+						uvalue = va_arg(args, uint32_t);
+						break;
+
+					default:
+						uvalue = va_arg(args, uint32_t);
+						break;
+				}
+
+				emit_unsigned(out, uvalue, 10, 0);
+				break;
 		}
 
 		if(*fmt) fmt++;
