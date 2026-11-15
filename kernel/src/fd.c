@@ -2,6 +2,7 @@
 #include <memory/common.h>
 #include <common/screen.h>
 #include <memory/heap.h>
+#include <vesa.h>
 
 FileDescriptor g_file_descriptors[0xFF];
 

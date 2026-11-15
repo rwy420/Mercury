@@ -3,10 +3,17 @@
 #include <psf1.h>
 #include <memory/common.h>
 #include <memory/paging.h>
+#include <printf.h>
 
 extern VesaInfo g_vesa_info;
 uint32_t* vesa_fb;
 static uint16_t x = 0, y = 0;
+
+int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
+{
+	kprintf((string) buffer);
+	return 0;
+}
 
 void vesa_init()
 {

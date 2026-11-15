@@ -4,12 +4,6 @@
 
 extern VesaInfo g_vesa_info;
 
-int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
-{
-	kprintf((string) buffer);
-	return 0;
-}
-
 void uint8_t_to_string(uint8_t value, char* buffer)
 {
 	int i = 0;

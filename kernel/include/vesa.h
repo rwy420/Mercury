@@ -1,7 +1,6 @@
 #ifndef __MERCURY__VESA_H
 #define __MERCURY__VESA_H
 
-
 #define COLOR_RGBA(r, g, b, a)  ((uint32_t)(((r) << 24) | ((g) << 16) | ((b) << 8) | (a)))
 #define COLOR_BLACK       COLOR_RGBA(0xFF, 0x00, 0x00, 0x00)
 #define COLOR_WHITE       COLOR_RGBA(0xFF, 0xFF, 0xFF, 0xFF)
@@ -20,12 +19,15 @@
 
 #include <common/types.h>
 #include <memory/paging.h>
+#include <fs/vfs/vfs.h>
 
 typedef struct
 {
 	uint32_t fb;
 	uint32_t fb_width, fb_height;
 } __attribute__((packed)) VesaInfo;
+
+int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length);
 
 void vesa_init();
 void vesa_put_pixel(int x, int y, uint32_t color);
