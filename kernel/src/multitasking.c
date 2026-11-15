@@ -11,7 +11,7 @@
 #include <memory/gdt.h>
 #include <exec/elf32/elf32loader.h>
 #include <printf.h>
-
+#include <vm.h>
 
 Task* task_list = NULL_PTR;
 Task* g_current_task = NULL_PTR;
@@ -25,39 +25,14 @@ void dummy_task()
 	asm("int $32");
 }
 
-const char msg[] = "printf via write syscall!\n";
-
-void test_task()
-{
-    uint32_t len = sizeof(msg) - 1;
-
-	asm volatile(
-		"mov $4, %%eax\n"
-		"mov $1, %%ebx\n"
-		"mov %0, %%ecx\n"
-		"mov %1, %%edx\n"
-		"int $0x80\n"
-		:
-		: "r"(msg), "r"(len)
-		: "eax", "ebx", "ecx", "edx"
-	);
-
-    asm volatile(
-        "mov $1, %%eax \n"
-        "mov $1, %%ebx \n"
-        "int $0x80"
-        :
-        :
-        : "eax", "edi"
-    );
-}
-
 void idle_task()
 {
 	uint32_t counter = 100;
 	while(1)
 	{
-		kprintf("Task 1 %x\n", counter++);
+		dbg_printf("Task 1 0x");
+		dbg_print_hex32(counter++);
+		dbg_printf("\n");
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
