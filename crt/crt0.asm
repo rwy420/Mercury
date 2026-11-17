@@ -18,5 +18,5 @@ _start:
 	int 0x80
 
 	; Shouldn't get here
-	ud2 ; ud2 will cause an invalid opcode instruction which terminates the task and therefore is the final way out of a task in case the
+	ud2 ; ud2 will cause an invalid opcode exception which terminates the task and therefore is the final way out of a task in case the
 		; syscall to exit failed somehow
