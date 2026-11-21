@@ -15,6 +15,7 @@ typedef struct Elf32_Load_Info
 	PageDirectory* pd;
 
 	uint32_t dynstr_off;
+	uint32_t symtab_off;
 	Elf32_Rel* relocations,* jmp_relocations;
 	uint32_t rel_size, jmprel_size;
 

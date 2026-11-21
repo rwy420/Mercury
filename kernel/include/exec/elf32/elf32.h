@@ -24,6 +24,7 @@
 #define DT_NEEDED 0x1
 #define DT_PLT_REL_SIZE 0x2
 #define DT_STRTAB 0x5
+#define DT_SYMTAB 0x6
 #define DT_RELA 0x7
 #define DT_REL 0x11
 #define DT_RELSZ 0x12

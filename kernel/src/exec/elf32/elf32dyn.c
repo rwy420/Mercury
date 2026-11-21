@@ -32,6 +32,9 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 			case DT_STRTAB:
 				load_info->dynstr_off = dyn[i].d_un.d_ptr;
 				break;
+			case DT_SYMTAB:
+				load_info->symtab_off = dyn[i].d_un.d_ptr;
+				break;
 			case DT_REL:
 				rel_addr = dyn[i].d_un.d_ptr;
 				break;
@@ -95,24 +98,20 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 {
 	uint32_t type = ELF32_R_TYPE(rel->r_info);
 	uint32_t sym = ELF32_R_SYM(rel->r_info);
+	uint32_t* target = (uint32_t*) (load_info->offset + rel->r_offset);
 
 	switch(type)
 	{
 		case R_386_RELATIVE:
-			kprintf("R_386_RELATIVE\n");
 			if(sym != 0) return -1;
-			
-			uint32_t* target = (uint32_t*) (load_info->offset + rel->r_offset);
+				
 			*target += load_info->offset;
 
 			break;
-
-		case R_386_GLOB_DAT:
-			//TODO
-			break;
-
+	
 		case R_386_JMP_SLOT:
-			
+		case R_386_GLOB_DAT:
+			kprintf("SYMIDX: %u", sym);
 			break;
 	}
 
