@@ -12,6 +12,7 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 	Elf32_Dyn* dyn = (Elf32_Dyn*) (load_info->offset + phdr->p_vaddr);
 	uint32_t count = phdr->p_memsz / sizeof(Elf32_Dyn);
 	uint32_t rel_addr = 0, rel_size = 0, rel_entry_size = 0;
+	char* needed_paths[16];
 
 	for(int i = 0; i < count; i++)
 	{
@@ -22,7 +23,7 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				goto pt_dynamic_end;
 				break;
 			case DT_NEEDED:
-				load_info->needed[load_info->needed_count++] = (char*) dyn[i].d_un.d_ptr;
+				needed_paths[load_info->needed_count++] = (char*) dyn[i].d_un.d_ptr;
 				break;
 			case DT_STRTAB:
 				load_info->dynstr_off = dyn[i].d_un.d_ptr;
@@ -44,7 +45,7 @@ pt_dynamic_end:
 	if(rel_entry_size != sizeof(Elf32_Rel)) goto error;
 	if(rel_size % rel_entry_size != 0) goto error;
 
-	for(int i = 0; i < load_info->needed_count; i++) elf32_handle_dtneeded(load_info->needed[i], load_info);
+	for(int i = 0; i < load_info->needed_count; i++) elf32_handle_dtneeded(needed_paths[i], load_info);
 
 	Elf32_Rel* relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
 	uint32_t relocation_count = rel_size / rel_entry_size;
