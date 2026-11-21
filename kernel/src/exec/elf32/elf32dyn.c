@@ -113,6 +113,7 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 		case R_386_JMP_SLOT:
 		case R_386_GLOB_DAT:
 			char* symlit = elf32_dynsym_get_lit(sym, load_info);
+
 			break;
 	}
 

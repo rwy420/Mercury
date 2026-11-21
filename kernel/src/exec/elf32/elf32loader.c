@@ -86,7 +86,11 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, E
 	if(!load_info) return 0;
 	memset(load_info, 0, sizeof(Elf32_Load_Info));
 
-	if(parent) pd = parent->pd;
+	if(parent)
+	{
+		pd = parent->pd;
+		load_info->parent = parent;
+	}
 	else load_info->next_obj = 0x20000000; 
 
 	Elf32_Ehdr* hdr = (Elf32_Ehdr*) elf_start;

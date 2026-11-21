@@ -20,6 +20,7 @@ typedef struct Elf32_Load_Info
 	uint32_t rel_size, jmprel_size;
 
 
+	struct Elf32_Load_Info* parent;
 	struct Elf32_Load_Info* needed[16];
 	uint32_t needed_count;
 } Elf32_Load_Info;

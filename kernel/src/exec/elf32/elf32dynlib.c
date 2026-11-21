@@ -29,3 +29,21 @@ Elf32_Load_Info* elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info
 
 	return lib;
 }
+
+void* elf32_total_lookup(char* name, Elf32_Load_Info* load_info)
+{
+	if(load_info->parent) load_info = load_info->parent; // Always use the parent executable because it contains the array off all the libs
+	
+	for(int i = 0; i < load_info->needed_count; i++)
+	{
+		Elf32_Load_Info* lib = load_info->needed[i];
+		return elf32_lib_lookup(name, lib);
+	}
+	
+	return 0;
+}
+
+void* elf32_lib_lookup(char* name, Elf32_Load_Info* load_info)
+{
+
+}
