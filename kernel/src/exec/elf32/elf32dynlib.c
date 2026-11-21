@@ -4,7 +4,7 @@
 #include <fs/vfs/vfs.h>
 #include <memory/heap.h>
 
-int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
+Elf32_Load_Info* elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
 {
 	char* name = (char*) (load_info->offset + load_info->dynstr_off + (uint32_t) nameoff);
 	size_t name_len = strlen(name);
@@ -27,5 +27,5 @@ int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
 
 	kfree(lib_buffer);
 
-	return 0;
+	return lib;
 }

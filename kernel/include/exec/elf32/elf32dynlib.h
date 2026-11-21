@@ -3,6 +3,6 @@
 
 #include <exec/elf32/elf32loader.h>
 
-int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info);
+Elf32_Load_Info* elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info);
 
 #endif

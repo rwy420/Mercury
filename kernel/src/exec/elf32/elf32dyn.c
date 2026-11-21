@@ -45,7 +45,7 @@ pt_dynamic_end:
 	if(rel_entry_size != sizeof(Elf32_Rel)) goto error;
 	if(rel_size % rel_entry_size != 0) goto error;
 
-	for(int i = 0; i < load_info->needed_count; i++) elf32_handle_dtneeded(needed_paths[i], load_info);
+	for(int i = 0; i < load_info->needed_count; i++) load_info->needed[i] = elf32_handle_dtneeded(needed_paths[i], load_info);
 
 	Elf32_Rel* relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
 	uint32_t relocation_count = rel_size / rel_entry_size;
