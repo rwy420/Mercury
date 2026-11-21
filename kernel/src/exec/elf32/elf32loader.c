@@ -39,7 +39,7 @@ void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 	return (void*) hdr->e_entry + load_info->offset;
 }
 
-void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
+uint32_t elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 {
 	// Determine total size for allocation
 	uint32_t min_vaddr = 0xFFFFFFFF, max_vaddr = 0;
@@ -92,12 +92,20 @@ void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* loa
 				break;
 		}
 	}
+
+	return total_size;
 }
 
-Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
+Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, Elf32_Load_Info* parent)
 {
 	Elf32_Load_Info* load_info = kmalloc(sizeof(Elf32_Load_Info));
-    Elf32_Ehdr* hdr = (Elf32_Ehdr*) elf_start;
+	if(!load_info) return 0;
+	memset(load_info, 0, sizeof(Elf32_Load_Info));
+
+	if(parent) pd = parent->pd;
+	else load_info->next_obj = 0x20000000; 
+
+	Elf32_Ehdr* hdr = (Elf32_Ehdr*) elf_start;
     Elf32_Phdr* phdr = (Elf32_Phdr*)(elf_start + hdr->e_phoff);
     Elf32_Shdr* shdr = (Elf32_Shdr*)(elf_start + hdr->e_shoff);
 
@@ -107,9 +115,6 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
         return 0;
     }
 
-	if(!load_info) return 0;
-
-	memset(load_info, 0, sizeof(Elf32_Load_Info));
 	load_info->image = elf_start;
 	load_info->pd = pd;
 
@@ -117,16 +122,26 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd)
 	{
 		case(ET_EXEC):
 			load_info->offset = 0;
+
+			// We shouldn't load ET_EXEC as children
+			if(parent)
+			{
+				kprintf("Tried loading ET_EXEC as ELF32 child\n");
+				return 0;
+			}
 			break;
 		case (ET_DYN):
-			load_info->offset = 0x60000000;
+			if(parent) load_info->offset = parent->next_obj;
+			else load_info->offset = 0x60000000;
+		
 			break;
 	}
 
 	//elf32_get_sections(hdr, shdr, load_info); Not part of every ELF image, we can get them from PT_DYNAMIC as well
-	elf32_load_segments(hdr, phdr, load_info);
+	uint32_t segments_size = elf32_load_segments(hdr, phdr, load_info);
+	if(parent) parent->next_obj += segments_size;
 
-    /*int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
+	/*int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
     Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
     char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
 

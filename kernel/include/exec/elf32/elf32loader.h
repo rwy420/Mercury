@@ -10,6 +10,7 @@ typedef struct
 	void* image;
 	void* entry;
 	uint32_t offset;
+	uint32_t next_obj; // Only for parent executables to help place the dynlibs
 	void* end;
 	PageDirectory* pd;
 
@@ -22,8 +23,8 @@ typedef struct
 const char* elf32_get_section_name(uint8_t* elf, Elf32_Shdr* shdr, int index);
 void elf32_get_sections(Elf32_Ehdr* ehdr, Elf32_Shdr* shdr, Elf32_Load_Info* load_info);
 void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info);
-void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
+uint32_t elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
 
-Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd);
+Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, Elf32_Load_Info* parent);
 
 #endif
