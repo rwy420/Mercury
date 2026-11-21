@@ -156,6 +156,7 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, E
 	// Only do relocations after every child of the parent executable has been loaded
 	if(!parent)
 	{
+		set_pd(load_info->pd);
 		for(int i = 0; i < load_info->needed_count; i++)
 		{
 			Elf32_Load_Info* lib = load_info->needed[i];
@@ -163,6 +164,7 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, E
 		}
 
 		elf32_relocate(load_info->relocations, load_info);
+		set_pd(g_kernel_pd);
 	}
 
 	load_info->entry = elf32_get_entry(hdr, load_info);

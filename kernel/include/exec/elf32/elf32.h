@@ -22,10 +22,14 @@
 
 #define DT_NULL 0x0
 #define DT_NEEDED 0x1
+#define DT_PLT_REL_SIZE 0x2
 #define DT_STRTAB 0x5
+#define DT_RELA 0x7
 #define DT_REL 0x11
 #define DT_RELSZ 0x12
 #define DT_RELENT 0x13
+#define DT_PLT_REL 0x14
+#define DT_JMPREL 0x17
 
 #define R_386_GLOB_DAT 0x6
 #define R_386_JMP_SLOT 0x7
