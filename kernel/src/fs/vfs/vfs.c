@@ -76,8 +76,12 @@ int vfs_mount(VFSNode* node, char* path)
 
 uint32_t vfs_open(char* path)
 {
+	VFSNode* node = vfs_resolve(path);
+
+	if(!node) return 0;
+
 	FileDescriptor* fd = create_fd();
-	fd->node = vfs_resolve(path);
+	fd->node = node;
 
 	return fd->id;
 }
