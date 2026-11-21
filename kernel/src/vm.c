@@ -1,11 +1,16 @@
 #include <vm.h>
+#include <stdarg.h>
+#include <printf.h>
 
-void dbg_printf(char* str)
+void dbg_printf(char* fmt, ...)
 {
-	for(int i = 0; str[i] != '\0'; i++)
-	{
-		dbg_putc(str[i]);
-	}
+	va_list args;
+	va_start(args, fmt);
+
+	format_output_t out = { dbg_putc, 0, 0 };
+	format(&out, fmt, args);
+
+	va_end(args);
 }
 
 void dbg_print_hex(uint8_t h)
