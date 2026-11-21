@@ -18,22 +18,6 @@ const char* elf32_get_section_name(uint8_t* elf, Elf32_Shdr* shdr, int index)
 	return &shstrtab[shdr[index].sh_name];
 }
 
-void elf32_get_sections(Elf32_Ehdr* ehdr, Elf32_Shdr* shdr, Elf32_Load_Info* load_info)
-{
-	Elf32_Shdr* shstrtab_shdr = &shdr[ehdr->e_shstrndx];
-	char* shstrtab = (char*) (load_info->image + shstrtab_shdr->sh_offset);
-
-	for(int i = 0; i < ehdr->e_shnum; i++)
-	{
-		char* name = &shstrtab[shdr[i].sh_name];
-
-		if(!strcmp(name, ".dynstr"))
-		{
-			load_info->dynstr_off = shdr[i].sh_offset;
-		}
-	}
-}
-
 void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info)
 {
 	return (void*) hdr->e_entry + load_info->offset;
@@ -137,21 +121,8 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, E
 			break;
 	}
 
-	//elf32_get_sections(hdr, shdr, load_info); Not part of every ELF image, we can get them from PT_DYNAMIC as well
 	uint32_t segments_size = elf32_load_segments(hdr, phdr, load_info);
 	if(parent) parent->next_obj += segments_size;
-
-	/*int global_symbol_table_index = elf32_find_global_symbol_table(hdr, shdr);
-    Elf32_Sym* global_syms = (Elf32_Sym*)(elf_start + shdr[global_symbol_table_index].sh_offset);
-    char* global_strings = elf_start + shdr[shdr[global_symbol_table_index].sh_link].sh_offset;
-
-    for (int i = 0; i < hdr->e_shnum; ++i)
-    {
-        if (shdr[i].sh_type == SHT_REL)
-        {
-            elf32_relocate(shdr + i, global_syms, global_strings, elf_start, elf_start);
-        }
-    }*/
 
 	// Only do relocations after every child of the parent executable has been loaded
 	if(!parent)
