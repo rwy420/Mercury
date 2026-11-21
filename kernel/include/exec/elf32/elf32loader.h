@@ -24,6 +24,6 @@ void elf32_get_sections(Elf32_Ehdr* ehdr, Elf32_Shdr* shdr, Elf32_Load_Info* loa
 void* elf32_get_entry(Elf32_Ehdr* hdr, Elf32_Load_Info* load_info);
 void elf32_load_segments(Elf32_Ehdr* hdr, Elf32_Phdr* phdr, Elf32_Load_Info* load_info);
 
-void* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd);
+Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd);
 
 #endif

@@ -27,7 +27,7 @@ int process_create(char* path, int argc, char** argv)
 	// Create user PD
 	PageDirectory* pd = (PageDirectory*) virtual_to_physical(create_kernel_pd());
 
-	void (*entry)() = elf32_load(buffer, file_size, pd);
+	void (*entry)() = elf32_load(buffer, file_size, pd)->entry;
 	Task* task = create_task(entry, 0, 0x1000, pd);
 
 	// Set up entry frame
