@@ -33,7 +33,7 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				load_info->dynstr_off = dyn[i].d_un.d_ptr;
 				break;
 			case DT_SYMTAB:
-				load_info->symtab_off = dyn[i].d_un.d_ptr;
+				load_info->dynsym_off = dyn[i].d_un.d_ptr;
 				break;
 			case DT_REL:
 				rel_addr = dyn[i].d_un.d_ptr;
@@ -111,7 +111,6 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 	
 		case R_386_JMP_SLOT:
 		case R_386_GLOB_DAT:
-			kprintf("SYMIDX: %u", sym);
 			break;
 	}
 
