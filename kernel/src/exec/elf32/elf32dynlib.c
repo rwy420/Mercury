@@ -10,7 +10,7 @@ int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
 	size_t name_len = strlen(name);
 	char path[5 + name_len]; // /lib/ + strlen(name);
 	memcpy(path, "/lib/", 5);
-	memcpy(&path[5], name, name_len + 1/* Should include \0*/); 
+	memcpy(&path[5], name, name_len + 1/* Should include '\0'*/); 
 
 	uint32_t lib_file = vfs_open(path);
 
@@ -21,6 +21,7 @@ int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
 	vfs_read(lib_file, lib_buffer, lib_size);
 
 	Elf32_Load_Info* lib = elf32_load(lib_buffer, lib_size, 0 /* Will use parent's pd if null*/, load_info);
+	if(!lib) return 0;
 
 	kprintf("Loaded %s at 0x%x", path, lib->offset);
 
