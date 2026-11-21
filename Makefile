@@ -12,8 +12,9 @@ clean:
 kernel.elf:
 	cd kernel && make kernel.elf
 
-grub: kernel.elf
+grub: kernel.elf libc.so
 	./makeimg.sh
+	cp libc.so ./root/lib/
 	
 rebuild: kernel.elf
 	@echo "Mounting and copying new kernel..."
@@ -36,5 +37,5 @@ qemu:
 bochs:
 	bochs -f bochs_config
 
-libc:
+libc.so:
 	gcc -m32 -fPIC -shared -Wl,-soname,libc.so -nostdlib -o libc.so lib/stdio.c lib/process.c
