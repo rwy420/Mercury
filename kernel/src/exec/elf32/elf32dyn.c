@@ -47,14 +47,8 @@ pt_dynamic_end:
 
 	for(int i = 0; i < load_info->needed_count; i++) load_info->needed[i] = elf32_handle_dtneeded(needed_paths[i], load_info);
 
-	Elf32_Rel* relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
-	uint32_t relocation_count = rel_size / rel_entry_size;
-
-	for(uint32_t i = 0; i < relocation_count; i++)
-	{
-		// Causes a page fault
-		//elf32_ptdynamic_relocate(&relocations[i], load_info);
-	}
+	load_info->relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
+	load_info->rel_size = rel_size;
 
 	set_pd(g_kernel_pd);
 	return 0;
@@ -64,7 +58,22 @@ error:
 	return -1;
 }
 
-int elf32_ptdynamic_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info)
+int elf32_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info)
+{
+	set_pd(load_info->pd);
+	uint32_t relocation_count = load_info->rel_size / sizeof(Elf32_Rel);
+
+	for(uint32_t i = 0; i < relocation_count; i++)
+	{
+		elf32_relocate_sym(&load_info->relocations[i], load_info);
+	}
+
+	set_pd(g_kernel_pd);
+
+	return 0;
+}
+
+int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 {
 	uint32_t type = ELF32_R_TYPE(rel->r_info);
 	uint32_t sym = ELF32_R_SYM(rel->r_info);
