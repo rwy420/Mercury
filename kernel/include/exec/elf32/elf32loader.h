@@ -5,7 +5,7 @@
 #include <common/types.h>
 #include <exec/elf32/elf32.h>
 
-typedef struct
+typedef struct Elf32_Load_Info
 {
 	void* image;
 	void* entry;
@@ -16,7 +16,7 @@ typedef struct
 
 	uint32_t dynstr_off;
 
-	char* needed[16];
+	struct Elf32_Load_Info* needed[16];
 	uint32_t needed_count;
 } Elf32_Load_Info;
 
