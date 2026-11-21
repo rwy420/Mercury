@@ -1,5 +1,5 @@
 #include <exec/elf32/elf32sym.h>
-#include "printf.h"
+#include <vm.h>
 #include <exec/elf32/elf32.h>
 #include <exec/elf32/elf32dynlib.h>
 #include <memory/paging.h>
@@ -30,6 +30,9 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 			case DT_PLT_REL_SIZE:
 				load_info->jmprel_size = dyn[i].d_un.d_val;
 				break;
+			case DT_HASH:
+				load_info->hash_off = dyn[i].d_un.d_ptr;
+				break;
 			case DT_STRTAB:
 				load_info->dynstr_off = dyn[i].d_un.d_ptr;
 				break;
@@ -47,7 +50,7 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				break;
 			case DT_PLT_REL:
 				int plt_rel_type = dyn[i].d_un.d_val;
-				if(plt_rel_type == DT_RELA) kprintf("UNSUPPORTED PLT_REL_TYPE = DT_RELA");
+				if(plt_rel_type == DT_RELA) dbg_printf("UNSUPPORTED PLT_REL_TYPE = DT_RELA");
 				break;
 			case DT_JMPREL:
 				load_info->jmp_relocations = (Elf32_Rel*) (load_info->offset +  dyn[i].d_un.d_ptr);
@@ -113,6 +116,9 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 		case R_386_JMP_SLOT:
 		case R_386_GLOB_DAT:
 			char* symlit = elf32_dynsym_get_lit(sym, load_info);
+			void* addr = elf32_total_lookup(symlit, load_info);
+
+			*target = (uint32_t) addr;
 
 			break;
 	}

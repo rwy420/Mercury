@@ -1,3 +1,4 @@
+#include <exec/elf32/elf32hash.h>
 #include <exec/elf32/elf32dynlib.h>
 #include <printf.h>
 #include <memory/common.h>
@@ -45,5 +46,8 @@ void* elf32_total_lookup(char* name, Elf32_Load_Info* load_info)
 
 void* elf32_lib_lookup(char* name, Elf32_Load_Info* load_info)
 {
+	Elf32_Sym* sym = elf32_hash_lookup(name, load_info);
+	if(!sym) return 0;
 
+	return (void*) (load_info->offset + sym->st_value);
 }

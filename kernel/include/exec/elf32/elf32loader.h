@@ -16,6 +16,7 @@ typedef struct Elf32_Load_Info
 
 	uint32_t dynstr_off;
 	uint32_t dynsym_off;
+	uint32_t hash_off;
 	Elf32_Rel* relocations,* jmp_relocations;
 	uint32_t rel_size, jmprel_size;
 

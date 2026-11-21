@@ -30,7 +30,7 @@ int process_create(char* path, int argc, char** argv)
 	void (*entry)() = elf32_load(buffer, file_size, pd, 0)->entry;
 	Task* task = create_task(entry, 0, 0x1000, pd);
 
-	task->state = TASK_TERMINATED;
+	//task->state = TASK_TERMINATED;
 	
 	// Set up entry frame
 	// TODO: envp passing

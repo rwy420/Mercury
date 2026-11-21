@@ -23,6 +23,7 @@
 #define DT_NULL 0x0
 #define DT_NEEDED 0x1
 #define DT_PLT_REL_SIZE 0x2
+#define DT_HASH 0x4
 #define DT_STRTAB 0x5
 #define DT_SYMTAB 0x6
 #define DT_RELA 0x7
