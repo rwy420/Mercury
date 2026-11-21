@@ -50,7 +50,7 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				break;
 			case DT_PLT_REL:
 				int plt_rel_type = dyn[i].d_un.d_val;
-				if(plt_rel_type == DT_RELA) dbg_printf("UNSUPPORTED PLT_REL_TYPE = DT_RELA");
+				if(plt_rel_type == DT_RELA) dbgprintf("UNSUPPORTED PLT_REL_TYPE = DT_RELA\n");
 				break;
 			case DT_JMPREL:
 				load_info->jmp_relocations = (Elf32_Rel*) (load_info->offset +  dyn[i].d_un.d_ptr);
@@ -120,6 +120,10 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 
 			*target = (uint32_t) addr;
 
+			break;
+
+		default:
+			dbgprintf("Unhandled relocation %u\n", type);
 			break;
 	}
 

@@ -22,17 +22,13 @@ void handle_page_fault(CPUState* cpu)
 	uint32_t address = 0;
 	__asm__ __volatile__("movl %%CR2, %0" : "=r" (address));
 
-	dbg_printf("Page fault at address: 0x");
-	dbg_print_hex32(address);
-	dbg_printf(" error: ");
-	dbg_print_hex32(cpu->error_code);
-	dbg_printf("\n");
+	dbgprintf("Page fault at address 0x%x error: 0x%x\n", address, cpu->error_code);
 
-	if(!(cpu->error_code & 0x1)) dbg_printf(" - Not present\n");
-	if(cpu->error_code & 0x2) dbg_printf(" - Write\n");
-	if(cpu->error_code & 0x4) dbg_printf(" - User\n");
-	if(cpu->error_code & 0x8) dbg_printf(" - Reserved bit voilation\n");
-	if(cpu->error_code & 0x10) dbg_printf(" - Instruction fetched\n");
+	if(!(cpu->error_code & 0x1)) dbgprintf(" - Not present\n");
+	if(cpu->error_code & 0x2) dbgprintf(" - Write\n");
+	if(cpu->error_code & 0x4) dbgprintf(" - User\n");
+	if(cpu->error_code & 0x8) dbgprintf(" - Reserved bit voilation\n");
+	if(cpu->error_code & 0x10) dbgprintf(" - Instruction fetched\n");
 
 	terminate_or_panic("PAGE FAULT", cpu);
 }

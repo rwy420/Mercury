@@ -1,3 +1,4 @@
+#include <vm.h>
 #include <exec/elf32/elf32hash.h>
 #include <exec/elf32/elf32dynlib.h>
 #include <printf.h>
@@ -24,7 +25,7 @@ Elf32_Load_Info* elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info
 	Elf32_Load_Info* lib = elf32_load(lib_buffer, lib_size, 0 /* Will use parent's pd if null*/, load_info);
 	if(!lib) return 0;
 
-	kprintf("Loaded %s at 0x%x\n", path, lib->offset);
+	dbgprintf("Loaded %s at 0x%x\n", path, lib->offset);
 
 	kfree(lib_buffer);
 

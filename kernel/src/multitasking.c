@@ -30,9 +30,7 @@ void idle_task()
 	uint32_t counter = 100;
 	while(1)
 	{
-		dbg_printf("Task 1 0x");
-		dbg_print_hex32(counter++);
-		dbg_printf("\n");
+		dbgprintf("Task 1 0x%x\n", counter++);
 		for(volatile uint32_t i = 0; i < 1000000; i++) for(volatile uint32_t i = 0; i < 1000; i++);
 	}
 }
