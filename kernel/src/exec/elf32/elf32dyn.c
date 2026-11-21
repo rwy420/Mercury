@@ -51,7 +51,8 @@ pt_dynamic_end:
 
 	for(uint32_t i = 0; i < relocation_count; i++)
 	{
-		elf32_ptdynamic_relocate(&relocations[i], load_info);
+		// Causes a page fault
+		//elf32_ptdynamic_relocate(&relocations[i], load_info);
 	}
 
 	set_pd(g_kernel_pd);

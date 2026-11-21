@@ -1,6 +1,8 @@
 #include <exec/elf32/elf32dynlib.h>
 #include <printf.h>
 #include <memory/common.h>
+#include <fs/vfs/vfs.h>
+#include <memory/heap.h>
 
 int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
 {
@@ -10,7 +12,15 @@ int elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
 	memcpy(path, "/lib/", 5);
 	memcpy(&path[5], name, name_len + 1/* Should include \0*/); 
 
-	kprintf("%s\n", path);
+	kprintf("Loading: %s\n", path);
+
+	uint32_t lib = vfs_open(path);
+
+	if(!lib) return 0;
+
+	size_t lib_size = vfs_get_size(lib);
+	uint8_t* lib_buffer = kmalloc(lib_size);
+	vfs_read(lib, lib_buffer, lib_size);
 
 	return 0;
 }
