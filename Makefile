@@ -38,4 +38,4 @@ bochs:
 	bochs -f bochs_config
 
 libc.so:
-	gcc -m32 -fPIC -shared -Wl,-soname,libc.so -Wl,--hash-style=sysv -nostdlib -o libc.so lib/stdio.c lib/process.c
+	gcc -m32 -fPIC -shared -Wl,-soname,libc.so -Wl,--hash-style=sysv -nostdlib -o libc.so lib/libc/stdio.c lib/libc/process.c
