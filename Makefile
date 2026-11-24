@@ -7,14 +7,16 @@ GRUBCFG := grub/grub.cfg
 
 clean:
 	cd kernel && make clean
-	cd bootloader && make clean
 
 kernel.elf:
 	cd kernel && make kernel.elf
 
+libc.so:
+	cd lib/libc && make libc.so
+
 grub: kernel.elf libc.so
+	cp lib/libc/libc.so ./root/lib/
 	./makeimg.sh
-	cp libc.so ./root/lib/
 	
 rebuild: kernel.elf
 	@echo "Mounting and copying new kernel..."
@@ -36,6 +38,3 @@ qemu:
 
 bochs:
 	bochs -f bochs_config
-
-libc.so:
-	gcc -m32 -fPIC -shared -Wl,-soname,libc.so -Wl,--hash-style=sysv -nostdlib -o libc.so lib/libc/stdio.c lib/libc/process.c
