@@ -2,4 +2,4 @@ GCCPARAMS = -m32 -fPIC -shared -Wl,-soname,libc.so -Wl,--hash-style=sysv -nostdl
 C_SOURCES := $(wildcard $(addsuffix /*.c, ./))
 
 libc.so:
-	gcc -m32 -fPIC -shared -Wl,-soname,libc.so -Wl,--hash-style=sysv -nostdlib -o libc.so $(C_SOURCES)
+	gcc $(GCCPARAMS) -o $@ $(C_SOURCES)
