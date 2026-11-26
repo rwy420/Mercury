@@ -13,7 +13,7 @@ void init_drivers()
 	driver_index = 0;
 }
 
-uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor)
+uint8_t create_driver(const char* name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor)
 {
 	Driver* driver = &drivers[driver_index];
 	driver_index++;

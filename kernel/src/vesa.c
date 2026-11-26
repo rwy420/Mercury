@@ -11,7 +11,7 @@ static uint16_t x = 0, y = 0;
 
 int syscall_printf(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 {
-	kprintf((string) buffer);
+	kprintf(buffer);
 	return 0;
 }
 

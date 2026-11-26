@@ -24,7 +24,7 @@ typedef struct
 typedef struct Driver
 {
 	uint8_t id;
-	string name;
+	const char* name;
 	int enabled;
 	DRIVER_TYPE type;
 	DeviceDescriptor* device_descriptor;
@@ -35,7 +35,7 @@ typedef struct Driver
 } Driver;
 
 void init_drivers();
-uint8_t create_driver(string name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor);
+uint8_t create_driver(const char* name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor);
 void set_interface(uint8_t driver, void* interface);
 void* get_interface(uint8_t driver);
 void enable_all_drivers();
