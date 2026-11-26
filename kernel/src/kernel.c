@@ -97,11 +97,14 @@ void v_kernel_start()
 	fd_init();
 
 	register_syscall_handler(0x01, (syscall_t) syscall_exit);
+	register_syscall_handler(0x02, (syscall_t) syscall_fork);
 	register_syscall_handler(0x03, (syscall_t) syscall_read);
 	register_syscall_handler(0x04, (syscall_t) syscall_write);
 	register_syscall_handler(0x05, (syscall_t) syscall_open);
 	register_syscall_handler(0x06, (syscall_t) syscall_close);
+	register_syscall_handler(0x0B, (syscall_t) syscall_execve);
 	register_syscall_handler(0x13, (syscall_t) syscall_lseek);
+	register_syscall_handler(0x72, (syscall_t) syscall_wait4);
 	kprintf("<Mercury> Syscalls registered\n");
 
 	register_interrupt_handler(0x06, (isr_t) handle_invalid_opcode);

@@ -6,6 +6,7 @@
 #include <printf.h>
 #include <exec/elf32/elf32loader.h>
 #include <fs/vfs/vfs.h>
+#include <vm.h>
 
 extern Task* g_current_task;
 
@@ -15,6 +16,24 @@ void syscall_exit(CPUState* cpu)
 	g_current_task->state = TASK_TERMINATED;
 	asm("int $32");
 }
+
+int syscall_fork(CPUState* cpu)
+{
+	dbgprintf("UNHANDLED SYSCALL: fork\n");
+	return 0;
+}
+
+int syscall_execve(CPUState* cpu)
+{
+	dbgprintf("UNHANDLED SYSCALL: execve\n");
+	return 0;
+}
+
+int syscall_wait4(CPUState* cpu)
+{
+	dbgprintf("UNHANDLED SYSCALL: wait4\n");
+	return 0;
+} 
 
 int process_create(const char* path, int argc, char** argv)
 {
