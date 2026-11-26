@@ -6,9 +6,9 @@
 #include <fs/vfs/vfs.h>
 #include <memory/heap.h>
 
-Elf32_Load_Info* elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info)
+Elf32_Load_Info* elf32_handle_dtneeded(const char* nameoff, Elf32_Load_Info* load_info)
 {
-	char* name = (char*) (load_info->offset + load_info->dynstr_off + (uint32_t) nameoff);
+	const char* name = (char*) (load_info->offset + load_info->dynstr_off + (uint32_t) nameoff);
 	size_t name_len = strlen(name);
 	char path[5 + name_len]; // /lib/ + strlen(name);
 	memcpy(path, "/lib/", 5);
@@ -32,7 +32,7 @@ Elf32_Load_Info* elf32_handle_dtneeded(char* nameoff, Elf32_Load_Info* load_info
 	return lib;
 }
 
-void* elf32_total_lookup(char* name, Elf32_Load_Info* load_info)
+void* elf32_total_lookup(const char* name, Elf32_Load_Info* load_info)
 {
 	if(load_info->parent) load_info = load_info->parent; // Always use the parent executable because it contains the array off all the libs
 	
@@ -45,7 +45,7 @@ void* elf32_total_lookup(char* name, Elf32_Load_Info* load_info)
 	return 0;
 }
 
-void* elf32_lib_lookup(char* name, Elf32_Load_Info* load_info)
+void* elf32_lib_lookup(const char* name, Elf32_Load_Info* load_info)
 {
 	Elf32_Sym* sym = elf32_hash_lookup(name, load_info);
 	if(!sym) return 0;

@@ -11,7 +11,7 @@ typedef struct
 	uint32_t table[];
 } Elf32_Sysv_Hash;
 
-uint32_t elf32_sysv_hash(char* name);
-Elf32_Sym* elf32_hash_lookup(char* name, Elf32_Load_Info* load_info);
+uint32_t elf32_sysv_hash(const char* name);
+Elf32_Sym* elf32_hash_lookup(const char* name, Elf32_Load_Info* load_info);
 
 #endif
