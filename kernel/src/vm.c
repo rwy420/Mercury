@@ -3,7 +3,7 @@
 #include <printf.h>
 #include <memory/common.h>
 
-void dbgprintf(char* fmt, ...)
+void dbgprintf(const char* fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);

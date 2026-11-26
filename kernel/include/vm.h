@@ -4,6 +4,6 @@
 #include <common/types.h>
 
 static inline void dbg_putc(char c) { __asm__ volatile("outb %0, $0xE9" :: "a"(c)); }
-void dbgprintf(char* fmt, ...);
+void dbgprintf(const char* fmt, ...);
 
 #endif

@@ -3,6 +3,6 @@
 
 #include <hardware/interrupts.h>
 
-void panic(char* reason, CPUState* cpu);
+void panic(const char* reason, CPUState* cpu);
 
 #endif

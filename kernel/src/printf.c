@@ -31,7 +31,7 @@ static void emit_unsigned(format_output_t* out, uint32_t value, uint32_t base, i
 }
 
 //TODO: support 64bit values by implementing a custom '__udivmoddi4' for 64bit division
-void format(format_output_t* out, char* fmt, va_list args)
+void format(format_output_t* out, const char* fmt, va_list args)
 {
 	while(*fmt)
 	{
@@ -198,7 +198,7 @@ void format(format_output_t* out, char* fmt, va_list args)
 	}
 }
 
-int kprintf(char* fmt, ...)
+int kprintf(const char* fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);

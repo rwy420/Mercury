@@ -7,6 +7,6 @@ void handle_invalid_opcode(CPUState* cpu);
 void handle_general_protection_fault(CPUState* cpu);
 void handle_page_fault(CPUState* cpu);
 
-void terminate_or_panic(char* reason, CPUState* cpu);
+void terminate_or_panic(const char* reason, CPUState* cpu);
 
 #endif

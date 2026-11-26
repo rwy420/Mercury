@@ -19,12 +19,12 @@ typedef enum
 	LEN_SIZE
 } format_length_t;
 
-void format(format_output_t* out, char* fmt, va_list args);
+void format(format_output_t* out, const char* fmt, va_list args);
 
-int kvprintf(char* fmt, va_list args);
-int kprintf(char* fmt, ...);
+int kvprintf(const char* fmt, va_list args);
+int kprintf(const char* fmt, ...);
 
-int vnsprintf(char* buffer, size_t size, char* fmt, va_list args);
-int snprintf(char* buffer, size_t size, char* fmt, ...);
+int vnsprintf(char* buffer, size_t size, const char* fmt, va_list args);
+int snprintf(char* buffer, size_t size, const char* fmt, ...);
 
 #endif

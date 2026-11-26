@@ -2,7 +2,7 @@
 #include <vesa.h>
 #include <printf.h>
 
-void panic(char* reason, CPUState* cpu)
+void panic(const char* reason, CPUState* cpu)
 {
 	pit_set_schedule(false);
 	vesa_clear();

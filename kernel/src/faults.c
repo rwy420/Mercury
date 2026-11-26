@@ -33,7 +33,7 @@ void handle_page_fault(CPUState* cpu)
 	terminate_or_panic("PAGE FAULT", cpu);
 }
 
-void terminate_or_panic(char* reason, CPUState* cpu)
+void terminate_or_panic(const char* reason, CPUState* cpu)
 {
 	if(!(g_current_task->flags & TASK_KERNEL))
 	{

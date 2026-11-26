@@ -4,6 +4,6 @@
 #include <hardware/interrupts.h>
 
 void syscall_exit(CPUState* cpu);
-int process_create(char* path, int argc, char** argv);
+int process_create(const char* path, int argc, char** argv);
 
 #endif
