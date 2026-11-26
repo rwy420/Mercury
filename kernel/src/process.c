@@ -12,7 +12,7 @@ extern Task* g_current_task;
 
 void syscall_exit(CPUState* cpu)
 {
-	kprintf("Process exited with code %u\n", (uint32_t) cpu->ebx);
+	kprintf("\nProcess exited with code %u\n", (uint32_t) cpu->ebx);
 	g_current_task->state = TASK_TERMINATED;
 	asm("int $32");
 }
