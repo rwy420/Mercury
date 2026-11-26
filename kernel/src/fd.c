@@ -52,7 +52,7 @@ int syscall_read(CPUState* cpu)
 		fd->node->ops->read(fd->node->fs_object, buffer, fd->offset, length);
 	}
 
-	return cpu->eax;
+	return length; //TODO
 }
 
 int syscall_write(CPUState* cpu)
@@ -67,23 +67,21 @@ int syscall_write(CPUState* cpu)
 		fd->node->ops->write(fd->node->fs_object, buffer, fd->offset, length);
 	}
 
-	return cpu->eax;
+	return length; //TODO
 }
 
 int syscall_open(CPUState* cpu)
 {
-	char* path = (char*) cpu->ebx;
-	int flags = cpu->ecx;
-	char mode = cpu->edx;
-
-	return 0; //fat16_open(path, mode);
+	//TODO
+	return 0;
 }
 
 int syscall_close(CPUState* cpu)
 {
+	//TODO
 	uint32_t fd = cpu->ebx;
 
-	return cpu->eax;
+	return 0;
 }
 
 int syscall_lseek(CPUState* cpu)
@@ -109,5 +107,5 @@ int syscall_lseek(CPUState* cpu)
 	}
 
 	fd->offset = seek;
-	return cpu->eax;
+	return 0; //TODO
 }
