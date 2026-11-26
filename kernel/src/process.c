@@ -31,7 +31,7 @@ int syscall_execve(CPUState* cpu)
 
 int syscall_wait4(CPUState* cpu)
 {
-	dbgprintf("UNHANDLED SYSCALL: wait4\n");
+	dbgprintf("UNHANDLED SYSCALL: wait4\nI'm just gonna wait4ever then...\n");
 	return 0;
 } 
 

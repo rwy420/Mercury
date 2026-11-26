@@ -1,12 +1,15 @@
+#include "vm.h"
 #include <fd.h>
 #include <memory/common.h>
 #include <memory/heap.h>
 #include <vesa.h>
 
-FileDescriptor g_file_descriptors[0xFF];
+FileDescriptor g_file_descriptors[MAX_FD_COUNT];
 
 FileDescriptor* stdin;
 FileDescriptor* stdout;
+
+VFSNodeOps stdout_ops = {0, 0, 0,  syscall_printf, 0, 0};
 
 void fd_init()
 {
@@ -15,18 +18,20 @@ void fd_init()
 	stdin = create_fd();
 	stdout = create_fd();
 
-	stdout->node->ops->write = syscall_printf;
+	stdout->node->ops = &stdout_ops;
 }
 
 FileDescriptor* create_fd()
 {
-	for(int i = 0; i < 0xFF; i++)
+	for(int i = 0; i < MAX_FD_COUNT; i++)
 	{
 		if(g_file_descriptors[i].attributes == 0x00)
 		{
 			g_file_descriptors[i].attributes = 0x01;
 			g_file_descriptors[i].id = i;
-			g_file_descriptors[i].node = kmalloc(sizeof(VFSNode));
+			VFSNode* node = (VFSNode*) kmalloc(sizeof(VFSNode));
+			g_file_descriptors[i].node = node;
+			memset(node, 0, sizeof(VFSNode));
 			return &g_file_descriptors[i];
 		}
 	}
@@ -37,20 +42,23 @@ FileDescriptor* create_fd()
 void close_fd(int fd)
 {
 	memset(&g_file_descriptors[fd], 0, sizeof(FileDescriptor));
-	g_file_descriptors[fd].attributes = 0x01;
+	g_file_descriptors[fd].attributes = 0x00;
 }
 
 int syscall_read(CPUState* cpu)
 {
 	uint32_t fd_idx = cpu->ebx;
+	if(fd_idx > MAX_FD_COUNT) return 0;
+
 	char* buffer = (char*) cpu->ecx;
 	size_t length = cpu->edx;
 
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
-	if(fd->node->ops->read != NULL_PTR) 
-	{
-		fd->node->ops->read(fd->node->fs_object, buffer, fd->offset, length);
-	}
+
+	if(!fd) return 0; //TODO: ERRORS
+	if(!fd->node->ops || !fd->node->ops->read) return 0;
+
+	fd->node->ops->read(fd->node->fs_object, buffer, fd->offset, length);
 
 	return length; //TODO
 }
@@ -58,14 +66,17 @@ int syscall_read(CPUState* cpu)
 int syscall_write(CPUState* cpu)
 {
 	uint32_t fd_idx = cpu->ebx;
+	if(fd_idx > MAX_FD_COUNT) return 0;
+
 	char* buffer = (char*) cpu->ecx;
 	size_t length = cpu->edx;
 
 	FileDescriptor* fd = &g_file_descriptors[fd_idx];
-	if(fd->node->ops->write != NULL_PTR) 
-	{
-		fd->node->ops->write(fd->node->fs_object, buffer, fd->offset, length);
-	}
+	
+	if(!fd) return 0; //TODO: ERRORS
+	if(!fd->node->ops || !fd->node->ops->write) return 0;
+
+	fd->node->ops->write(fd->node->fs_object, buffer, fd->offset, length);
 
 	return length; //TODO
 }

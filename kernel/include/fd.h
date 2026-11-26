@@ -1,6 +1,8 @@
 #ifndef __MERCURY__FD_H
 #define __MERCURY__FD_H
 
+#define MAX_FD_COUNT 0xFF
+
 #include <hardware/interrupts.h>
 #include <common/types.h>
 #include <fs/vfs/vfs.h>
