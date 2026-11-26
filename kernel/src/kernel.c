@@ -113,14 +113,14 @@ void v_kernel_start()
 	register_interrupt_handler(0x80, (isr_t) syscall);
 
 #ifdef ATA
-	Disk ata0m = init_disk(0x1F0, true);
+	Disk ata0m = init_disk(0x1F0, 1);
 	if(identify_disk(&ata0m))
 	{
 		kprintf("<Mercury> Selected ata0m as default disk\n");
 		g_default_disk = &ata0m;
 	}
 
-	Disk ata0s = init_disk(0x1F0, false);
+	Disk ata0s = init_disk(0x1F0, 0);
 	if(identify_disk(&ata0s))
 	{
 		kprintf("<Mercury> Selected ata0s as default disk\n");
@@ -142,7 +142,7 @@ void v_kernel_start()
 	tasks_init();
 	// Continuing kernel initialization in a kernel task
 	kthread_create("KERNEL", kthread_init);
-	pit_set_schedule(true);
+	pit_set_schedule(1);
 
 	while(1);
 }
