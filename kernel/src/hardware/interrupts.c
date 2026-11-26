@@ -4,7 +4,7 @@
 #include <memory/common.h>
 #include <hardware/interrupts.h>
 #include <hardware/pic.h>
-#include <syscalls.h>
+#include <syscall.h>
 #include <multitasking.h>
 
 extern Task* g_current_task;

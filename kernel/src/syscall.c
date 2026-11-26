@@ -1,4 +1,4 @@
-#include <syscalls.h>
+#include <syscall.h>
 #include <hardware/interrupts.h>
 #include <printf.h>
 

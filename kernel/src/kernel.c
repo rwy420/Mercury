@@ -1,7 +1,7 @@
 #include <printf.h>
 #include <thread.h>
 #include <multiboot.h>
-#include <syscalls.h>
+#include <syscall.h>
 #include <fd.h>
 #include <vesa.h>
 #include <process.h>
