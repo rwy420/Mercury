@@ -19,7 +19,7 @@ uint32_t fat_dir_entry_to_cluster(FATDirectoryEntry* entry)
 	return result;
 }
 
-int string_to_83_name(char* name_83, char* path_name)
+int string_to_83_name(char* name_83, const char* path_name)
 {
 	char result[12];
 	memset(result, 0, 12);

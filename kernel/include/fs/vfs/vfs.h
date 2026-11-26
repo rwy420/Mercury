@@ -16,7 +16,7 @@ typedef struct
 
 typedef struct VFSNodeOps
 {
-	VFSNode* (*lookup)(VFSNode* dir, char* name);
+	VFSNode* (*lookup)(VFSNode* dir, const char* name);
 	int (*open)(VFSNode* node);
 	int (*read)(VFSNode* node, void* buffer, size_t size, size_t offset);
 	int (*write)(VFSNode* node, void* buffer, size_t size, size_t offset);
@@ -38,7 +38,7 @@ typedef struct VFSMount
 
 int vfs_init();
 VFSNode* vfs_resolve(char* path);
-int vfs_mount(VFSNode* node, char* path);
+int vfs_mount(VFSNode* node, const char* path);
 int vfs_mount_root(VFSNode* node);
 
 uint32_t vfs_open(char* path);

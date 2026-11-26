@@ -69,7 +69,7 @@ int vfs_mount_root(VFSNode* node)
 	return 0;
 }
 
-int vfs_mount(VFSNode* node, char* path)
+int vfs_mount(VFSNode* node, const char* path)
 {
 	return 0;
 }

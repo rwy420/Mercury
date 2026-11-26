@@ -10,7 +10,7 @@
 extern FAT32Volume g_volume;
 extern VFSNodeOps g_fat32_ops;
 
-VFSNode* fat32_lookup(VFSNode* dir, char* n/*name*/)
+VFSNode* fat32_lookup(VFSNode* dir, const char* n/*name*/)
 {
 	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) dir->fs_object;
 	VFSNode* result = 0;
