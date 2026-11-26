@@ -1,6 +1,8 @@
 #ifndef __STDIO_H
 #define __STDIO_H
 
+#include "./types.h"
+
 typedef enum
 {
     SEEK_SET, 
@@ -8,10 +10,10 @@ typedef enum
 	SEEK_END
 } SEEK_WHENCE;
 
-void read(unsigned int fd, char* buffer, unsigned int length);
-void write(unsigned int fd, char* buffer, unsigned int length);
-int open(char* path, int flags, char mode);
-void close(unsigned int fd);
-void lseek(unsigned int fd, unsigned int offset, unsigned int whence);
+size_t read(int fd, const char* buffer, size_t length);
+size_t write(int fd, const char* buffer, size_t length);
+int open(const char* path, int flags/*TODO*/);
+int close(int fd);
+uint32_t lseek(int fd, uint32_t offset, int whence);
 
 #endif

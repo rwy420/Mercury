@@ -1,27 +1,27 @@
 #include "./stdio.h"
 #include "./syscall.h"
 
-void read(unsigned int fd, char* buffer, unsigned int length)
+size_t read(int fd, const char* buffer, size_t length)
 {
-	syscall(0x03, fd, (unsigned int) buffer, length, 0, 0);
+	return syscall(0x03, fd, (uint32_t) buffer, length, 0, 0);
 }
 
-void write(unsigned int fd, char* buffer, unsigned int length)
+size_t write(int fd, const char* buffer, size_t length)
 {
-	syscall(0x04, fd, (unsigned int) buffer, length, 0, 0);
+	return syscall(0x04, fd, (uint32_t) buffer, length, 0, 0);
 }
 
-int open(char* path, int flags, char mode)
+int open(const char* path, int flags)
 {
-	return syscall(0x05, (unsigned int) path, flags, mode, 0, 0);
+	return syscall(0x05, (uint32_t) path, flags, 0, 0, 0);
 }
 
-void close(unsigned int fd)
+int close(int fd)
 {
-	syscall(0x06, fd, 0, 0, 0, 0);
+	return syscall(0x06, fd, 0, 0, 0, 0);
 }
 
-void lseek(unsigned int fd, unsigned int offset, unsigned int whence)
+uint32_t lseek(int fd, uint32_t offset, int whence)
 {
-	syscall(0x13, fd, offset, whence, 0, 0);
+	return syscall(0x13, fd, offset, whence, 0, 0);
 } 
