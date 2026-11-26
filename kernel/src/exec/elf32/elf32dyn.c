@@ -75,8 +75,6 @@ int elf32_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 	{
 		uint32_t relocation_count = load_info->rel_size / sizeof(Elf32_Rel);
 
-
-
 		for(uint32_t i = 0; i < relocation_count; i++)
 		{
 			elf32_relocate_sym(&load_info->relocations[i], load_info);
@@ -101,8 +99,6 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 	uint32_t type = ELF32_R_TYPE(rel->r_info);
 	uint32_t sym = ELF32_R_SYM(rel->r_info);
 	uint32_t* target = (uint32_t*) (load_info->offset + rel->r_offset);
-
-	dbgprintf("%x\n", (uint32_t) rel);
 
 	switch(type)
 	{
