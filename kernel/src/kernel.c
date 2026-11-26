@@ -176,7 +176,7 @@ void kthread_init()
 	argv[2] = c;
 
 	//TODO: This should become execve to replace this task by INIT.ELF
-	process_create("/sbin/init.elf", 3, argv);
+	process_create("/bin/sh", 3, argv);
 
 	while(1);
 }
