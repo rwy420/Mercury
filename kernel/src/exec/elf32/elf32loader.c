@@ -137,7 +137,7 @@ Elf32_Load_Info* elf32_load(void* elf_start, uint32_t size, PageDirectory* pd, E
 			Elf32_Load_Info* lib = load_info->needed[i];
 			elf32_relocate(lib->relocations, lib);
 		}
-
+	
 		elf32_relocate(load_info->relocations, load_info);
 		set_pd(g_kernel_pd);
 	}

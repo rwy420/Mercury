@@ -13,7 +13,6 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 	set_pd(load_info->pd);
 	Elf32_Dyn* dyn = (Elf32_Dyn*) (load_info->offset + phdr->p_vaddr);
 	uint32_t count = phdr->p_memsz / sizeof(Elf32_Dyn);
-	uint32_t rel_addr = 0, rel_size = 0, rel_entry_size = 0;
 	char* needed_paths[16];
 
 	for(int i = 0; i < count; i++)
@@ -40,13 +39,14 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 				load_info->dynsym_off = dyn[i].d_un.d_ptr;
 				break;
 			case DT_REL:
-				rel_addr = dyn[i].d_un.d_ptr;
+				load_info->relocations = (Elf32_Rel*) (load_info->offset + dyn[i].d_un.d_ptr);
 				break;
 			case DT_RELSZ:
-				rel_size = dyn[i].d_un.d_val;
+				load_info->rel_size = dyn[i].d_un.d_val;
 				break;
 			case DT_RELENT:
-				rel_entry_size = dyn[i].d_un.d_val;
+				uint32_t rel_entry_size = dyn[i].d_un.d_val;
+				if(rel_entry_size != sizeof(Elf32_Rel)) goto error;
 				break;
 			case DT_PLT_REL:
 				int plt_rel_type = dyn[i].d_un.d_val;
@@ -59,35 +59,33 @@ int elf32_handle_ptdynamic(Elf32_Phdr* phdr, Elf32_Load_Info* load_info)
 	}
 
 pt_dynamic_end:
-	if(!rel_addr || !rel_size || !rel_entry_size) goto error;
-	if(rel_entry_size != sizeof(Elf32_Rel)) goto error;
-	if(rel_size % rel_entry_size != 0) goto error;
-
 	for(int i = 0; i < load_info->needed_count; i++) load_info->needed[i] = elf32_handle_dtneeded(needed_paths[i], load_info);
-
-	load_info->relocations = (Elf32_Rel*) (load_info->offset + rel_addr);
-	load_info->rel_size = rel_size;
 
 	set_pd(g_kernel_pd);
 	return 0;
 
 error:
 	set_pd(g_kernel_pd);
-	return -1;
+	return 1;
 }
 
 int elf32_relocate(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 {
-	uint32_t relocation_count = load_info->rel_size / sizeof(Elf32_Rel);
-
-	for(uint32_t i = 0; i < relocation_count; i++)
+	if(load_info->relocations)
 	{
-		elf32_relocate_sym(&load_info->relocations[i], load_info);
+		uint32_t relocation_count = load_info->rel_size / sizeof(Elf32_Rel);
+
+
+
+		for(uint32_t i = 0; i < relocation_count; i++)
+		{
+			elf32_relocate_sym(&load_info->relocations[i], load_info);
+		}
 	}
 
 	if(load_info->jmp_relocations)
 	{
-		relocation_count = load_info->jmprel_size / sizeof(Elf32_Rel);
+		uint32_t relocation_count = load_info->jmprel_size / sizeof(Elf32_Rel);
 
 		for(uint32_t i = 0; i < relocation_count; i++)
 		{
@@ -103,6 +101,8 @@ int elf32_relocate_sym(Elf32_Rel* rel, Elf32_Load_Info* load_info)
 	uint32_t type = ELF32_R_TYPE(rel->r_info);
 	uint32_t sym = ELF32_R_SYM(rel->r_info);
 	uint32_t* target = (uint32_t*) (load_info->offset + rel->r_offset);
+
+	dbgprintf("%x\n", (uint32_t) rel);
 
 	switch(type)
 	{
