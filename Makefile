@@ -30,7 +30,7 @@ rebuild: kernel.elf
 	echo "Kernel updated in $(IMG)"
 
 qemu-usb:
-	qemu-system-x86_64 -enable-kvm -cpu host -device qemu-xhci -device usb-storage,drive=disk -drive file=kernel.img,if=none,id=disk,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0 -m 2048M -no-reboot -no-shutdown
+	qemu-system-x86_64 -enable-kvm -cpu host -device qemu-xhci -device usb-storage,drive=disk -drive file=kernel.img,if=none,id=disk,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0 -m 2048M -debugcon stdio
 
 qemu:
 	qemu-system-x86_64 -enable-kvm -cpu host -drive file=kernel.img,if=ide,format=raw -device rtl8139,netdev=net0 -netdev user,id=net0 -m 2048M -debugcon stdio
