@@ -14,10 +14,10 @@ uint32_t heap_init(size_t start, size_t size)
     {
         first = (MemoryChunk*) start;
         
-        first -> allocated = false;
-        first -> prev = 0;
-        first -> next = 0;
-        first -> size = size - sizeof(MemoryChunk);
+        first->allocated = 0;
+        first->prev = 0;
+        first->next = 0;
+        first->size = size - sizeof(MemoryChunk);
     }
 
 	uint32_t max = 0;
@@ -32,7 +32,7 @@ uint32_t heap_init(size_t start, size_t size)
         
 void* kmalloc(size_t size)
 {
-    MemoryChunk *result = 0;
+    MemoryChunk* result = 0;
     
     for(MemoryChunk* chunk = first; chunk != 0 && result == 0; chunk = chunk->next)
         if(chunk->size > size && !chunk->allocated)
@@ -45,7 +45,7 @@ void* kmalloc(size_t size)
     {
         MemoryChunk* temp = (MemoryChunk*)((size_t) result + sizeof(MemoryChunk) + size);
         
-        temp->allocated = false;
+        temp->allocated = 0;
         temp->size = result->size - size - sizeof(MemoryChunk);
         temp->prev = result;
         temp->next = result->next;
@@ -56,7 +56,7 @@ void* kmalloc(size_t size)
         result->next = temp;
     }
     
-    result->allocated = true;
+    result->allocated = 1;
     return (void*)(((size_t)result) + sizeof(MemoryChunk));
 }
 
@@ -64,7 +64,7 @@ void kfree(void* ptr)
 {
     MemoryChunk* chunk = (MemoryChunk*)((size_t)ptr - sizeof(MemoryChunk));
     
-    chunk -> allocated = false;
+    chunk -> allocated = 0;
     
     if(chunk->prev != 0 && !chunk->prev->allocated)
     {
