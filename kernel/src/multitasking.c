@@ -1,5 +1,6 @@
 // TODO: Add a reaper task to remove TERMINATED tasks and free their memory
 
+#include "panic.h"
 #include <memory/paging.h>
 #include <types.h>
 #include <memory/frames.h>
@@ -15,15 +16,11 @@
 
 Task* task_list;
 Task* g_current_task;
+
 uint32_t next_id = 1;
 
 extern TSS g_tss;
 extern PageDirectory* g_kernel_pd;
-
-void dummy_task()
-{
-	asm("int $32");
-}
 
 void idle_task()
 {
@@ -40,8 +37,7 @@ void tasks_init()
 	task_list = 0;
 	g_current_task = 0;
 
-	create_task(dummy_task, TASK_KERNEL, 0, 0);
-	create_task(idle_task, TASK_KERNEL, 0, 0);
+	//create_task(idle_task, TASK_KERNEL, 0, 0);
 }
 
 Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirectory* pd)
@@ -150,11 +146,8 @@ void kill_task(uint8_t id)
 	}
 }
 
-// TODO: fix the bug where the first task created won't execute; this is probably because the first time schedule is ran, it likely sets the first 
-// task's state to what the kernel itself was at
 uint32_t schedule(uint32_t esp) 
 {
-	// The CPUState was pushed onto the stack, right above the address in esp
 	CPUState* cpu = (CPUState*) esp;
 	set_pd(g_kernel_pd);
 
@@ -162,8 +155,10 @@ uint32_t schedule(uint32_t esp)
 
 	if(g_current_task == 0)
 	{
+		if(task_list == 0) panic("SCHEDULER HAS NO TASKS", cpu);
+
 		g_current_task = task_list;
-		return esp;
+		goto ctx_switch;
 	}
 
 	g_current_task->kernel_esp = esp;
@@ -175,7 +170,8 @@ uint32_t schedule(uint32_t esp)
 		g_current_task = g_current_task->next ? g_current_task->next : task_list;
 
 		if(g_current_task->state == TASK_READY || g_current_task->state == TASK_RUNNING)
-		{ 
+		{
+ctx_switch:
 			if(!(g_current_task->flags & TASK_KERNEL))
 			{
 				asm volatile("mov $0x23, %AX");
