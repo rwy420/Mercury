@@ -166,6 +166,8 @@ uint32_t schedule(uint32_t esp)
 		return esp;
 	}
 
+	g_current_task->kernel_esp = esp;
+
 	Task* start = g_current_task;
 
 	do

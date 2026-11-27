@@ -55,8 +55,6 @@ uint32_t interrupt_handler(uint32_t interrupt, uint32_t esp)
 {
 	CPUState* cpu_state = (CPUState*) esp;		
 
-	g_current_task->kernel_esp = esp;
-
 	if(interrupt == 0x20) 
 	{
 		esp = pit_handle_interrupt(esp);
