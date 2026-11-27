@@ -14,8 +14,7 @@ kernel.elf:
 libc.so:
 	cd lib/libc && make libc.so
 
-grub: kernel.elf libc.so
-	cp lib/libc/libc.so ./root/lib/
+grub: kernel.elf
 	./makeimg.sh
 	
 rebuild: kernel.elf
