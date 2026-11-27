@@ -25,10 +25,8 @@ extern kernel_init
 global _start:function (_start.end - _start)
 _start:
 	mov esp, 0x8FFF0
-
-	; calculate actual location of kernel_init in physical memory
-	mov ecx, kernel_init
-	sub ecx, 0xC0000000 
+	
+	lea ecx, [kernel_init - 0xC0000000] ; calculate actual location of kernel_init in physical memory
 
 	push eax ; uint32_t magic
 	push ebx ; uint32_t multiboot
