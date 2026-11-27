@@ -7,11 +7,9 @@
 extern FileDescriptor g_file_descriptors[];
 VFSNode* root_vfs_node = 0;
 
-int vfs_init()
+void vfs_init()
 {
 	kprintf("<VFS> VFS Initialized\n");
-
-	return 0;
 }
 
 VFSNode* vfs_resolve(char* path)
