@@ -28,7 +28,6 @@
 #define ATA
 //#define STARTTEXT
 
-// Variables from the linker script
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
 
@@ -46,10 +45,6 @@ extern PageDirectory* g_kernel_pd;
 
 void v_kernel_start();
 void kthread_init();
-
-char* a = "Testing! This won't overwrite anything now!!\n";
-char* b = "ARGV";
-char* c = "ABCD1234";
 
 void kernel_init(uint32_t multiboot, uint32_t magic)
 {
@@ -161,7 +156,7 @@ void kthread_init()
 	//load_initrd();
 	if(!read_mbr()) kprintf("<Mercury> Could not read the MBR\n");
 	
-	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, NULL_PTR, ps2_kb_enable, ps2_kb_disable, NULL_PTR);
+	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, 0, ps2_kb_enable, ps2_kb_disable, 0);
 	enable_all_drivers();
 
 	kprintf("<Mercury> Startup done\n");
@@ -169,14 +164,9 @@ void kthread_init()
 	vesa_clear();
 	kprintf("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n");
 #endif
-	
-	char** argv = kmalloc(sizeof(char*) * 3); 
-	argv[0] = a;
-	argv[1] = b;
-	argv[2] = c;
 
 	//TODO: This should become execve to replace this task by INIT.ELF
-	process_create("/bin/sh", 3, argv);
+	process_create("/bin/sh", 0, 0);
 
 	while(1);
 }

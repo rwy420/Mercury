@@ -25,9 +25,9 @@ uint8_t create_driver(const char* name, DRIVER_TYPE type, void* init_handle, voi
 	driver->init_handle = init_handle;
 	driver->enable_handler = enable_handle;
 	driver->disbale_handler = disbale_handle;
-	driver->enabled = false;	
+	driver->enabled = 0;	
 
-	if(init_handle != NULL_PTR) driver->init_handle(driver);
+	if(init_handle) driver->init_handle(driver);
 
 	return driver->id;
 }
@@ -53,7 +53,7 @@ void enable_driver(uint8_t id)
 {
 	Driver* driver = &drivers[id];
 
-	driver->enabled = true;
+	driver->enabled = 1;
 	driver->enable_handler();
 
 	kprintf("<Mercury> Driver '%s' enabled\n", driver->name);
@@ -68,7 +68,7 @@ void enable_driver(uint8_t id)
 void disbale_driver(uint8_t id)
 {
 	Driver* driver = &drivers[id];
-	driver->enabled = false;
+	driver->enabled = 0;
 	driver->disbale_handler();
 
 	kprintf("<Mercury> Driver '%s' disabled \n", driver->name);

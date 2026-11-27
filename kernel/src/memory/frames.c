@@ -27,11 +27,11 @@ int frame_allocator_init(uint32_t start, size_t size)
 	frames_start = start;
 
 	frame_bitmap = kmalloc(total_frames / 8);
-	if(!frame_bitmap) return false;
+	if(!frame_bitmap) return 0;
 
 	memset(frame_bitmap, 0, size / FRAME_SIZE / 8);
 
-	return true;
+	return 1;
 }
 
 void* alloc_frame()
@@ -45,7 +45,7 @@ void* alloc_frame()
 		}
 	}
 
-	return NULL_PTR;
+	return 0;
 }
 
 void free_frame(void* frame)
@@ -56,7 +56,7 @@ void free_frame(void* frame)
 
 void* alloc_frames(size_t count)
 {
-	if (count == 0 || count > total_frames) return NULL_PTR;
+	if (count == 0 || count > total_frames) return 0;
 
 	for (uint32_t i = 0; i <= total_frames - count; i++) 
 	{
@@ -80,7 +80,7 @@ void* alloc_frames(size_t count)
 		}
 	}
 
-	return NULL_PTR;
+	return 0;
 }
 
 void free_frames(void* frame, size_t count)

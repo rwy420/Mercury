@@ -13,8 +13,8 @@
 #include <printf.h>
 #include <vm.h>
 
-Task* task_list = NULL_PTR;
-Task* g_current_task = NULL_PTR;
+Task* task_list;
+Task* g_current_task;
 uint32_t next_id = 1;
 
 extern TSS g_tss;
@@ -37,8 +37,8 @@ void idle_task()
 
 void tasks_init()
 {
-	task_list = NULL_PTR;
-	g_current_task = NULL_PTR;
+	task_list = 0;
+	g_current_task = 0;
 
 	create_task(dummy_task, TASK_KERNEL, 0, 0);
 	create_task(idle_task, TASK_KERNEL, 0, 0);
@@ -46,11 +46,11 @@ void tasks_init()
 
 Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirectory* pd)
 {
-	if(next_id > MAX_TASKS) return NULL_PTR;
+	if(next_id > MAX_TASKS) return 0;
 	if(stack_size == 0) stack_size = PAGE_SIZE; // Task stack size will default to smallest size, which is the size of one page
 
 	Task* task = (Task*) kmalloc(sizeof(Task));
-	if(!task) return NULL_PTR;
+	if(!task) return 0;
 	memset(task, 0, sizeof(Task));	
 
 	task->flags = flags;
@@ -114,9 +114,9 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 
 	task->id = next_id++;
 	task->state = TASK_READY;
-	task->next = NULL_PTR;
+	task->next = 0;
 
-	if(task_list == NULL_PTR)
+	if(task_list == 0)
 	{
 		task_list = task;
 	}
@@ -132,7 +132,7 @@ Task* create_task(void entry(), uint32_t flags, uint32_t stack_size, PageDirecto
 
 void kill_task(uint8_t id)
 {
-	Task* prev = NULL_PTR, *current = task_list;
+	Task* prev = 0, *current = task_list;
 
 	while(current)
 	{
@@ -160,7 +160,7 @@ uint32_t schedule(uint32_t esp)
 
 	pic_confirm(0x20);
 
-	if(g_current_task == NULL_PTR)
+	if(g_current_task == 0)
 	{
 		g_current_task = task_list;
 		return esp;

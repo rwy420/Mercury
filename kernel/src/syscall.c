@@ -8,7 +8,7 @@ void syscall(CPUState* cpu)
 {
 	uint32_t syscall = cpu->eax;
 
-	if(handlers[syscall] == NULL_PTR)
+	if(!handlers[syscall])
 	{
 		kprintf("Unhandled syscall 0x%x\n", syscall);
 		return;

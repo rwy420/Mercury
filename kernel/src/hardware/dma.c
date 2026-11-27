@@ -12,7 +12,7 @@ DMARegion* dma_create(size_t size)
 	uint32_t aligned_size = ((size + 0xFFF) & ~0xFFF) / FRAME_SIZE;
 	void* frames = alloc_frames(aligned_size);
 
-	if(!frames) return NULL_PTR;
+	if(!frames) return 0;
 
 	for(int i = 0; i < aligned_size; i++)
 	{

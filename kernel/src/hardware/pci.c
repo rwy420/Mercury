@@ -198,7 +198,7 @@ BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 	uint8_t header_type = pci_read8(bus, device, function, 0x0E) & 0x7F;
 	int max_bars = (header_type == 0x01) ? 2 : 6;
 
-	if(bar >= max_bars) return NULL_PTR;
+	if(bar >= max_bars) return 0;
 
 	BAR* result = kmalloc(sizeof(BAR));
 	memset(result, 0, sizeof(BAR));
@@ -211,8 +211,8 @@ BAR* pci_get_bar(uint16_t bus, uint16_t device, uint16_t function, uint16_t bar)
 	{
 		result->type = IO;
 		result->address = bar_value & ~0x3;
-		result->prefetchable = false;
-		result->is_64bit = false;
+		result->prefetchable = 0;
+		result->is_64bit = 0;
 
 		pci_write32(bus, device, function, bar_offset, 0xFFFFFFFF);
 		uint32_t size_mask = pci_read32(bus, device, function, bar_offset) & ~0x3;
