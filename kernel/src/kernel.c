@@ -1,3 +1,4 @@
+#include <kernel.h>
 #include <printf.h>
 #include <thread.h>
 #include <multiboot.h>
@@ -25,8 +26,9 @@
 #include <fs/vfs/vfs.h>
 #include <fs/initrd.h>
 #include <printf.h>
+
 #define ATA
-//#define STARTTEXT
+#define STARTTEXT
 
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
@@ -159,7 +161,7 @@ void kthread_init()
 	kprintf("<Mercury> Startup done\n");
 #ifdef STARTTEXT
 	vesa_clear();
-	kprintf("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\nBy Arjan (rwy)                    |___/ \n");
+	kprintf("  __  __                                \n |  \\/  |                               \n | \\  / | ___ _ __ ___ _   _ _ __ _   _ \n | |\\/| |/ _ \\ '__/ __| | | | '__| | | |\n | |  | |  __/ | | (__| |_| | |  | |_| |\n |_|  |_|\\___|_|  \\___|\\__,_|_|   \\__, |\n                                   __/ |\n                                  |___/ \n%s (%s @ %s) By Arjan (rwy420)\n\n", VNAME, __DATE__, __TIME__);
 #endif
 
 	//TODO: This should become execve to replace this task by INIT.ELF
