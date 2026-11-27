@@ -1,13 +1,13 @@
 #include <multiboot.h>
 #include <printf.h>
+#include <panic.h>
 
 multiboot_info_t* mb;
 
-int mb_confirm(uint32_t multiboot, uint32_t magic)
+void mb_confirm(uint32_t multiboot, uint32_t magic)
 {
 	mb = (multiboot_info_t*) multiboot;
-
-	return 0;
+	if(magic != MULTIBOOT_BOOTLOADER_MAGIC) panic("Multiboot header is invalid", 0);
 }
 
 void mb_get_vesa(VesaInfo* vesa_info)

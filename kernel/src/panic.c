@@ -4,7 +4,7 @@
 
 void panic(const char* reason, CPUState* cpu)
 {
-	pit_set_schedule(false);
+	pit_set_schedule(0);
 	vesa_clear();
 	kprintf("KERNEL PANIC: %s =(\n", reason);
 

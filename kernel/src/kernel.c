@@ -48,8 +48,7 @@ void kthread_init();
 
 void kernel_init(uint32_t multiboot, uint32_t magic)
 {
-	if(!mb_confirm(multiboot, magic));
-
+	mb_confirm(multiboot, magic);
 	mb_get_vesa(&g_vesa_info);
    
 	if(!paging_init()); //TODO error handling
