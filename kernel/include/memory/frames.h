@@ -5,7 +5,7 @@
 
 #include <types.h>
 
-int frame_allocator_init(uint32_t start, size_t size);
+void frame_allocator_init(uint32_t start, size_t size);
 void* alloc_frame();
 void free_frame(void* frame);
 void* alloc_frames(size_t count);

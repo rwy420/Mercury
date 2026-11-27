@@ -1,3 +1,4 @@
+#include "panic.h"
 #include <memory/heap.h>
 #include <memory/frames.h>
 #include <memory/common.h>
@@ -21,17 +22,15 @@ static inline int frame_used(uint32_t i)
 	return (frame_bitmap[i / 8] >> (i % 8)) & 1;
 }
 
-int frame_allocator_init(uint32_t start, size_t size)
+void frame_allocator_init(uint32_t start, size_t size)
 {
 	total_frames = size / FRAME_SIZE;
 	frames_start = start;
 
 	frame_bitmap = kmalloc(total_frames / 8);
-	if(!frame_bitmap) return 0;
+	if(!frame_bitmap) panic("Frame allocator initialization failed", 0);
 
 	memset(frame_bitmap, 0, size / FRAME_SIZE / 8);
-
-	return 1;
 }
 
 void* alloc_frame()
