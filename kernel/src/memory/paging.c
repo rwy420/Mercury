@@ -84,10 +84,9 @@ void map_page(void* p_address, void* v_address)
 	map_page_pd(g_current_pd, p_address, v_address);
 }
 
-int paging_init()
+void paging_init()
 {
     PageDirectory* directory = (PageDirectory*) 0x90000;  //kmalloc_aligned(4096, 4096 * 3); //malloc(4096 * 3);
-	if(!directory) return 0;
 
 	memset(directory, 0, sizeof(PageDirectory));
 	//for(uint32_t i = 0; i < 1024; i++) directory->entries[i] = 0x02;
@@ -95,9 +94,7 @@ int paging_init()
 	g_kernel_pd = directory;
 
 	PageTable* table = (PageTable*) 0x93000; //kmalloc_aligned(4096, 4096); //malloc(4096);
-	if(!table) return 0;	
 	PageTable* table_3g = (PageTable*) 0x94000; //kmalloc_aligned(4096, 4096); //malloc(4096);
-	if(!table_3g) return 0;	
 
 	memset(table, 0x0, sizeof(PageTable));
 	memset(table_3g, 0x0, sizeof(PageTable));
@@ -134,6 +131,4 @@ int paging_init()
 
 	set_pd(directory);
 	__asm__ __volatile__ ("movl %CR0, %EAX; orl $0x80000011, %EAX; movl %EAX, %CR0; movl $0xC0090000, %ESP");
-
-	return 1;
 }

@@ -63,6 +63,6 @@ void map_page_pd(PageDirectory* pd, void* p_address, void* v_address);
 void map_page(void* p_address, void* v_address);
 void map_page_pd_flags(PageDirectory* pd, void* p_address, void* v_address, int flags);
 
-int paging_init();
+void paging_init();
 
 #endif 

@@ -51,7 +51,7 @@ void kernel_init(uint32_t multiboot, uint32_t magic)
 	mb_confirm(multiboot, magic);
 	mb_get_vesa(&g_vesa_info);
    
-	if(!paging_init()); //TODO error handling
+	paging_init();
 
 	// Calculate the address of v_kernel_start in the higher half once mapped
 	void(*v_kernel)(void) = (void*) 0xC0000000 + (uint32_t) &v_kernel_start;
