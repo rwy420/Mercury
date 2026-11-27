@@ -136,7 +136,7 @@ void v_kernel_start()
 
 	tasks_init();
 	// Continuing kernel initialization in a kernel task
-	kthread_create("KERNEL", kthread_init);
+	kthread_create("init", kthread_init);
 	pit_set_schedule(1);
 
 	while(1);
