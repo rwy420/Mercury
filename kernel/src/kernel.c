@@ -143,8 +143,6 @@ void v_kernel_start()
 
 void kthread_init()
 {
-	init_drivers();
-
 	kprintf("<PCI> Enumerating PCI devices\n");
 	pci_enumerate_devices();
 
