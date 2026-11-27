@@ -1,7 +1,7 @@
 #ifndef __MERCURY__MEMORY__COMMON_H
 #define __MERCURY__MEMORY__COMMON_H
 
-#include <common/types.h>
+#include <types.h>
 
 void* memset(void* dest, uint8_t val, size_t len);
 void* memmove(void* dest, const void* src, size_t len);

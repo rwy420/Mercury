@@ -1,7 +1,7 @@
 #ifndef __MERCURY__NET__NIC_H
 #define __MERCURY__NET__NIC_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

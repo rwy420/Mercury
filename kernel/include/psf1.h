@@ -1,6 +1,6 @@
 // Font from https://font.gohu.org/
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

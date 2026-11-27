@@ -3,7 +3,7 @@
 
 #define FRAME_SIZE 0x1000
 
-#include <common/types.h>
+#include <types.h>
 
 int frame_allocator_init(uint32_t start, size_t size);
 void* alloc_frame();

@@ -4,7 +4,7 @@
 #define MAX_TASKS 0xFF
 
 #include <memory/paging.h>
-#include <common/types.h>
+#include <types.h>
 #include <hardware/interrupts.h>
 
 typedef enum

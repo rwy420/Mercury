@@ -2,7 +2,7 @@
 #define __MERCURY__SYSCALLS_H
 
 #include <hardware/interrupts.h>
-#include <common/types.h>
+#include <types.h>
 
 typedef int (*syscall_t)(CPUState* cpu);
 

@@ -1,7 +1,7 @@
 #ifndef __MERCURY__DRIVER__DRIVER_H
 #define __MERCURY__DRIVER__DRIVER_H
 
-#include <common/types.h>
+#include <types.h>
 #include <hardware/interrupts.h>
 #include <hardware/pci.h>
 

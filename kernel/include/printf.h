@@ -2,7 +2,7 @@
 #define __PRINTF_H
 
 #include <stdarg.h>
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

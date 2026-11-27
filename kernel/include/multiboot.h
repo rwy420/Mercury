@@ -2,7 +2,7 @@
 #define __MERCURY__MULTIBOOT_H
 
 #include <vesa.h>
-#include <common/types.h>
+#include <types.h>
 
 #define MULTIBOOT_MEMORY_AVAILABLE        1
 #define MULTIBOOT_MEMORY_RESERVED         2

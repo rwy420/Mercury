@@ -1,7 +1,7 @@
 #ifndef __MERCURY__FS__FAT__BPB_H
 #define __MERCURY__FS__FAT__BPB_H
 
-#include <common/types.h>
+#include <types.h>
 #include <fs/disk.h>
 
 typedef struct

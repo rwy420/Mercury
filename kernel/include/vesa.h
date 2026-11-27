@@ -17,7 +17,7 @@
 #define COLOR_PINK        COLOR_RGBA(0xFF, 0xFF, 0x69, 0xB4)
 
 
-#include <common/types.h>
+#include <types.h>
 #include <memory/paging.h>
 #include <fs/vfs/vfs.h>
 

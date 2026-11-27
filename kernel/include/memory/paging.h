@@ -1,7 +1,7 @@
 #ifndef __MERCURY__MEMORY__PAGING_H
 #define __MERCURY__MEMORY__PAGING_H
 
-#include <common/types.h>
+#include <types.h>
 #include <hardware/interrupts.h>
 
 #define PAGES_PER_TABLE 1024

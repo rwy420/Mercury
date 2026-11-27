@@ -1,7 +1,7 @@
 #ifndef __MERCURY__EXEC__ELF32__ELF32_H
 #define __MERCURY__EXEC__ELF32__ELF32_H
 
-#include <common/types.h>
+#include <types.h>
 
 #define ELF_IDENT 0x10
 

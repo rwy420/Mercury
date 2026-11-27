@@ -1,7 +1,7 @@
 #ifndef __MERCURY__FS__USTAR__USTAR_H
 #define __MERCURY__FS__USTAR__USTAR_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

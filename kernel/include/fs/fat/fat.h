@@ -1,7 +1,7 @@
 #ifndef __MERCURY__FS__FAT__FAT_H
 #define __MERCURY__FS__FAT__FAT_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

@@ -1,7 +1,7 @@
 #ifndef __MERCURY__DRIVER__VGA__VGA_H
 #define __MERCURY__DRIVER__VGA__VGA_H
 
-#include <common/types.h>
+#include <types.h>
 
 #define VGA_WIDTH 720
 #define VGA_HEIGHT 480

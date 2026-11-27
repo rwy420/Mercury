@@ -2,7 +2,7 @@
 #define __MERCURY__HARDWARE__INTERRUPTS_H
 
 #include <hardware/pic.h>
-#include <common/types.h>
+#include <types.h>
 #include <memory/gdt.h>
 #include <hardware/port.h>
 

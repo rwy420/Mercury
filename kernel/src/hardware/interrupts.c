@@ -1,5 +1,5 @@
 #include <hardware/pit.h>
-#include <common/types.h>
+#include <types.h>
 #include <memory/gdt.h>
 #include <memory/common.h>
 #include <hardware/interrupts.h>

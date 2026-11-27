@@ -20,7 +20,7 @@
 #define ATA_DEV_BUSY 0x80
 #define ATA_DEV_DRQ 0x08
 
-#include <common/types.h>
+#include <types.h>
 #include <driver/sata/ahci.h>
 #include <memory/heap.h>
 #include <memory/common.h>

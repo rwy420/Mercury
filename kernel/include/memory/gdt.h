@@ -1,7 +1,7 @@
 #ifndef __MERCURY__MEMORY__GDT_H
 #define __MERCURY__MEMORY__GDT_H
 
-#include <common/types.h> 
+#include <types.h> 
 
 #define KERNEL_CODE_SEGMENT ((1 << 3) | 0)
 #define KERNEL_DATA_SEGMENT ((2 << 3) | 0)

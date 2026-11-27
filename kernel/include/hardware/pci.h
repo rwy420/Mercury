@@ -4,7 +4,7 @@
 #define MAX_DEVICES 0xFF
 
 #include <hardware/port.h>
-#include <common/types.h>
+#include <types.h>
 
 typedef enum 
 {

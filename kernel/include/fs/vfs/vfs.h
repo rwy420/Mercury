@@ -1,7 +1,7 @@
 #ifndef __MERCURY__FS__VFS__VFS_H
 #define __MERCURY__FS__VFS__VFS_H
 
-#include <common/types.h>
+#include <types.h>
 
 struct VFSNodeOps;
 struct VFSMount;

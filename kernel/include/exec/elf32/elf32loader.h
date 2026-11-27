@@ -2,7 +2,7 @@
 #define __MERCURY__EXEC__ELF32__ELF32LOADER_H
 
 #include <memory/paging.h>
-#include <common/types.h>
+#include <types.h>
 #include <exec/elf32/elf32.h>
 
 typedef struct Elf32_Load_Info

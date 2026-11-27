@@ -2,7 +2,7 @@
 #define __MERCURY__HARDWARE__PIT_H
 
 #include <hardware/interrupts.h>
-#include <common/types.h>
+#include <types.h>
 
 void pit_init(uint32_t hz);
 uint32_t pit_handle_interrupt(uint32_t esp);

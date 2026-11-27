@@ -2,7 +2,7 @@
 #define __MERCURY__EXEC__ELF32__ELF32HASH_H
 
 #include <exec/elf32/elf32loader.h>
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

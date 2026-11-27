@@ -1,7 +1,7 @@
 #ifndef __MERCURY__MEMORY__HEAP_H
 #define __MERCURY__MEMORY__HEAP_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct MemoryChunk
 {

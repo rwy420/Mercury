@@ -1,7 +1,7 @@
 #ifndef __MERCURY__DRIVER__SATA__AHCI_H
 #define __MERCURY__DRIVER__SATA__AHCI_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef enum
 {

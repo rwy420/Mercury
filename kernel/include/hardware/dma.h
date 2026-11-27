@@ -1,7 +1,7 @@
 #ifndef __MERCURY__HARDWARE__DMA_H
 #define __MERCURY__HARDWARE__DMA_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

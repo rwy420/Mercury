@@ -1,7 +1,7 @@
 #ifndef __MERCURY__DRIVER__ATA__ATA_H
 #define __MERCURY__DRIVER__ATA__ATA_H
 
-#include <common/types.h>
+#include <types.h>
 
 typedef struct
 {

@@ -8,7 +8,7 @@
 #define PIC_CONFIRM 0x20
 #define PIC_ICW4_8086 0x01
 
-#include <common/types.h>
+#include <types.h>
 #include <hardware/port.h>
 
 void pic_remap(uint32_t offset1, uint32_t offset2);

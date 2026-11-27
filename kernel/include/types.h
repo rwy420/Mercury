@@ -1,5 +1,5 @@
-#ifndef __MERCURY__COMMON__TYPES_H
-#define __MERCURY__COMMON__TYPES_H
+#ifndef __MERCURY__TYPES_H
+#define __MERCURY__TYPES_H
 
 // TODO: use these everywhere
 #define ALIGN_DOWN(value, alignment) ((value) & ~((alignment) - 1))
