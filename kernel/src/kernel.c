@@ -8,6 +8,7 @@
 #include <process.h>
 #include <multitasking.h>
 #include <types.h>
+#include <panic.h>
 #include <exec/elf32/elf32loader.h>
 #include <memory/gdt.h>
 #include <driver/driver.h>
@@ -153,7 +154,7 @@ void kthread_init()
 
 	vfs_init();
 	//load_initrd();
-	if(!read_mbr()) kprintf("<Mercury> Could not read the MBR\n");
+	if(!read_mbr()) panic("Could not read the MBR", 0);
 	
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, 0, ps2_kb_enable, ps2_kb_disable, 0);
 	enable_all_drivers();
