@@ -1,4 +1,4 @@
-GCCPARAMS = -m32 -Iinclude -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions \
+GCCPARAMS = -m32 -Iinclude -nostdlib -fno-builtin -fno-exceptions \
 			-fno-leading-underscore -fno-stack-protector -Wwrite-strings \
 			-Os -ffunction-sections -fdata-sections -mno-sse -msoft-float -finline-small-functions -fstrict-volatile-bitfields
 
