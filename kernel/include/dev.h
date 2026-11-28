@@ -1,6 +1,8 @@
 #ifndef __MERCURY__DEV_H
 #define __MERCURY__DEV_H
 
+#define MAX_DEV_NUM 0x10
+
 #include <types.h>
 
 typedef enum
