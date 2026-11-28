@@ -94,7 +94,8 @@ void pci_enumerate_devices()
 				device_descriptor->class_id = pci_get_class_id(bus, device, function);
 				device_descriptor->subclass_id = pci_get_subclass_id(bus, device, function);
 
-				kprintf("<PCI> Found device at %x.%x.%x\n", (uint32_t) bus & 0xFF, (uint32_t) device & 0xFF, (uint32_t) function & 0xFF);
+				kprintf("<PCI> Found device at %x.%x.%x: 0x%x/0x%x\n", (uint32_t) bus & 0xFF, (uint32_t) device & 0xFF, (uint32_t) function & 0xFF,
+						device_descriptor->vendor_id, device_descriptor->device_id);
 
 				for(uint8_t bar_idx = 0; bar_idx < 5; bar_idx++)
 				{
