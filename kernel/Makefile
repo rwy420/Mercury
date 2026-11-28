@@ -5,7 +5,7 @@ GCCPARAMS = -m32 -Iinclude -nostdlib -fno-builtin -fno-exceptions \
 NASMPARAMS = -felf32
 LDPARAMS = -melf_i386
 
-SRC_DIRS := asm src src/common src/exec/elf32 src/exec src/fs src/fs/vfs src/fs/ustar src/fs/fat src/fs/fat32 src/hardware src/memory \
+SRC_DIRS := asm src src/common src/exec/elf32 src/exec src/fs src/fs/devfs src/fs/vfs src/fs/ustar src/fs/fat src/fs/fat32 src/hardware src/memory \
 			src/net src/driver src/driver/ata src/driver/ps2 src/driver/sata src/driver/vga
 BUILD_DIR := build
 
