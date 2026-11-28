@@ -4,8 +4,9 @@
 *.so
 *.o
 build/
-root/bin/*
-root/sbin/*
+
+# Custom
+root/bin/sh
 
 # Images
 *.img
