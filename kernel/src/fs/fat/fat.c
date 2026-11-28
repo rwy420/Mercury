@@ -48,5 +48,5 @@ int string_to_83_name(char* name_83, const char* path_name)
 
 	memcpy(name_83, result, 11);
 
-	return true;
+	return 0;
 }

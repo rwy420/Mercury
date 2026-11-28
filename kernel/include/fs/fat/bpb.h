@@ -1,6 +1,7 @@
 #ifndef __MERCURY__FS__FAT__BPB_H
 #define __MERCURY__FS__FAT__BPB_H
 
+#include <blkdev.h>
 #include <types.h>
 #include <fs/disk.h>
 
@@ -41,6 +42,6 @@ typedef struct
 	uint16_t boot_signature;
 } __attribute__((packed)) EBPB_FAT32;
 
-int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition);
+int fat_read_bpb(BlkDev* dev, BPB* bpb_buffer, PartitionTableEntry* partition);
 
 #endif

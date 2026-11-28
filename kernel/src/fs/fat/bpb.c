@@ -5,10 +5,11 @@
 #include <driver/ata/ata.h>
 #include <memory/common.h>
 
-int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition)
+int fat_read_bpb(BlkDev* dev, BPB* bpb_buffer, PartitionTableEntry* partition)
 {
 	uint8_t* buffer = kmalloc(512);
 	//read28(partition->lba_start, 0, (uint8_t*) buffer, 512);
+	dev->ops->read_blocks(dev, partition->lba_start, buffer, 512);
 	memcpy(bpb_buffer, buffer, 512);
 	kfree(buffer);
 

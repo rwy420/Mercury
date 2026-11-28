@@ -78,7 +78,6 @@ void ata_probe()
 register_disk:
 		Device* dev = kmalloc(sizeof(Device));
 		gen_drive_name(dev->name);
-		dev->ops = &ata_ops;
 		BlkDev* blkdev = kmalloc(sizeof(BlkDev));
 		dev->data = blkdev;
 

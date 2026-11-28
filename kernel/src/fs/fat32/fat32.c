@@ -42,7 +42,7 @@ VFSNode* fat32_mount(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition)
 	return result;
 }
 
-uint32_t fat_get_next_cluster(uint32_t cluster)
+uint32_t fat_get_next_cluster(BlkDev* dev, uint32_t cluster)
 {
     uint32_t fat_offset = cluster * 4;
     uint32_t fat_sector = g_volume.fat_start + (fat_offset / 512);
@@ -50,7 +50,8 @@ uint32_t fat_get_next_cluster(uint32_t cluster)
     
     uint8_t sector_buffer[512];
     //read28(fat_sector, 0, sector_buffer, 512);
-    
+	dev->ops->read_blocks(dev, fat_sector, sector_buffer, 512);
+
     uint32_t next = *(uint32_t*)(sector_buffer + entry_offset) & 0x0FFFFFFF;
     return next;
 }
@@ -62,7 +63,9 @@ int fat32_open(VFSNode* node)
 
 int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 {
-	FATDirectoryEntry* dir_entry = node->fs_object;
+	FAT32Node* fat32node = node->fs_object;
+	FATDirectoryEntry* dir_entry = fat32node->entry;
+	
 	uint32_t dir_entry_sector_size = (dir_entry->size + 511) / 512;
 	uint32_t current_cluster = fat_dir_entry_to_cluster(dir_entry);
 	uint32_t sector_offset = offset / 512;
@@ -79,12 +82,13 @@ int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 
 		uint32_t sector = cluster_to_lba(current_cluster) + sectors_current_cluster;
 		//read28(sector, sector_offset_start, sector_buffer, bytes_to_read);
+		fat32node->blkdev->ops->read_blocks(fat32node->blkdev, sector, sector_buffer, bytes_read);
 		memcpy(buffer + bytes_read, sector_buffer, bytes_to_read);
 		memset(sector_buffer, 0, 512);
 
 		if(sectors_current_cluster >= g_volume.sectors_per_cluster)
 		{
-			current_cluster = fat_get_next_cluster(current_cluster);
+			current_cluster = fat_get_next_cluster(fat32node->blkdev, current_cluster);
 			sectors_current_cluster = 0;
 		}
 
@@ -109,6 +113,7 @@ int fat32_close(VFSNode* node)
 
 uint32_t fat32_get_size(VFSNode* node)
 {
-	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) node->fs_object;
+	FAT32Node* fat32node = node->fs_object;
+	FATDirectoryEntry* dir_entry = fat32node->entry;
 	return dir_entry->size;
 }

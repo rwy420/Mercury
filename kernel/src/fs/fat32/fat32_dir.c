@@ -12,7 +12,9 @@ extern VFSNodeOps g_fat32_ops;
 
 VFSNode* fat32_lookup(VFSNode* dir, const char* n/*name*/)
 {
-	FATDirectoryEntry* dir_entry = (FATDirectoryEntry*) dir->fs_object;
+	FAT32Node* fat32node = dir->fs_object;
+	FATDirectoryEntry* dir_entry = fat32node->entry;
+	
 	VFSNode* result = 0;
 	FATDirectoryEntry* result_entry = kmalloc(sizeof(FATDirectoryEntry));
 	uint8_t* cluster_buffer = kmalloc(g_volume.sectors_per_cluster * 512);
@@ -22,7 +24,9 @@ VFSNode* fat32_lookup(VFSNode* dir, const char* n/*name*/)
 	memcpy(name, n, strlen(n) + 1); // Create copy of n and include null terminator
 	to_uppercase(name, strlen(n));
 
-	//read28(cluster_to_lba(fat_dir_entry_to_cluster(dir_entry)), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
+	//read28(cluster_t_lba(fat_dir_entry_to_cluster(dir_entry)), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
+	fat32node->blkdev->ops->read_blocks(fat32node->blkdev, fat_dir_entry_to_cluster(dir_entry),
+			cluster_buffer, g_volume.sectors_per_cluster * 512);
 
 	for(int i = 0; i < (g_volume.sectors_per_cluster * 512) / sizeof(FATDirectoryEntry); i++)
 	{
@@ -40,7 +44,12 @@ VFSNode* fat32_lookup(VFSNode* dir, const char* n/*name*/)
 		{
 			result = kmalloc(sizeof(VFSNode));
 			memcpy(result_entry, entry, sizeof(FATDirectoryEntry));
-			result->fs_object = result_entry;
+			
+			FAT32Node* fat32node_res = kmalloc(sizeof(FAT32Node));
+			fat32node_res->blkdev = fat32node->blkdev;
+			fat32node_res->entry = result_entry;
+
+			result->fs_object = fat32node_res;
 			result->ops = &g_fat32_ops;
 			result->mounted = 0;
 			result->type = 0;

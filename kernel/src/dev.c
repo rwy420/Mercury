@@ -6,7 +6,7 @@ int drive_num;
 
 int device_register(Device *device)
 {
-	if(!device || !device->ops) return -1;
+	if(!device) return -1;
 
 	g_devices[device_num] = device;
 

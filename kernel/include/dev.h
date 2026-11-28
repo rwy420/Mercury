@@ -15,7 +15,6 @@ typedef struct
 {
 	char name[16];
 	uint32_t attributes;
-	void* ops;
 	void* data;
 } Device;
 

@@ -1,6 +1,7 @@
 #ifndef __MERCURY__FS__FAT32__FAT32_H
 #define __MERCURY__FS__FAT32__FAT32_H
 
+#include <blkdev.h>
 #include <fs/fat/fat.h>
 #include <fs/disk.h>
 #include <fs/fat/bpb.h>
@@ -21,10 +22,11 @@ typedef struct
 typedef struct
 {
 	FATDirectoryEntry* entry;
-} FAT32File;
+	BlkDev* blkdev;
+} FAT32Node;
 
 VFSNode* fat32_mount(BPB* bpb, EBPB_FAT32* ebpb, PartitionTableEntry* partition);
-uint32_t fat_get_next_cluster(uint32_t cluster);
+uint32_t fat_get_next_cluster(BlkDev* dev, uint32_t cluster);
 
 int fat32_open(VFSNode* node);
 int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length);

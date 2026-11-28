@@ -31,7 +31,7 @@ int read_mbr(BlkDev* dev)
 		if(entry->type == 0x0C)
 		{
 			BPB* bpb_buffer = kmalloc(512);
-			int fat_type = 0;//fat_read_bpb(bpb_buffer, entry);
+			int fat_type = fat_read_bpb(dev, bpb_buffer, entry);
 
 			switch(fat_type)
 			{
