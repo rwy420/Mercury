@@ -91,7 +91,8 @@ register_disk:
 
 		blkdev->data = ata;
 
-		read_partition_table(blkdev);
+		read_partition_table(blkdev); //TODO create blkdevs for each partition
+		device_register(dev);
 
 		return;
 }

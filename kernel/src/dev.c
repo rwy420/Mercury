@@ -7,6 +7,7 @@ int drive_num;
 int device_register(Device *device)
 {
 	if(!device) return -1;
+	if(device_num > MAX_DEV_NUM - 1) return -1;
 
 	g_devices[device_num] = device;
 
