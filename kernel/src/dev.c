@@ -18,5 +18,5 @@ void gen_drive_name(char* name)
 	name[0] = 's';
 	name[1] = 'd';
 	name[2] = 'a' + drive_num++;
-	name[3] = '\n';
+	name[3] = '\0';
 }
