@@ -33,7 +33,6 @@
 extern uint8_t ld_kernel_start;
 extern uint8_t ld_kernel_end;
 
-extern Disk* g_default_disk;
 extern uint32_t g_ms_since_init;
 
 uint32_t kernel_start_address;
@@ -137,8 +136,7 @@ void kthread_init()
 
 	vfs_init();
 	//load_initrd();
-	if(!read_mbr()) panic("Could not read the MBR", 0);
-	
+
 	uint8_t ps2_keyboard = create_driver("PS2-KB", KEYBOARD, 0, ps2_kb_enable, ps2_kb_disable, 0);
 	enable_all_drivers();
 
@@ -149,7 +147,7 @@ void kthread_init()
 #endif
 
 	//TODO: This should become execve to replace this task by INIT.ELF
-	process_create("/bin/sh", 0, 0);
+	//process_create("/bin/sh", 0, 0);
 
 	while(1);
 }

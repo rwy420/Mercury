@@ -49,7 +49,7 @@ uint32_t fat_get_next_cluster(uint32_t cluster)
     uint32_t entry_offset = fat_offset % 512;
     
     uint8_t sector_buffer[512];
-    read28(fat_sector, 0, sector_buffer, 512);
+    //read28(fat_sector, 0, sector_buffer, 512);
     
     uint32_t next = *(uint32_t*)(sector_buffer + entry_offset) & 0x0FFFFFFF;
     return next;
@@ -78,7 +78,7 @@ int fat32_read(VFSNode* node, void* buffer, uint32_t offset, size_t length)
 		if(bytes_to_read > length) bytes_to_read = length;
 
 		uint32_t sector = cluster_to_lba(current_cluster) + sectors_current_cluster;
-		read28(sector, sector_offset_start, sector_buffer, bytes_to_read);
+		//read28(sector, sector_offset_start, sector_buffer, bytes_to_read);
 		memcpy(buffer + bytes_read, sector_buffer, bytes_to_read);
 		memset(sector_buffer, 0, 512);
 

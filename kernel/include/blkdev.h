@@ -3,21 +3,24 @@
 
 #include <types.h>
 
-typedef struct
-{
-	int (*read_blocks)(uint32_t dev, uint32_t lba, void* buffer, size_t size);
-	int (*write_blocks)(uint32_t dev, uint32_t lba, void* buffer, size_t size);
-} BlkDevOps;
+struct BlkDevOps;
 
 typedef struct BlkDev
 {
 	uint32_t block_size;
 	uint64_t block_count;
 	uint32_t flags;
-	BlkDevOps* ops;
 	struct BlkDev* parent;
+	struct BlkDevOps* ops;
 	uint64_t start_lba;
 	void* data;
 } BlkDev;
+
+typedef struct BlkDevOps
+{
+	int (*read_blocks)(BlkDev* dev, uint32_t lba, void* buffer, size_t size);
+	int (*write_blocks)(BlkDev* dev, uint32_t lba, void* buffer, size_t size);
+	int (*flush)(BlkDev* dev);
+} BlkDevOps;
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef __MERCURY__FS__DISK_H
 #define __MERCURY__FS__DISK_H
 
+#include <blkdev.h>
 #include <types.h>
 
 typedef struct
@@ -22,6 +23,7 @@ typedef struct
 	uint16_t signature;
 } __attribute__((packed)) MBR;
 
-int read_mbr();
+int read_partition_table(BlkDev* dev);
+int read_mbr(BlkDev* dev);
 
 #endif

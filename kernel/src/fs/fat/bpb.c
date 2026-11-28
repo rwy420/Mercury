@@ -8,7 +8,7 @@
 int fat_read_bpb(BPB* bpb_buffer, PartitionTableEntry* partition)
 {
 	uint8_t* buffer = kmalloc(512);
-	read28(partition->lba_start, 0, (uint8_t*) buffer, 512);
+	//read28(partition->lba_start, 0, (uint8_t*) buffer, 512);
 	memcpy(bpb_buffer, buffer, 512);
 	kfree(buffer);
 

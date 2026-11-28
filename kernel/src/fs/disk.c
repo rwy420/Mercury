@@ -6,10 +6,15 @@
 #include <memory/heap.h>
 #include <printf.h>
 
-int read_mbr()
+int read_partition_table(BlkDev* dev)
+{
+	return read_mbr(dev);
+}
+
+int read_mbr(BlkDev* dev)
 {
 	uint8_t* mbr_buffer = kmalloc(512);
-	read28(0, 0, mbr_buffer, 512);
+	dev->ops->read_blocks(dev, 0, mbr_buffer, 512);
 
 	MBR* mbr = (MBR*) mbr_buffer;
 
@@ -26,7 +31,7 @@ int read_mbr()
 		if(entry->type == 0x0C)
 		{
 			BPB* bpb_buffer = kmalloc(512);
-			int fat_type = fat_read_bpb(bpb_buffer, entry);
+			int fat_type = 0;//fat_read_bpb(bpb_buffer, entry);
 
 			switch(fat_type)
 			{

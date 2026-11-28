@@ -22,7 +22,7 @@ VFSNode* fat32_lookup(VFSNode* dir, const char* n/*name*/)
 	memcpy(name, n, strlen(n) + 1); // Create copy of n and include null terminator
 	to_uppercase(name, strlen(n));
 
-	read28(cluster_to_lba(fat_dir_entry_to_cluster(dir_entry)), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
+	//read28(cluster_to_lba(fat_dir_entry_to_cluster(dir_entry)), 0, cluster_buffer, g_volume.sectors_per_cluster * 512);
 
 	for(int i = 0; i < (g_volume.sectors_per_cluster * 512) / sizeof(FATDirectoryEntry); i++)
 	{
