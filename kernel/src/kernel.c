@@ -28,7 +28,6 @@
 #include <fs/initrd.h>
 #include <printf.h>
 
-#define ATA
 #define STARTTEXT
 
 extern uint8_t ld_kernel_start;
@@ -108,22 +107,6 @@ void v_kernel_start()
 	register_interrupt_handler(0x0D, (isr_t) handle_general_protection_fault);
 	register_interrupt_handler(0x0E, (isr_t) handle_page_fault);
 	register_interrupt_handler(0x80, (isr_t) syscall);
-
-#ifdef ATA
-	Disk ata0m = init_disk(0x1F0, 1);
-	if(identify_disk(&ata0m))
-	{
-		kprintf("<Mercury> Selected ata0m as default disk\n");
-		g_default_disk = &ata0m;
-	}
-
-	Disk ata0s = init_disk(0x1F0, 0);
-	if(identify_disk(&ata0s))
-	{
-		kprintf("<Mercury> Selected ata0s as default disk\n");
-		g_default_disk = &ata0s;
-	}
-#endif
 
 	kernel_start_address = (uint32_t) &ld_kernel_start;
 	kernel_end_address = (uint32_t) &ld_kernel_end;

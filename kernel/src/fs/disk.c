@@ -13,7 +13,7 @@ int read_mbr()
 
 	MBR* mbr = (MBR*) mbr_buffer;
 
-	if(mbr->signature != 0xAA55) return false;
+	if(mbr->signature != 0xAA55) return 0;
 
 	for(uint8_t i = 0; i < 3; i++) 
 	{
@@ -45,5 +45,5 @@ int read_mbr()
 		}
 	}
 
-	return true;
+	return 1;
 }

@@ -1,3 +1,4 @@
+#include <driver/ata/ata.h>
 #include <hardware/pci.h>
 #include <driver/driver.h>
 #include <memory/common.h>
@@ -53,6 +54,7 @@ void init_devices()
 	}
 
 	pci_init_devices();
+	ata_probe();
 }
 
 void enable_driver(uint8_t id)
