@@ -5,5 +5,6 @@
 #include <fs/vfs/vfs.h>
 
 VFSNode* fat32_lookup(VFSNode* dir, const char* name);
+VFSNode** fat32_read_dir(VFSNode* node);
 
 #endif

@@ -22,6 +22,7 @@ typedef struct VFSNodeOps
 	int (*write)(VFSNode* node, void* buffer, size_t size, size_t offset);
 	int (*close)(VFSNode* node);
 	uint32_t (*get_size)(VFSNode* node);
+	VFSNode** (*read_dir)(VFSNode* node);
 } VFSNodeOps;
 
 typedef struct

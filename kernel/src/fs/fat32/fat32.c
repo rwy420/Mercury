@@ -13,7 +13,8 @@ VFSNodeOps g_fat32_ops =
 	.read = fat32_read,
 	.write = fat32_write,
 	.close = fat32_close,
-	.get_size = fat32_get_size
+	.get_size = fat32_get_size,
+	.read_dir = fat32_read_dir
 };
 
 FAT32Volume g_volume;

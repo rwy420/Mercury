@@ -61,3 +61,8 @@ VFSNode* fat32_lookup(VFSNode* dir, const char* n/*name*/)
 
 	return result;
 }
+
+VFSNode** fat32_read_dir(VFSNode* node)
+{
+	return 0;
+}
