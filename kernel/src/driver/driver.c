@@ -1,28 +1,28 @@
+#include <hardware/pci.h>
 #include <driver/driver.h>
 #include <memory/common.h>
 #include <memory/heap.h>
 #include <printf.h>
 
-Driver drivers[0x40];
-uint8_t driver_index;
+Driver drivers[MAX_DRIVER_NUM];
+uint8_t num_drivers;
 
 void* default_net_interface;
 
 uint8_t create_driver(const char* name, DRIVER_TYPE type, void* init_handle, void* enable_handle, void* disbale_handle, DeviceDescriptor* device_descriptor)
 {
-	Driver* driver = &drivers[driver_index];
-	driver_index++;
+	Driver* driver = &drivers[num_drivers];
 
 	driver->name = name;
 	driver->type = type;
-	driver->id = driver_index - 1;
+	driver->id = num_drivers;
 	driver->device_descriptor = device_descriptor;
 	driver->init_handle = init_handle;
 	driver->enable_handler = enable_handle;
 	driver->disbale_handler = disbale_handle;
 	driver->enabled = 0;	
 
-	if(init_handle) driver->init_handle(driver);
+	num_drivers++;
 
 	return driver->id;
 }
@@ -38,10 +38,21 @@ void* get_interface(uint8_t driver)
 
 void enable_all_drivers()
 {
-	for(int i = 0; i < driver_index; i++)
+	for(int i = 0; i < num_drivers; i++)
 	{
 		enable_driver(i);
 	}
+}
+
+void init_devices()
+{
+	for(int i = 0; i < num_drivers; i++)
+	{
+		Driver* driver = &drivers[i];
+		if(driver->init_handle) driver->init_handle(driver);
+	}
+
+	pci_init_devices();
 }
 
 void enable_driver(uint8_t id)
@@ -49,31 +60,17 @@ void enable_driver(uint8_t id)
 	Driver* driver = &drivers[id];
 
 	driver->enabled = 1;
-	driver->enable_handler();
+	if(driver->enable_handler) driver->enable_handler();
 
 	kprintf("<Mercury> Driver '%s' enabled\n", driver->name);
 
-	if(driver->type == ETHERNET && ((EthernetInterface*)(driver->driver_interface))->send)
-	{
-		default_net_interface = driver->driver_interface;
-		kprintf("<Mercury> Selected '%s' as default ethernet driver\n", driver->name);
-	}
 }
 
 void disbale_driver(uint8_t id)
 {
 	Driver* driver = &drivers[id];
 	driver->enabled = 0;
-	driver->disbale_handler();
+	if(driver->disbale_handler) driver->disbale_handler();
 
 	kprintf("<Mercury> Driver '%s' disabled \n", driver->name);
-}
-
-void net_send(char* buffer, size_t size)
-{
-	if(default_net_interface)
-	{
-		EthernetInterface* interface = (EthernetInterface*) default_net_interface;
-		interface->send(buffer, size);
-	}
 }

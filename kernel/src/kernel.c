@@ -149,8 +149,8 @@ void kthread_init()
 	kprintf("<PCI> Enumerating PCI devices\n");
 	pci_enumerate_devices();
 
-	kprintf("<PCI> Initializing PCI devices\n");
-	pci_init_devices();
+	kprintf("<PCI> Initializing devices\n");
+	init_devices();
 
 	vfs_init();
 	//load_initrd();
