@@ -19,5 +19,6 @@ typedef struct
 } Device;
 
 int device_register(Device* device);
+void gen_drive_name(char* name);
 
 #endif
